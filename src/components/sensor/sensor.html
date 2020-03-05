@@ -1,0 +1,39 @@
+<v-container>
+    <v-card class="mx-auto" max-width="400" tile>
+        <v-list flat>
+            <v-layout>
+                <v-flex xs10>
+                    <div class="text-center primary--text">
+                        {{spot.id}}
+                    </div>
+                </v-flex>
+                <v-flex xs2>
+                    <v-icon @click="closeIt">mdi-close</v-icon>
+                </v-flex>
+            </v-layout>
+            <v-list-item-group color="primary" class="list-container">
+                <v-list-item>
+                    <v-flex xs6>PM1</v-flex>
+                    <v-flex xs6>{{formatNumber(spot.pm1)}} μg/m³ </v-flex>
+                </v-list-item>
+                <v-list-item>
+                    <v-flex xs6>PM2.5</v-flex>
+                    <v-flex xs6>{{formatNumber(spot.pm2_5)}} μg/m³ </v-flex>
+                </v-list-item>
+                <v-list-item>
+                    <v-flex xs6>PM10</v-flex>
+                    <v-flex xs6>{{formatNumber(spot.pm10)}} μg/m³ </v-flex>
+                </v-list-item>
+                <v-list-item>
+                    <v-flex xs6>Humidity</v-flex>
+                    <v-flex xs6>{{formatNumber(spot.humidity)}} °C</v-flex>
+                </v-list-item>
+                <v-list-item>
+                    <v-flex xs6>Temperature</v-flex>
+                    <v-flex xs6>{{formatNumber(spot.temperature)}} %</v-flex>
+                </v-list-item>
+            </v-list-item-group>
+        </v-list>
+        <div class="caption text-center">Last Updated : {{spot.dateTime}} UTC</div>
+    </v-card>
+</v-container>

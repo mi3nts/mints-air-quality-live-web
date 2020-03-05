@@ -1,0 +1,79 @@
+<div class="home fill-height">
+    <div id="map" class="fill-height"></div>
+    <div class="side-drawer">
+        <div class="text-center">
+            <v-btn @click="howToUse=true;" class="ma-2" tile outlined color="primary">
+                <v-icon left>mdi-help</v-icon> How To Use
+            </v-btn>
+        </div>
+        
+        <v-expansion-panels style="width:300px" v-model="panels" multiple accordion>
+            <v-expansion-panel>
+                <v-expansion-panel-header color="primary">Layers</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="radarLayer" label="Radar"></v-checkbox>
+                        <v-checkbox v-if="windControl" class="my-0" hide-labels hide-details color="primary" v-model="windLayer" label="Wind"></v-checkbox>
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>Sensor Data</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        <v-radio-group hide-details v-model="pmType" class="my-0">
+                            <v-radio color="primary" label="PM1" value="pm1"></v-radio>
+                            <v-radio color="primary" label="PM2.5" value="pm2_5"></v-radio>
+                            <v-radio color="primary" label="PM10" value="pm10"></v-radio>
+                        </v-radio-group>
+                        <div class="scale">
+                            <img src="/img/newcolorscale.png" />
+                        </div>
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>Purple Air</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        Coming soon...
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>NOAA</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        Coming soon...
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+        </v-expansion-panels>
+
+    </div>
+    <div v-if="selectedSensor" class="side-window">
+        <Sensor :spot="selectedSensor" @close="selectedSensor=null" />
+    </div>
+    <v-dialog v-model="howToUse" max-width="50%">
+        <v-card>
+            <v-card-title class="headline">Instructions</v-card-title>
+
+            <v-card-text>
+                <ul>
+                    <li>Single Click a Map Marker to view the Real Time Sensor Information</li>
+                    <br />
+                    <li>Use left side "Layers" options to add different layers like Wind or Radar</li>
+                    <!-- <li>Double Click a Map Marker to view the Historical Time Sensor Information</li> -->
+                    <br />
+                    <li>Use The Top Right Button to change map styles</li>
+                    <br />
+                </ul>
+            </v-card-text>
+
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary darken-1" text @click="howToUse = false">Close</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+</div>
