@@ -110,7 +110,8 @@ export default {
                     layers: 'nexrad-n0r',
                     format: 'image/png',
                     transparent: true,
-                    attribution: "Weather data &copy; 2015 IEM Nexrad"
+                    attribution: "Weather data &copy; 2015 IEM Nexrad",
+                    zIndex: 1000
                 }
             );
 
