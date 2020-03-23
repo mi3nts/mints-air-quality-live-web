@@ -1,4 +1,18 @@
 .list-container {
-    max-height: 75vh;
-    overflow: auto;
-  }
+  padding-left: 15px;
+  padding-right: 15px;
+  font-size: 14px;  
+  
+}
+.mx-auto{
+  border-radius: 25px;
+  width: 317px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
+
+#title {
+text-align: center;
+font-weight: bold;
+font-size: 14px;
+}
