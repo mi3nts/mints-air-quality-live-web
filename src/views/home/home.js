@@ -214,12 +214,12 @@ export default {
             });
         },
         getMarkerColor(sensor) {
-            var PM = Number(sensor[this.pmType]);
-            if(PM >= 0   && PM <=5)   return "#ffff66";
-            else if(PM >  5   && PM <=10)  return "#ff6600";
-            else if(PM > 10   && PM <=15)  return "#cc0000";
-            else if(PM > 15   && PM <=20)  return "#990099";
-            else if(PM > 20) return "#732626";
+            var PM = Number(sensor[this.pmType]);                        
+                 if(PM >= 0    && PM <=25)   return "#ffff66";
+            else if(PM > 25    && PM <=50)   return "#ff6600";
+            else if(PM > 50    && PM <=100)  return "#cc0000";
+            else if(PM > 100   && PM <=150)  return "#990099";
+            else if(PM > 150)                return "#732626";
         },
         getSVGMarker(color) {
             var svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30pt" height="32pt" viewBox="0 0 30 32" version="1.1">

@@ -7,33 +7,29 @@
                         {{spot.id}}
                     </div>
                 </v-flex>
-                <v-flex xs2>
                     <v-icon @click="closeIt">mdi-close</v-icon>
-                </v-flex>
             </v-layout>
-            <v-list-item-group color="primary" class="list-container">
-                <v-list-item>
-                    <v-flex xs6>PM1</v-flex>
-                    <v-flex xs6>{{formatNumber(spot.pm1)}} μg/m³ </v-flex>
-                </v-list-item>
-                <v-list-item>
-                    <v-flex xs6>PM2.5</v-flex>
-                    <v-flex xs6>{{formatNumber(spot.pm2_5)}} μg/m³ </v-flex>
-                </v-list-item>
-                <v-list-item>
-                    <v-flex xs6>PM10</v-flex>
-                    <v-flex xs6>{{formatNumber(spot.pm10)}} μg/m³ </v-flex>
-                </v-list-item>
-                <v-list-item>
-                    <v-flex xs6>Humidity</v-flex>
-                    <v-flex xs6>{{formatNumber(spot.humidity)}} °C</v-flex>
-                </v-list-item>
-                <v-list-item>
-                    <v-flex xs6>Temperature</v-flex>
-                    <v-flex xs6>{{formatNumber(spot.temperature)}} %</v-flex>
-                </v-list-item>
-            </v-list-item-group>
+            <div class="list-container">
+                <p id ="title">Current Senser Data</p>
+                <ul>
+                   <p><li>PM1:
+                    {{formatNumber(spot.pm1)}} Micrograms Per Cubic Meter</li></p>
+                
+                    <p><li>PM2.5:
+                    {{formatNumber(spot.pm2_5)}} Micrograms Per Cubic Meter </li></p>
+                
+                    <p><li>PM10:
+                    {{formatNumber(spot.pm10)}} Micrograms Per Cubic Meter </li></p>
+               
+                    <p><li>Temperature:
+                    {{formatNumber(spot.temperature)}} Degree Celcius</li></p>
+                
+                    <p><li>Humidity:
+                    {{formatNumber(spot.humidity)}}% </li></p>
+                
+                </ul>
+                </div>
         </v-list>
-        <div class="caption text-center">Last Updated : {{spot.timestamp}} UTC</div>
+        <div class="caption text-right">Last Updated : {{spot.timestamp}} UTC</div>
     </v-card>
 </v-container>
