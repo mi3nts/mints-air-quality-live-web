@@ -182,32 +182,57 @@ export default {
                 response.data.forEach(s => {
                     sensorData.getSensorData(s).then(sensorResponse => {
                         sensorResponse.data.id = s;
-                        this.sensors.push(sensorResponse.data[0]);
+                       this.sensors.push(sensorResponse.data[0]);
                         this.renderSensor(sensorResponse.data[0]);
                     });
                 });
             });
         },
+
+        // single click pop up information
         renderSensor: function (sensor) {
+            let PopupString = "<div style='font-size:14px'><div style='text-align:center; font-weight:bold'>" + "Current Sensor Data </div><br>";
+    if(!isNaN(parseFloat(sensor.pm1)) && parseFloat(sensor.pm1) !== 0)
+      PopupString += "<li>PM1: " + parseFloat(sensor.pm1).toFixed(2) + " Micrograms Per Cubic Meter</li><br>";
+    if(!isNaN(parseFloat(sensor.pm2_5)) && parseFloat(sensor.pm2_5) !== 0)
+      PopupString += "<li>PM2.5: " + parseFloat(sensor.pm2_5).toFixed(2) + " Micrograms Per Cubic Meter</li><br>" ;
+    if(!isNaN(parseFloat(sensor.pm4)) && parseFloat(sensor.pm4) !== 0)
+      PopupString += "<li>PM4: " + parseFloat(sensor.pm4).toFixed(2) + " Micrograms Per Cubic Meter</li><br>" ;
+    if(!isNaN(parseFloat(sensor.pm10))&& parseFloat(sensor.pm10) !== 0)    
+      PopupString += "<li>PM10: " + parseFloat(sensor.pm10).toFixed(2) + " Micrograms Per Cubic Meter</li><br>" ;
+    if(!isNaN(parseFloat(sensor.temperature))&& parseFloat(sensor.temperature) !== 0)
+      PopupString += "<li>Temperature: " + parseFloat(sensor.temperature).toFixed(2) + " Celcius</li><br>" ;
+    if(!isNaN(parseFloat(sensor.humidity))&& parseFloat(sensor.humidity) !== 0)
+      PopupString += "<li>Humidity: " + parseFloat(sensor.humidity).toFixed(2) + "%</li><br>" ;
+    if(!isNaN(parseFloat(sensor.dewpoint))&& parseFloat(sensor.dewpoint) !== 0)
+      PopupString += "<li>DewPoint: " + parseFloat(sensor.dewpoint).toFixed(2) + "%</li></div><br>" 
+    if(!isNaN(parseFloat(sensor.timestamp)))
+      PopupString += "<div style='text-align:right; font-size: 11px'>Last Updated: " + sensor.timestamp + " UTC</div>";
+
             sensor.marker = L.marker([sensor.latitude, sensor.longitude], {
                 icon: this.buildMarkerIcon(sensor)
             });
+
+            //handles click event for single click events
             sensor.marker.addTo(this.map);
             sensor.marker.on('click', () => {
                 this.selectedSensor = sensor;
-            });
+            }).bindPopup (PopupString);
+            this.markers.push(sensor);
         },
+        
         buildMarkerIcon: function (sensor) {
             /** If you change SCG marker,
              *  you need to fine tune  iconAnchor, iconSize & popupAnchor as well*/
             return L.divIcon({
                 className: 'svg-icon',
                 html: this.getSVGMarker(this.getMarkerColor(sensor)),
-                iconAnchor: [20, 45],
-                iconSize: [30, 32],
+                iconAnchor: [20, 10],
+                iconSize: [20, 32],
                 popupAnchor: [0, -30]
             })
         },
+        
         refreshIcons() {
             this.sensors.forEach(sensor => {
                 sensor.marker.setIcon(this.buildMarkerIcon(sensor));
