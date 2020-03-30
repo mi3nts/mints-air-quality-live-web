@@ -1,5 +1,7 @@
 import Sensor from "@/components/sensor";
 import sensorData from "../../services/sensor-data";
+import purpleAirData from "../../services/purpleair-data";
+import openAqData from "../../services/openaq-data";
 
 /**
  * Main landing page with all map functionality
@@ -54,7 +56,13 @@ export default {
         }
     },
     created: function () {
+        purpleAirData.getSensorData(purpleAirData.sensors.join("|")).then(response => {
+            console.log("Purple Air Data", response.data);
+        });
 
+        openAqData.getLatestCityData().then(response => {
+            console.log("Open AQ Data", response.data);
+        });
     },
     mounted: function () {
         /** Let's first build the layers. Notice that map is not ready yet.
@@ -208,9 +216,11 @@ export default {
       PopupString += "<li>DewPoint: " + parseFloat(sensor.dewpoint).toFixed(2) + "%</li></div><br>" 
     if(!isNaN(parseFloat(sensor.timestamp)))
       PopupString += "<div style='text-align:right; font-size: 11px'>Last Updated: " + sensor.timestamp + " UTC</div>";
-
-            sensor.marker = L.marker([sensor.latitude, sensor.longitude], {
-                icon: this.buildMarkerIcon(sensor)
+          
+            sensor.marker = L.circleMarker([sensor.latitude, sensor.longitude], {
+                fillColor : this.getMarkerColor(sensor),
+                fillOpacity : 0.8,
+                color : "#38b5e6"
             });
 
             //handles click event for single click events
@@ -232,33 +242,19 @@ export default {
                 popupAnchor: [0, -30]
             })
         },
-        
+       
         refreshIcons() {
             this.sensors.forEach(sensor => {
-                sensor.marker.setIcon(this.buildMarkerIcon(sensor));
+                sensor.marker.setStyle({fillColor : this.getMarkerColor(sensor)});
             });
         },
         getMarkerColor(sensor) {
-            var PM = Number(sensor[this.pmType]);                        
-                 if(PM >= 0    && PM <=25)   return "#ffff66";
-            else if(PM > 25    && PM <=50)   return "#ff6600";
-            else if(PM > 50    && PM <=100)  return "#cc0000";
-            else if(PM > 100   && PM <=150)  return "#990099";
-            else if(PM > 150)                return "#732626";
-        },
-        getSVGMarker(color) {
-            var svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30pt" height="32pt" viewBox="0 0 30 32" version="1.1">
-            <g id="surface1">
-            <path style="fill-rule:nonzero;fill:${color};fill-opacity:1;stroke-width:1.25;stroke-linecap:round;stroke-linejoin:round;stroke:${color};stroke-opacity:1;stroke-miterlimit:4;" d="M 99.709245 31.002122 C 98.581293 27.183586 96.711674 19.48417 90.716532 19.48417 C 84.72139 19.48417 82.712708 27.168 81.708367 31.002122 L 65.716172 84.726592 C 70.722424 92.410423 110.710639 92.410423 115.624183 84.726592 Z M 99.709245 31.002122 " transform="matrix(0.252809,0,0,0.250628,-7.996443,9.401882)"/>
-            <path style="fill-rule:nonzero;fill:${color};fill-opacity:1;stroke-width:5.46;stroke-linecap:round;stroke-linejoin:round;stroke:${color};stroke-opacity:1;stroke-miterlimit:4;" d="M 98.643098 1.482498 C 98.643098 5.628338 95.274694 8.979298 91.133719 8.979298 C 86.992745 8.979298 83.639792 5.628338 83.639792 1.482498 C 83.639792 -2.663342 86.992745 -6.014302 91.133719 -6.014302 C 95.274694 -6.014302 98.643098 -2.663342 98.643098 1.482498 Z M 98.643098 1.482498 " transform="matrix(0.252809,0,0,0.250628,-7.996443,9.401882)"/>
-            <path style="fill-rule:evenodd;fill:rgb(100%,100%,100%);fill-opacity:1;stroke-width:6.370155;stroke-linecap:round;stroke-linejoin:miter;stroke:${color};stroke-opacity:1;stroke-miterlimit:4;" d="M 105.920706 -10.175728 C 105.920706 -10.175728 109.999875 -5.998716 109.999875 1.934488 M 105.920706 13.98236 C 105.920706 13.98236 109.999875 9.805349 109.999875 1.872145 " transform="matrix(0.252809,0,0,0.250628,-7.996443,9.401882)"/>
-            <path style="fill-rule:evenodd;fill:rgb(100%,100%,100%);fill-opacity:1;stroke-width:6.370155;stroke-linecap:round;stroke-linejoin:miter;stroke:${color};stroke-opacity:1;stroke-miterlimit:4;" d="M 119.811512 -22.254771 C 119.811512 -22.254771 127.954398 -13.916335 127.954398 1.950074 M 119.811512 26.061404 C 119.811512 26.061404 127.954398 17.707381 127.954398 1.856559 " transform="matrix(0.252809,0,0,0.250628,-7.996443,9.401882)"/>
-            <path style="fill-rule:evenodd;fill:rgb(100%,100%,100%);fill-opacity:1;stroke-width:6.370155;stroke-linecap:round;stroke-linejoin:miter;stroke:${color};stroke-opacity:1;stroke-miterlimit:4;" d="M 134.953881 -34.333815 C 134.953881 -34.333815 147.175935 -21.818367 147.175935 1.981246 M 134.953881 38.124862 C 134.953881 38.124862 147.175935 25.625 147.175935 1.825387 " transform="matrix(0.252809,0,0,0.250628,-7.996443,9.401882)"/>
-            <path style="fill-rule:evenodd;fill:rgb(100%,100%,100%);fill-opacity:1;stroke-width:6.370155;stroke-linecap:round;stroke-linejoin:miter;stroke:${color};stroke-opacity:1;stroke-miterlimit:4;" d="M 75.635969 -10.175728 C 75.635969 -10.175728 71.572251 -5.998716 71.572251 1.934488 M 75.635969 13.98236 C 75.635969 13.98236 71.572251 9.805349 71.572251 1.872145 " transform="matrix(0.252809,0,0,0.250628,-7.996443,9.401882)"/>
-            <path style="fill-rule:evenodd;fill:rgb(100%,100%,100%);fill-opacity:1;stroke-width:6.370155;stroke-linecap:round;stroke-linejoin:miter;stroke:${color};stroke-opacity:1;stroke-miterlimit:4;" d="M 62.177802 -22.254771 C 62.177802 -22.254771 54.034916 -13.916335 54.034916 1.950074 M 62.177802 26.061404 C 62.177802 26.061404 54.034916 17.707381 54.034916 1.856559 " transform="matrix(0.252809,0,0,0.250628,-7.996443,9.401882)"/>
-            <path style="fill-rule:evenodd;fill:rgb(100%,100%,100%);fill-opacity:1;stroke-width:6.370155;stroke-linecap:round;stroke-linejoin:miter;stroke:${color};stroke-opacity:1;stroke-miterlimit:4;" d="M 47.019982 -34.333815 C 47.019982 -34.333815 34.813378 -21.818367 34.813378 1.981246 M 47.019982 38.124862 C 47.019982 38.124862 34.813378 25.625 34.813378 1.825387 " transform="matrix(0.252809,0,0,0.250628,-7.996443,9.401882)"/>
-            </g>`;
-            return svg;
+            var PM = Number(sensor[this.pmType]);
+            if (PM >= 0 && PM <= 25) return "#ffff66";
+            else if (PM > 25 && PM <= 50) return "#ff6600";
+            else if (PM > 50 && PM <= 100) return "#cc0000";
+            else if (PM > 100 && PM <= 150) return "#990099";
+            else if (PM > 150) return "#732626";
         }
     }
 };
