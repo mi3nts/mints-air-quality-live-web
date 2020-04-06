@@ -6,32 +6,59 @@
                 <v-icon left>mdi-help</v-icon> How To Use
             </v-btn>
         </div>
-        
-        <v-expansion-panels style="width:275px" v-model="panels" multiple accordion>
+
+        <v-expansion-panels style="width:275px" :value="activePanel" accordion>
             <v-expansion-panel>
-                <v-expansion-panel-header color="primary">Layers</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                    <div>
-                        <v-checkbox class="my-0" hide-details color="primary" v-model="radarLayer" label="Radar"></v-checkbox>
-                        <v-checkbox v-if="windControl" class="my-0" hide-labels hide-details color="primary" v-model="windLayer" label="Wind"></v-checkbox>
+                <v-expansion-panel-header>
+                    <div @click.stop>
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="sensorLayer" label="Sensor Data">
+                        </v-checkbox>
                     </div>
-                </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-                <v-expansion-panel-header>Sensor Data</v-expansion-panel-header>
+                </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <div>
                         <v-radio-group hide-details v-model="pmType" class="my-0">
                             <v-radio color="primary" label="PM2.5" value="pm2_5"></v-radio>
                         </v-radio-group>
                         <div class="scale">
-                            <img src="/img/colorscale1.png"/>
+                            <img src="/img/colorscale1.png" />
                         </div>
                     </div>
                 </v-expansion-panel-content>
             </v-expansion-panel>
             <v-expansion-panel>
-                <v-expansion-panel-header>OpenAQ</v-expansion-panel-header>
+                <v-expansion-panel-header>
+                    <div @click.stop>
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="radarLayer" label="Radar">
+                        </v-checkbox>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        No details..
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div @click.stop>
+                        <v-checkbox :disabled="!windControl" class="my-0" hide-details color="primary"
+                            v-model="windLayer" label="NOAA (Wind)"></v-checkbox>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        No details..
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div @click.stop>
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="openAQLayer" label="OpenAQ">
+                        </v-checkbox>
+                    </div>
+                </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <div>
                         Coming soon...
@@ -39,7 +66,12 @@
                 </v-expansion-panel-content>
             </v-expansion-panel>
             <v-expansion-panel>
-                <v-expansion-panel-header>EPA</v-expansion-panel-header>
+                <v-expansion-panel-header>
+                    <div @click.stop>
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="epaLayer" label="EPA">
+                        </v-checkbox>
+                    </div>
+                </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <div>
                         Coming soon...
@@ -47,7 +79,13 @@
                 </v-expansion-panel-content>
             </v-expansion-panel>
             <v-expansion-panel>
-                <v-expansion-panel-header>PurpleAir</v-expansion-panel-header>
+                <v-expansion-panel-header>
+                    <div @click.stop>
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="purpleAirLayer"
+                            label="PurpleAir">
+                        </v-checkbox>
+                    </div>
+                </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <div>
                         Coming soon...
