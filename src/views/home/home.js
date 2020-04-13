@@ -101,7 +101,10 @@ export default {
             console.log("Open AQ Data", response.data);
         });
 	epaData.getLatestCityData().then(response => {
-	    console.log("Open EPA Data". response.data);
+	    console.log("Open EPA Data", response.data);
+	});
+	epaData.getHistoricalData(startDate, endDate).then(response => {
+	    console.log("Get EPA Historical Data", response.data);
 	});
     },
     mounted: function () {
