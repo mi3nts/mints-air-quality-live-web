@@ -21,5 +21,7 @@ export default new Vue({
         getLatestCityData: function () {
             return this.$axios.get(this.baseUrl + "/?parameters=" + this.bboxRecent);
         },
+	getHistoricalData: function (startDate, endDate) {
+	    return this.$axios.get(this.baseUrl + "/?startDate=" + startDate + "&endDate=" + endDate +"&parameters=" + this.bboxRecent);
     }
 }); 
