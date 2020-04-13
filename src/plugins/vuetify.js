@@ -6,7 +6,7 @@ Vue.use(Vuetify);
 /** http://mcg.mbitson.com/#!?mcgpalette0=%23064a56 */
 export default new Vuetify({
   icons: {
-    iconfont: 'mdi',
+    iconfont: 'md',
   },
   options: {
     customProperties: true

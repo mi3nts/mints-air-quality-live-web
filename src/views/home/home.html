@@ -1,6 +1,9 @@
 <div class="home fill-height">
     <div id="map" class="fill-height"></div>
-    <div class="side-drawer">
+    <div class="side-drawer visible">
+        <div class="menu-container">
+            <v-icon @click="slide">menu</v-icon>
+        </div>
         <div class="text-center">
             <v-btn @click="howToUse=true;" class="ma-2" tile outlined color="primary">
                 <v-icon left>mdi-help</v-icon> How To Use
@@ -42,13 +45,14 @@
             <v-expansion-panel>
                 <v-expansion-panel-header>
                     <div @click.stop>
-                        <v-checkbox :disabled="!windControl" class="my-0" hide-details color="primary"
+                        <v-checkbox :disabled="!wind.data_time" class="my-0" hide-details color="primary"
                             v-model="windLayer" label="NOAA (Wind)"></v-checkbox>
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <div>
-                        See wind overlay on map...
+                    <div class="body-2">
+                        <div><b class="caption">Data Time: </b>{{wind.data_time? wind.data_time : 'Updating..' }}</div>
+                        <div><b class="caption">Updated Last: </b>{{wind.updated_time? wind.updated_time: 'Updating..'}}</div>
                     </div>
                 </v-expansion-panel-content>
             </v-expansion-panel>
