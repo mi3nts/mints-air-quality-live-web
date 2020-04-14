@@ -2,6 +2,7 @@ import Sensor from "@/components/sensor";
 import sensorData from "../../services/sensor-data";
 import purpleAirData from "../../services/purpleair-data";
 import openAqData from "../../services/openaq-data";
+import epaData from "../../services/epa-data";
 
 /**
  * Main landing page with all map functionality
@@ -98,6 +99,13 @@ export default {
 
         openAqData.getLatestCityData().then(response => {
             console.log("Open AQ Data", response.data);
+        });
+      
+        epaData.getLatestCityData().then(response => {
+            console.log("Open EPA Data", response.data);
+        });
+        epaData.getHistoricalData(startDate, endDate).then(response => {
+            console.log("Get EPA Historical Data", response.data);
         });
     },
     mounted: function () {
