@@ -21,8 +21,10 @@ export default {
             layerControl: L.control.layers([], []),
             /** All available layer instances */
             layers: {},
-            /** Custom made leaflet control for wind date stamps */
-            windControl: null,
+            wind: {
+                data_time: null,
+                updated_time: null
+            },
             radarLayer: false,
             windLayer: false,
             sensorLayer: true,
@@ -85,10 +87,8 @@ export default {
         'windLayer': function (newValue) {
             if (newValue) {
                 this.layers.wind_layer.addTo(this.map);
-                this.windControl.addTo(this.map);
             } else {
                 this.map.removeLayer(this.layers.wind_layer);
-                this.map.removeControl(this.windControl);
             }
         }
     },
@@ -100,12 +100,13 @@ export default {
         openAqData.getLatestCityData().then(response => {
             console.log("Open AQ Data", response.data);
         });
-	epaData.getLatestCityData().then(response => {
-	    console.log("Open EPA Data", response.data);
-	});
-	epaData.getHistoricalData(startDate, endDate).then(response => {
-	    console.log("Get EPA Historical Data", response.data);
-	});
+      
+        epaData.getLatestCityData().then(response => {
+            console.log("Open EPA Data", response.data);
+        });
+        epaData.getHistoricalData(startDate, endDate).then(response => {
+            console.log("Get EPA Historical Data", response.data);
+        });
     },
     mounted: function () {
         /** Let's first build the layers. Notice that map is not ready yet.
@@ -166,29 +167,8 @@ export default {
                 }
             );
 
-            /** Custom leaflet wind control */
-            this.buildWindControl();
-
             /** Wind Layer */
             this.buildWindLayer('Carto Positron');
-        },
-        buildWindControl: function () {
-            L.Control.WindControl = L.Control.extend({
-                onAdd: function () {
-                    var div = L.DomUtil.create('div');
-                    div.class = "wind-display-control";
-                    div.innerHTML = "<div><b>Wind Data Time</b> : " + this.options.data_time + "</div>";
-                    div.innerHTML += "<div><b>Wind Updated Last</b> : " + this.options.updated_time + "</div>";
-                    div.style.width = '260px';
-                    div.style.background = 'white';
-                    div.style.padding = '5px';
-                    return div;
-                },
-
-                onRemove: function () {
-                    // Nothing to do here
-                }
-            });
         },
         windColorScale: function (layerName) {
             var dark = [
@@ -253,11 +233,8 @@ export default {
                     maxVelocity: 10,
                     colorScale: this.windColorScale(layerName)
                 });
-                this.windControl = new L.Control.WindControl({
-                    position: 'bottomright',
-                    data_time: response.data[0].recorded_time.replace(".000Z", ""),
-                    updated_time: response.data[0].header.refTime.replace(".000Z", "")
-                });
+                this.wind.data_time = response.data[0].recorded_time.replace(".000Z", "");
+                this.wind.updated_time = response.data[0].header.refTime.replace(".000Z", "")
                 if (addWhenready) {
                     this.windLayer = true;
                 }
@@ -316,9 +293,10 @@ export default {
                 PopupString += "<li>DewPoint: " + parseFloat(sensor.dewpoint).toFixed(2) + "%</li></div><br>"
             if (!isNaN(parseFloat(sensor.timestamp)))
                 PopupString += "<div style='text-align:right; font-size: 11px'>Last Updated: " + sensor.timestamp + " UTC</div>";
+            var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(sensor.timestamp))).asMinutes();
 
             sensor.marker = L.circleMarker([sensor.latitude, sensor.longitude], {
-                fillColor: this.getMarkerColor(sensor),
+                fillColor: timeDiffMinutes>5 ? 'grey' :this.getMarkerColor(sensor),
                 fillOpacity: 0.8,
                 color: "#38b5e6"
             });
@@ -356,6 +334,18 @@ export default {
             else if (PM > 50 && PM <= 100) return "#cc0000";
             else if (PM > 100 && PM <= 150) return "#990099";
             else if (PM > 150) return "#732626";
+        },
+        slide() {
+            var hidden = $('.side-drawer');
+            if (hidden.hasClass('visible')) {
+                hidden.animate({
+                    "left": "-286px"
+                }, "slow").removeClass('visible');
+            } else {
+                hidden.animate({
+                    "left": "0px"
+                }, "slow").addClass('visible');
+            }
         }
     }
 };
