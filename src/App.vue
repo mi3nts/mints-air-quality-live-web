@@ -57,6 +57,9 @@ export default {
   data: () => ({
     showAbout: false,
     showPM: false
-  })
+  }),
+  created: function() {
+    window["moment"] = this.$moment;
+  }
 };
 </script>
