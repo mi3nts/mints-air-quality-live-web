@@ -31,6 +31,8 @@ export default {
             epaLayer: false,
             purpleAirLayer: false,
             openAQLayer: false,
+            //startDate: null,
+            //endDate: null,
             /** Popup controls */
             howToUse: false,
             /** Currently selected PM type */
@@ -104,9 +106,10 @@ export default {
         epaData.getLatestCityData().then(response => {
             console.log("Open EPA Data", response.data);
         });
-        epaData.getHistoricalData(startDate, endDate).then(response => {
+        //TODO: Be able to get the user input for startDate and endDate
+        /*epaData.getHistoricalData(startDate, endDate).then(response => {
             console.log("Get EPA Historical Data", response.data);
-        });
+        });*/
     },
     mounted: function () {
         /** Let's first build the layers. Notice that map is not ready yet.
@@ -329,11 +332,11 @@ export default {
         },
         getMarkerColor(sensor) {
             var PM = Number(sensor[this.pmType]);
-            if (PM >= 0 && PM <= 25) return "#ffff66";
-            else if (PM > 25 && PM <= 50) return "#ff6600";
-            else if (PM > 50 && PM <= 100) return "#cc0000";
-            else if (PM > 100 && PM <= 150) return "#990099";
-            else if (PM > 150) return "#732626";
+            if (PM >= 0 && PM <= 10) return "#ffff66";
+            else if (PM > 10 && PM <= 20) return "#ff6600";
+            else if (PM > 20 && PM <= 50) return "#cc0000";
+            else if (PM > 50 && PM <= 100) return "#990099";
+            else if (PM > 100) return "#732626";
         },
         slide() {
             var hidden = $('.side-drawer');
