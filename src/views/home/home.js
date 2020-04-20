@@ -95,14 +95,7 @@ export default {
         }
     },
     created: function () {
-        purpleAirData.getSensorData(purpleAirData.sensors.join("|")).then(response => {
-            console.log("Purple Air Data", response.data);
-        });
 
-        openAqData.getLatestCityData().then(response => {
-            console.log("Open AQ Data", response.data);
-        });
-      
         epaData.getLatestCityData().then(response => {
             console.log("Open EPA Data", response.data);
         });
@@ -121,9 +114,17 @@ export default {
          */
         this.initMap();
         /**
-         * This will load sensor data from remore API
+         * This will load sensor data from remote API
          */
         this.loadData();
+        /**
+         * This will load data from OpenAQ API
+         */
+        this.loadOpenAQ();
+        /**
+         * This will load data from PurpleAir API
+         */
+        this.loadPurpleAir();
     },
     methods: {
         buildLayers: function () {
@@ -265,6 +266,69 @@ export default {
                 }
             });
         },
+        loadPurpleAir: function () {
+            purpleAirData.getSensorData(purpleAirData.sensors.join("|")).then(response => {
+                response.data.results.forEach(result => {
+                    /** They have nested devices. So, let's consider parent only */
+                    if (!result.ParentID) {
+                        this.renderPurpleAir(result);
+                    }
+
+                });
+            });
+        },
+        renderPurpleAir: function (location) {
+            location.marker = L.marker([location.Lat, location.Lon], {
+                icon: L.divIcon({
+                    className: 'svg-icon',
+                    html: this.getTriangleMarker("purple", 20),
+                    iconAnchor: [20, 10],
+                    iconSize: [20, 32],
+                    popupAnchor: [0, -30]
+                })
+            })
+            location.marker.addTo(this.purpleAirGroup);
+            var popup = "<div style='font-size:14px'>";
+            popup += "<div style='text-align:center; font-weight:bold'>" + location.Label + " </div><br>";
+            popup += "<li> PM0.3 : " + location.p_0_3_um + " µg/m³ </li><br>";
+            popup += "<li> PM0.3 : " + location.p_0_5_um + " µg/m³ </li><br>";
+            popup += "<li> PM0.3 : " + location.p_1_0_um + " µg/m³ </li><br>";
+            popup += "<li> PM0.3 : " + location.p_2_5_um + " µg/m³ </li><br>";
+            popup += "<li> PM0.3 : " + location.p_5_0_um + " µg/m³ </li><br>";
+            popup += "<li> PM0.3 : " + location.p_10_0_um + " µg/m³ </li><br>";
+            popup += "<li> Temperature : " + location.temp_f + " °F </li><br>";
+            popup += "<li> Humidity : " + location.humidity + " % </li><br>";
+
+            popup += "</div>";
+            location.marker.bindPopup(popup);
+        },
+        loadOpenAQ: function () {
+            openAqData.getLatestCityData().then(response => {
+                response.data.results.forEach(result => {
+                    this.renderOpenAQ(result);
+                });
+            });
+        },
+        renderOpenAQ: function (location) {
+
+            location.marker = L.marker([location.coordinates.latitude, location.coordinates.longitude], {
+                icon: L.divIcon({
+                    className: 'svg-icon',
+                    html: this.getSquareMarker("green", 20),
+                    iconAnchor: [20, 10],
+                    iconSize: [20, 32],
+                    popupAnchor: [0, -30]
+                })
+            })
+            location.marker.addTo(this.openAQGroup);
+            var popup = "<div style='font-size:14px'>";
+            popup += "<div style='text-align:center; font-weight:bold'>" + location.location + " </div><br>";
+            location.measurements.forEach(m => {
+                popup += "<li>" + m.parameter + ": " + m.value + " " + m.unit + " </li><br>";
+            });
+            popup += "</div>";
+            location.marker.bindPopup(popup);
+        },
         loadData: function () {
             sensorData.getSensors().then(response => {
                 response.data.forEach(s => {
@@ -299,7 +363,7 @@ export default {
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(sensor.timestamp))).asMinutes();
 
             sensor.marker = L.circleMarker([sensor.latitude, sensor.longitude], {
-                fillColor: timeDiffMinutes>5 ? 'grey' :this.getMarkerColor(sensor),
+                fillColor: timeDiffMinutes > 5 ? 'grey' : this.getMarkerColor(sensor),
                 fillOpacity: 0.8,
                 color: "#38b5e6"
             });
@@ -349,6 +413,14 @@ export default {
                     "left": "0px"
                 }, "slow").addClass('visible');
             }
+        },
+        getSquareMarker(color, size) {
+            var svg = `<svg id="Layer_1" enable-background="new 0 0 506.1 506.1" preserveAspectRatio="xMidYMin" height="${size}" viewBox="0 0 506.1 506.1" width="${size}" xmlns="http://www.w3.org/2000/svg"><path style="fill:${color}" d="m489.609 0h-473.118c-9.108 0-16.491 7.383-16.491 16.491v473.118c0 9.107 7.383 16.491 16.491 16.491h473.119c9.107 0 16.49-7.383 16.49-16.491v-473.118c0-9.108-7.383-16.491-16.491-16.491z"/></svg>`;
+            return svg;
+        },
+        getTriangleMarker(color, size) {
+            var svg = `<svg version="1.1" id="Layer_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" preserveAspectRatio="xMidYMin" height="${size}" width="${size}" xml:space="preserve"><g><path style="fill:${color}" d="M507.521,427.394L282.655,52.617c-12.074-20.122-41.237-20.122-53.311,0L4.479,427.394c-12.433,20.72,2.493,47.08,26.655,47.08h449.732C505.029,474.474,519.955,448.114,507.521,427.394z"/></g></svg>`;
+            return svg;
         }
     }
 };
