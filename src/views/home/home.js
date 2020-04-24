@@ -353,7 +353,7 @@ export default {
             if (!isNaN(parseFloat(sensor.pm10)) && parseFloat(sensor.pm10) !== 0)
                 PopupString += "<li>PM10: " + parseFloat(sensor.pm10).toFixed(2) + " Micrograms Per Cubic Meter</li><br>";
             if (!isNaN(parseFloat(sensor.temperature)) && parseFloat(sensor.temperature) !== 0)
-                PopupString += "<li>Temperature: " + parseFloat(sensor.temperature).toFixed(2) + " Celcius</li><br>";
+                PopupString += "<li>Temperature: " + ((parseFloat(sensor.temperature)*9/5)+32).toFixed(2) + " Farenheit</li><br>";
             if (!isNaN(parseFloat(sensor.humidity)) && parseFloat(sensor.humidity) !== 0)
                 PopupString += "<li>Humidity: " + parseFloat(sensor.humidity).toFixed(2) + "%</li><br>";
             if (!isNaN(parseFloat(sensor.dewpoint)) && parseFloat(sensor.dewpoint) !== 0)
