@@ -1,0 +1,26 @@
+<v-container>
+    <v-card class="mx-auto" max-width="400" tile>
+        <v-card-text>
+            <v-layout>
+                <v-flex xs11>
+                    <div class="text-center primary--text">
+                        Past 24 hours ({{spot.sensor_id}})
+                    </div>
+                </v-flex>
+                <v-icon class="ml-auto" @click="closeIt">close</v-icon>
+            </v-layout>
+            <div class='with-3d-shadow with-transitions'>
+                <div id="chart">
+                    <div class="my-4 text-center">Loading data...</div>
+                </div>
+                <h5 class="text-center">PM 2.5 (μg/m³) (1-hour average)</h5>
+                <div class="text-center mt-2">
+                    <a @click="showMore=true">More data</a>
+                </div>
+            </div>
+        </v-card-text>
+    </v-card>
+    <v-dialog v-model="showMore" max-width="90%">
+        <sensor-chart :sensor="spot" @close="showMore=false;"></sensor-chart>
+    </v-dialog>
+</v-container>

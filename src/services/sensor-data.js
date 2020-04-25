@@ -11,10 +11,13 @@ export default new Vue({
     },
     methods: {
         getSensors: function () {
-            return this.$axios.get(this.baseUrl +"/sensor_id_list");
+            return this.$axios.get(this.baseUrl + "/sensor_id_list");
         },
         getSensorData: function (sensorID) {
-            return this.$axios.get(this.baseUrl +"/latest/" + sensorID);
+            return this.$axios.get(this.baseUrl + "/latest/" + sensorID);
+        },
+        getChartData: function (sensorID, range) {
+            return this.$axios.get(this.baseUrl + `/data/${sensorID}/${range.start}/${range.end}`);
         },
         getWindData: function () {
             return this.$axios.get(this.baseUrl + "/wind_data/latest");
