@@ -58,46 +58,46 @@ export default {
                     values: [{}]
                 },
                 //color ranges of µg/m³
-                { //0-25µg/m³ yellow
+                { //0-10µg/m³ yellow
                     key: "0-25µg/m³",
                     values: [{
                             x: val[0].x,
-                            y: 25
+                            y: 10
                         },
                         {
                             x: val[val.length - 1].x,
-                            y: 25
+                            y: 10
                         }
                     ],
                     color: "rgba(255,255,0, 0.7)"
                 },
-                { //25-50µg/m³ orange
+                { //10-20µg/m³ orange
                     key: "25-50µg/m³",
                     values: [{
                             x: val[0].x,
-                            y: 25
+                            y: 10
                         },
                         {
                             x: val[val.length - 1].x,
-                            y: 25
+                            y: 10
                         }
                     ],
                     color: "rgba(255,128,0, 0.7)"
                 },
-                { //50-100µg/m³ red
+                { //20-50µg/m³ red
                     key: "50-100µg/m³",
                     values: [{
                             x: val[0].x,
-                            y: 50
+                            y: 30
                         },
                         {
                             x: val[val.length - 1].x,
-                            y: 50
+                            y: 30
                         }
                     ],
                     color: "rgba(220,0,0, 0.7)"
                 },
-                { //100-150µg/m³ purple
+                { //50-100µg/m³ purple
                     key: "100-150µg/m³",
                     values: [{
                             x: val[0].x,
@@ -110,7 +110,7 @@ export default {
                     ],
                     color: "rgba(76,0,153, 0.7)"
                 },
-                { //150+µg/m³ maroon
+                { //100+µg/m³ maroon
                     key: "150+µg/m³",
                     values: [{
                             x: val[0].x,
@@ -150,14 +150,14 @@ export default {
                     })
                     .showLegend(false)
                     .color(d3.scale.category10().range())
-                    .yDomain1([0, 200]);
+                    .yDomain1([0, 150]);
                 chart.xAxis
                     .tickFormat(function (d) {
                         return d3.time.format('%I:%M%p')(new Date(d))
                     })
                     .staggerLabels(true);
                 chart.yAxis1
-                    .tickValues([25, 50, 100, 150, 200])
+                    .tickValues([10, 20, 50, 100, 150])
                     .tickFormat(function (d) {
                         return d3.format(',.1f')(d) + 'µg/m³'
                     })

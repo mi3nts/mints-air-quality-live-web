@@ -30,6 +30,39 @@ export default {
                 }
             });
         },
+		changeInterval: function (values) {
+			var length = values.length;
+			length = length / 3000;
+			length = Math.round(length);
+			
+			var newValues = [];
+			var temp = [];
+			
+			temp.push({x:values[0].x, y:values[0].y});
+			for(var i = 1; i < values.length; i++){
+				if(temp.length >= length){
+					var average = 0;
+					for(var j = 0; j < temp.length; j++){
+						average += temp[j].y;
+					}
+					average = average / temp.length;
+					newValues.push({x:temp[0].x, y:average});
+					
+					temp = [];
+				}
+				temp.push({x:values[i].x, y:values[i].y});
+			}
+			if(temp.length >= 1){
+				average = 0;
+				for(j = 0; j < temp.length; j++){
+					average += temp[j].y;
+				}
+				average = average / temp.length;
+				newValues.push({x:temp[0].x, y:average});
+			}
+			console.log(newValues);
+			return newValues;
+		},
         createChart: function (data) {
             //formats the data for the chart
             var val = [];
@@ -39,6 +72,9 @@ export default {
                     y: data[i].pm2_5
                 });
             }
+			if(val.length > 3000){
+				val = this.changeInterval(val);
+			}
             var testdata = [
                 //data
                 {
@@ -46,47 +82,47 @@ export default {
                     values: [{}]
                 },
                 //color ranges of µg/m³
-                { //0-25µg/m³ yellow
-                    key: "0-25µg/m³",
+                { //0-10µg/m³ yellow
+                    key: "0-10µg/m³",
                     values: [{
                             x: val[0].x,
-                            y: 25
+                            y: 10
                         },
                         {
                             x: val[val.length - 1].x,
-                            y: 25
+                            y: 10
                         }
                     ],
                     color: '#ffff44'
                 },
-                { //25-50µg/m³ orange
-                    key: "25-50µg/m³",
+                { //10-20/m³ orange
+                    key: "10-20µg/m³",
                     values: [{
                             x: val[0].x,
-                            y: 25
+                            y: 10
                         },
                         {
                             x: val[val.length - 1].x,
-                            y: 25
+                            y: 10
                         }
                     ],
                     color: '#ff5500'
                 },
-                { //50-100µg/m³ red
+                { //20-50µg/m³ red
                     key: "50-100µg/m³",
                     values: [{
                             x: val[0].x,
-                            y: 50
+                            y: 30
                         },
                         {
                             x: val[val.length - 1].x,
-                            y: 50
+                            y: 30
                         }
                     ],
                     color: '#cc0000'
                 },
-                { //100-150µg/m³ purple
-                    key: "100-150µg/m³",
+                { //50-100µg/m³ purple
+                    key: "50-100µg/m³",
                     values: [{
                             x: val[0].x,
                             y: 50
@@ -98,8 +134,8 @@ export default {
                     ],
                     color: '#990099'
                 },
-                { //150+µg/m³ maroon
-                    key: "150+µg/m³",
+                { //100+µg/m³ maroon
+                    key: "100+µg/m³",
                     values: [{
                             x: val[0].x,
                             y: 50
@@ -137,7 +173,7 @@ export default {
                         left: 90
                     })
                     .color(d3.scale.category10().range())
-                    .yDomain1([0, 200]);
+                    .yDomain1([0, 150]);
                 chart.xAxis
                     .tickFormat(function (d) {
                         return d3.time.format('%b %d %I:%M:%S%p')(new Date(d))
