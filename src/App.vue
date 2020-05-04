@@ -29,6 +29,7 @@
 </template>
 
 <style>
+.nvd3 .nv-axis line { stroke: black; opacity: 0.6; }
 .v-overlay {
   z-index: 9999 !important;
 }

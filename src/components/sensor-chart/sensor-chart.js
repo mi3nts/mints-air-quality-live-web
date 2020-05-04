@@ -37,13 +37,15 @@ export default {
 			
 			var newValues = [];
 			var temp = [];
+			var indexJ = 0;
+			var average = 0;
 			
 			temp.push({x:values[0].x, y:values[0].y});
 			for(var i = 1; i < values.length; i++){
 				if(temp.length >= length){
-					var average = 0;
-					for(var j = 0; j < temp.length; j++){
-						average += temp[j].y;
+					average = 0;
+					for(indexJ = 0; indexJ < temp.length; indexJ++){
+						average += temp[indexJ].y;
 					}
 					average = average / temp.length;
 					newValues.push({x:temp[0].x, y:average});
@@ -54,8 +56,8 @@ export default {
 			}
 			if(temp.length >= 1){
 				average = 0;
-				for(j = 0; j < temp.length; j++){
-					average += temp[j].y;
+				for(indexJ = 0; indexJ < temp.length; indexJ++){
+					average += temp[indexJ].y;
 				}
 				average = average / temp.length;
 				newValues.push({x:temp[0].x, y:average});
@@ -65,17 +67,17 @@ export default {
 		},
         createChart: function (data) {
             //formats the data for the chart
-            var val = [];
+            var sensorValues = [];
             for (var i = 0; i < data.length; i++) {
-                val.push({
+                sensorValues.push({
                     x: this.$moment.utc(data[i].timestamp).local().toDate(),
                     y: data[i].pm2_5
                 });
             }
-			if(val.length > 3000){
-				val = this.changeInterval(val);
+			if(sensorValues.length > 3000){
+				sensorValues = this.changeInterval(sensorValues);
 			}
-            var testdata = [
+            var chartData = [
                 //data
                 {
                     key: "PM 2.5",
@@ -85,11 +87,11 @@ export default {
                 { //0-10µg/m³ yellow
                     key: "0-10µg/m³",
                     values: [{
-                            x: val[0].x,
+                            x: sensorValues[0].x,
                             y: 10
                         },
                         {
-                            x: val[val.length - 1].x,
+                            x: sensorValues[sensorValues.length - 1].x,
                             y: 10
                         }
                     ],
@@ -98,11 +100,11 @@ export default {
                 { //10-20/m³ orange
                     key: "10-20µg/m³",
                     values: [{
-                            x: val[0].x,
+                            x: sensorValues[0].x,
                             y: 10
                         },
                         {
-                            x: val[val.length - 1].x,
+                            x: sensorValues[sensorValues.length - 1].x,
                             y: 10
                         }
                     ],
@@ -111,11 +113,11 @@ export default {
                 { //20-50µg/m³ red
                     key: "50-100µg/m³",
                     values: [{
-                            x: val[0].x,
+                            x: sensorValues[0].x,
                             y: 30
                         },
                         {
-                            x: val[val.length - 1].x,
+                            x: sensorValues[sensorValues.length - 1].x,
                             y: 30
                         }
                     ],
@@ -124,11 +126,11 @@ export default {
                 { //50-100µg/m³ purple
                     key: "50-100µg/m³",
                     values: [{
-                            x: val[0].x,
+                            x: sensorValues[0].x,
                             y: 50
                         },
                         {
-                            x: val[val.length - 1].x,
+                            x: sensorValues[sensorValues.length - 1].x,
                             y: 50
                         }
                     ],
@@ -137,11 +139,11 @@ export default {
                 { //100+µg/m³ maroon
                     key: "100+µg/m³",
                     values: [{
-                            x: val[0].x,
+                            x: sensorValues[0].x,
                             y: 50
                         },
                         {
-                            x: val[val.length - 1].x,
+                            x: sensorValues[sensorValues.length - 1].x,
                             y: 50
                         }
                     ],
@@ -150,19 +152,19 @@ export default {
             ];
 
             //sets the chart types among other things
-            testdata[0].type = "line";
-            testdata[0].yAxis = 1;
-            testdata[0].values = val; //sets the data from sensor
-            testdata[1].type = "area";
-            testdata[1].yAxis = 1;
-            testdata[2].type = "area";
-            testdata[2].yAxis = 1;
-            testdata[3].type = "area";
-            testdata[3].yAxis = 1;
-            testdata[4].type = "area";
-            testdata[4].yAxis = 1;
-            testdata[5].type = "area";
-            testdata[5].yAxis = 1;
+            chartData[0].type = "line";
+            chartData[0].yAxis = 1;
+            chartData[0].values = sensorValues; //sets the data from sensor
+            chartData[1].type = "area";
+            chartData[1].yAxis = 1;
+            chartData[2].type = "area";
+            chartData[2].yAxis = 1;
+            chartData[3].type = "area";
+            chartData[3].yAxis = 1;
+            chartData[4].type = "area";
+            chartData[4].yAxis = 1;
+            chartData[5].type = "area";
+            chartData[5].yAxis = 1;
 
             nv.addGraph(function () {
                 var chart = nv.models.multiChart()
@@ -174,6 +176,7 @@ export default {
                     })
                     .color(d3.scale.category10().range())
                     .yDomain1([0, 150]);
+				chart.legend.updateState(false);
                 chart.xAxis
                     .tickFormat(function (d) {
                         return d3.time.format('%b %d %I:%M:%S%p')(new Date(d))
@@ -184,7 +187,7 @@ export default {
                         return d3.format(',.2f')(d) + 'µg/m³'
                     });
                 d3.select('#chart2 svg')
-                    .datum(testdata)
+                    .datum(chartData)
                     .transition()
                     .duration(500)
                     .call(chart);
