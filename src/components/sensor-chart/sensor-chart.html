@@ -1,7 +1,7 @@
 <v-card>
     <v-card-title class="headline">
         <v-layout>
-            <v-flex xs12 class="text-center">Hourly average concentrations of PM2.5 </v-flex>
+            <v-flex xs12 class="text-center">Concentrations of PM2.5 </v-flex>
             <v-flex class="text-right">
                 <v-icon @click="$emit('close')">close</v-icon>
             </v-flex>
@@ -12,10 +12,9 @@
         <div id="chart2">
             <div class="my-4 text-center">Loading data...</div>
         </div>
-        <h3 class="text-center">Timeframe (hourly average)</h3>
-        <p id="para">The graph shows hourly average concentrations of PM2.5 at UT Dallas station.
-            Also displayed are the World Health Organization's Air Quality Guidelines for PM2.5; evidence-based targets
-            for air quality management
+        <h3 class="text-center">Timeframe</h3>
+        <p id="para">The graph shows concentrations of PM2.5 from UT Dallas sensor.
+            Also displayed are evidence-based targets for air quality management
             to protect populations from the adverse health effects of air pollution.</p>
         <h3 class="text-center my-4">Choose any date range</h3>
         <v-layout>
