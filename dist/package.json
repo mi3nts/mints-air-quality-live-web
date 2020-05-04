@@ -1,7 +1,9 @@
 {
   "name": "downwinders",
   "version": "1.0.0",
-  "engines" : { "node" : ">=8.11.1 <10.0.0" } ,
+  "engines": {
+    "node": ">=8.11.1 <10.0.0"
+  },
   "scripts": {
     "start": "node server.js"
   },

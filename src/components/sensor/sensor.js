@@ -44,101 +44,101 @@ export default {
         },
         createChart: function (data) {
             //formats the data for the chart
-            var val = [];
+            var sensorValues = [];
             for (var i = 0; i < data.length; i++) {
-                val.push({
+                sensorValues.push({
                     x: this.$moment.utc(data[i].timestamp).local().toDate(),
                     y: data[i].pm2_5
                 });
             }
-            var testdata = [
+            var chartData = [
                 //data
                 {
                     key: "PM 2.5",
                     values: [{}]
                 },
                 //color ranges of µg/m³
-                { //0-25µg/m³ yellow
-                    key: "0-25µg/m³",
+                { //0-10µg/m³ yellow
+                    key: "0-10µg/m³",
                     values: [{
-                            x: val[0].x,
-                            y: 25
+                            x: sensorValues[0].x,
+                            y: 10
                         },
                         {
-                            x: val[val.length - 1].x,
-                            y: 25
+                            x: sensorValues[sensorValues.length - 1].x,
+                            y: 10
                         }
                     ],
-                    color: "rgba(255,255,0, 0.7)"
+                    color: '#ffff44'
                 },
-                { //25-50µg/m³ orange
-                    key: "25-50µg/m³",
+                { //10-20µg/m³ orange
+                    key: "10-20µg/m³",
                     values: [{
-                            x: val[0].x,
-                            y: 25
+                            x: sensorValues[0].x,
+                            y: 10
                         },
                         {
-                            x: val[val.length - 1].x,
-                            y: 25
+                            x: sensorValues[sensorValues.length - 1].x,
+                            y: 10
                         }
                     ],
-                    color: "rgba(255,128,0, 0.7)"
+                    color: '#ff5500'
                 },
-                { //50-100µg/m³ red
+                { //20-50µg/m³ red
+                    key: "20-50µg/m³",
+                    values: [{
+                            x: sensorValues[0].x,
+                            y: 30
+                        },
+                        {
+                            x: sensorValues[sensorValues.length - 1].x,
+                            y: 30
+                        }
+                    ],
+                    color: '#cc0000'
+                },
+                { //50-100µg/m³ purple
                     key: "50-100µg/m³",
                     values: [{
-                            x: val[0].x,
+                            x: sensorValues[0].x,
                             y: 50
                         },
                         {
-                            x: val[val.length - 1].x,
+                            x: sensorValues[sensorValues.length - 1].x,
                             y: 50
                         }
                     ],
-                    color: "rgba(220,0,0, 0.7)"
+                    color: '#990099'
                 },
-                { //100-150µg/m³ purple
-                    key: "100-150µg/m³",
+                { //100+µg/m³ maroon
+                    key: "100+µg/m³",
                     values: [{
-                            x: val[0].x,
+                            x: sensorValues[0].x,
                             y: 50
                         },
                         {
-                            x: val[val.length - 1].x,
+                            x: sensorValues[sensorValues.length - 1].x,
                             y: 50
                         }
                     ],
-                    color: "rgba(76,0,153, 0.7)"
-                },
-                { //150+µg/m³ maroon
-                    key: "150+µg/m³",
-                    values: [{
-                            x: val[0].x,
-                            y: 50
-                        },
-                        {
-                            x: val[val.length - 1].x,
-                            y: 50
-                        }
-                    ],
-                    color: "rgba(140,22,22, 0.7)"
+                    color: '#aa2626'
                 }
             ];
 
             //sets the chart types among other things
-            testdata[0].type = "line";
-            testdata[0].yAxis = 1;
-            testdata[0].values = val; //sets the data from sensor
-            testdata[1].type = "area";
-            testdata[1].yAxis = 1;
-            testdata[2].type = "area";
-            testdata[2].yAxis = 1;
-            testdata[3].type = "area";
-            testdata[3].yAxis = 1;
-            testdata[4].type = "area";
-            testdata[4].yAxis = 1;
-            testdata[5].type = "area";
-            testdata[5].yAxis = 1;
+            chartData[0].type = "line";
+            chartData[0].yAxis = 1;
+            chartData[0].values = sensorValues; //sets the data from sensor
+            chartData[1].type = "area";
+            chartData[1].yAxis = 1;
+            chartData[2].type = "area";
+            chartData[2].yAxis = 1;
+            chartData[3].type = "area";
+            chartData[3].yAxis = 1;
+            chartData[4].type = "area";
+            chartData[4].yAxis = 1;
+            chartData[5].type = "area";
+            chartData[5].yAxis = 1;
 
             nv.addGraph(function () {
                 var chart = nv.models.multiChart()
@@ -150,20 +150,20 @@ export default {
                     })
                     .showLegend(false)
                     .color(d3.scale.category10().range())
-                    .yDomain1([0, 200]);
+                    .yDomain1([0, 150]);
                 chart.xAxis
                     .tickFormat(function (d) {
                         return d3.time.format('%I:%M%p')(new Date(d))
                     })
-                    .staggerLabels(true);
+					.tickValues([]);
                 chart.yAxis1
-                    .tickValues([25, 50, 100, 150, 200])
+                    .tickValues([10, 20, 50, 100, 150])
                     .tickFormat(function (d) {
                         return d3.format(',.1f')(d) + 'µg/m³'
                     })
                     .showMaxMin(false);
                 d3.select('#chart svg')
-                    .datum(testdata)
+                    .datum(chartData)
                     .transition()
                     .duration(500)
                     .call(chart);
