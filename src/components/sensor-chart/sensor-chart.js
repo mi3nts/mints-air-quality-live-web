@@ -169,7 +169,7 @@ export default {
             nv.addGraph(function () {
                 var chart = nv.models.multiChart()
                     .margin({
-                        top: 30,
+                        top: 50,
                         right: 60,
                         bottom: 50,
                         left: 90
