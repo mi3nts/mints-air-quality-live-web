@@ -1,47 +1,70 @@
 import sensorData from "../../services/sensor-data";
-import SensorChart from "../sensor-chart"
-/**
- * This is stand alone component showing sensor data only. 
- * Eventually it will grow to show more data.
- */
+
 export default {
-    components: {
-        SensorChart
-    },
-    props: ["spot"],
+    props: ["sensor"],
     data: () => ({
-        showMore: false
+        startDateModel: false,
+        endDateModel: false,
+        startDate: null,
+        endDate: null
     }),
-    watch: {
-        'spot': function () {
-            this.initChart();
-        }
+    created: function () {
+        this.startDate = this.$moment().add(-1, 'day').format("YYYY-MM-DD");
+        this.endDate = this.$moment().format("YYYY-MM-DD");
     },
-    created: function () {},
     mounted: function () {
         this.initChart();
     },
     methods: {
         initChart: function () {
-            $("#chart").css('height', '50px').html("<div class='my-4 text-center'>Loading data...</div>");
-            sensorData.getChartData(this.spot.sensor_id, {
-                start: this.$moment.utc().add(-24, 'hour').toISOString(),
-                end: this.$moment.utc().toISOString(),
+            $("#chart2").html("<div class='my-4 text-center'>Loading data...</div>");
+            sensorData.getChartData(this.sensor.sensor_id, {
+                start: this.$moment.utc(this.startDate).toISOString(),
+                end: this.$moment.utc(this.endDate).toISOString(),
             }).then(response => {
                 if (response.data.length) {
-                    $("#chart").css('height', '250px').html("<svg> </svg>")
+                    $("#chart2").html("<svg> </svg>")
                     this.createChart(response.data);
                 } else {
-                    $("#chart").css('height', '50px').html("<div class='my-4 text-center'>No data available.</div>");
+                    $("#chart2").html("<div class='my-4 text-center'>No data available.</div>");
                 }
             });
         },
-        formatNumber: function (num) {
-            return Number(num).toFixed(1);
-        },
-        closeIt: function () {
-            this.$emit('close');
-        },
+		changeInterval: function (values) {
+			var length = values.length;
+			length = length / 3000;
+			length = Math.round(length);
+			
+			var newValues = [];
+			var temp = [];
+			var indexJ = 0;
+			var average = 0;
+			
+			temp.push({x:values[0].x, y:values[0].y});
+			for(var i = 1; i < values.length; i++){
+				if(temp.length >= length){
+					average = 0;
+					for(indexJ = 0; indexJ < temp.length; indexJ++){
+						average += temp[indexJ].y;
+					}
+					average = average / temp.length;
+					newValues.push({x:temp[0].x, y:average});
+					
+					temp = [];
+				}
+				temp.push({x:values[i].x, y:values[i].y});
+			}
+			if(temp.length >= 1){
+				average = 0;
+				for(indexJ = 0; indexJ < temp.length; indexJ++){
+					average += temp[indexJ].y;
+				}
+				average = average / temp.length;
+				newValues.push({x:temp[0].x, y:average});
+			}
+			console.log(newValues);
+			return newValues;
+		},
         createChart: function (data) {
             //formats the data for the chart
             var sensorValues = [];
@@ -51,6 +74,9 @@ export default {
                     y: data[i].pm2_5
                 });
             }
+			if(sensorValues.length > 3000){
+				sensorValues = this.changeInterval(sensorValues);
+			}
             var chartData = [
                 //data
                 {
@@ -71,7 +97,7 @@ export default {
                     ],
                     color: '#ffff44'
                 },
-                { //10-20µg/m³ orange
+                { //10-20/m³ orange
                     key: "10-20µg/m³",
                     values: [{
                             x: sensorValues[0].x,
@@ -85,7 +111,7 @@ export default {
                     color: '#ff5500'
                 },
                 { //20-50µg/m³ red
-                    key: "20-50µg/m³",
+                    key: "50-100µg/m³",
                     values: [{
                             x: sensorValues[0].x,
                             y: 30
@@ -143,26 +169,24 @@ export default {
             nv.addGraph(function () {
                 var chart = nv.models.multiChart()
                     .margin({
-                        top: 30,
-                        right: 30,
-                        bottom: 30,
+                        top: 50,
+                        right: 60,
+                        bottom: 50,
                         left: 90
                     })
-                    .showLegend(false)
                     .color(d3.scale.category10().range())
                     .yDomain1([0, 150]);
+				chart.legend.updateState(false);
                 chart.xAxis
                     .tickFormat(function (d) {
-                        return d3.time.format('%I:%M%p')(new Date(d))
+                        return d3.time.format('%b %d %I:%M:%S%p')(new Date(d))
                     })
-					.tickValues([]);
+                    .staggerLabels(true);
                 chart.yAxis1
-                    .tickValues([10, 20, 50, 100, 150])
                     .tickFormat(function (d) {
-                        return d3.format(',.1f')(d) + 'µg/m³'
-                    })
-                    .showMaxMin(false);
-                d3.select('#chart svg')
+                        return d3.format(',.2f')(d) + 'µg/m³'
+                    });
+                d3.select('#chart2 svg')
                     .datum(chartData)
                     .transition()
                     .duration(500)
@@ -171,4 +195,4 @@ export default {
             });
         }
     }
-}
+};
