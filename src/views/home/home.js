@@ -94,16 +94,6 @@ export default {
             }
         }
     },
-    created: function () {
-
-        epaData.getLatestCityData().then(response => {
-            console.log("Open EPA Data", response.data);
-        });
-        //TODO: Be able to get the user input for startDate and endDate
-        /*epaData.getHistoricalData(startDate, endDate).then(response => {
-            console.log("Get EPA Historical Data", response.data);
-        });*/
-    },
     mounted: function () {
         /** Let's first build the layers. Notice that map is not ready yet.
          * We are building layers not rendering them
@@ -121,6 +111,10 @@ export default {
          * This will load data from OpenAQ API
          */
         this.loadOpenAQ();
+        /**
+         * This will load data from PurpleAir API
+         */
+        this.loadEPA();
         /**
          * This will load data from PurpleAir API
          */
@@ -213,10 +207,8 @@ export default {
 
 
             if (layerName == "Dark Mode" || layerName == "Satellite") {
-                console.log("Dark");
                 return dark;
             } else {
-                console.log("Light");
                 return light;
             }
         },
@@ -259,7 +251,6 @@ export default {
             this.layerControl.addTo(this.map);
             this.sensorGroup.addTo(this.map);
             this.map.on('baselayerchange', (event) => {
-                console.log(event);
                 if (this.windLayer) {
                     this.windLayer = false;
                     this.buildWindLayer(event.name, true);
@@ -273,7 +264,6 @@ export default {
                     if (!result.ParentID) {
                         this.renderPurpleAir(result);
                     }
-
                 });
             });
         },
@@ -281,7 +271,7 @@ export default {
             location.marker = L.marker([location.Lat, location.Lon], {
                 icon: L.divIcon({
                     className: 'svg-icon',
-                    html: this.getTriangleMarker("purple", 20),
+                    html: this.getHexagonMarker("#9370DB", this.getMarkerColor(location.p_2_5_um),40,location.p_2_5_um),
                     iconAnchor: [20, 10],
                     iconSize: [20, 32],
                     popupAnchor: [0, -30]
@@ -291,14 +281,24 @@ export default {
             var popup = "<div style='font-size:14px'>";
             popup += "<div style='text-align:center; font-weight:bold'>" + location.Label + " </div><br>";
             popup += "<li> PM0.3 : " + location.p_0_3_um + " µg/m³ </li><br>";
-            popup += "<li> PM0.3 : " + location.p_0_5_um + " µg/m³ </li><br>";
-            popup += "<li> PM0.3 : " + location.p_1_0_um + " µg/m³ </li><br>";
-            popup += "<li> PM0.3 : " + location.p_2_5_um + " µg/m³ </li><br>";
-            popup += "<li> PM0.3 : " + location.p_5_0_um + " µg/m³ </li><br>";
-            popup += "<li> PM0.3 : " + location.p_10_0_um + " µg/m³ </li><br>";
-            popup += "<li> Temperature : " + location.temp_f + " °F </li><br>";
-            popup += "<li> Humidity : " + location.humidity + " % </li><br>";
-
+            popup += "<li> PM0.5 : " + location.p_0_5_um + " µg/m³ </li><br>";
+            popup += "<li> PM1 : " + location.p_1_0_um + " µg/m³ </li><br>";
+            popup += "<li> PM2.5 : " + location.p_2_5_um + " µg/m³ </li><br>";
+            popup += "<li> PM5 : " + location.p_5_0_um + " µg/m³ </li><br>";
+            popup += "<li> PM10 : " + location.p_10_0_um + " µg/m³ </li><br>";
+            popup += "<li> Temperature : " + location.temp_f + "°F </li><br>";
+            popup += "<li> Humidity : " + location.humidity + "% </li><br>";
+            let unix_timestamp = location.LastUpdateCheck;
+            var a = new Date(unix_timestamp * 1000);
+            var months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+            var year = a.getFullYear();
+            var month = months[a.getMonth()];
+            var date = a.getDate();
+            var hour = a.getHours();
+            var min = a.getMinutes();
+            var sec = a.getSeconds();
+            var time = year + '-' + month + '-' + hour + '-' + date + ' ' + hour + ':' + min + ':' + sec;
+            popup += "<div style='text-align:right; font-size: 11px'>Last Updated: " + time + " UTC</div>";
             popup += "</div>";
             location.marker.bindPopup(popup);
         },
@@ -310,11 +310,22 @@ export default {
             });
         },
         renderOpenAQ: function (location) {
-
+            var index = -1;
+            var markerValue = '';
+            var fillColor = "#6B8E23"; //O3 colors to be determined
+            if (location.measurements[0].parameter.includes("pm25")) {
+                index = 0;
+            } else if (location.measurements.length-1 > 0 && location.measurements[1].parameter.includes("pm25")) {
+                index = 1;
+            }
+            if (index != -1) {
+                fillColor = this.getMarkerColor(location.measurements[index].value);
+                markerValue = location.measurements[index].value;
+            }
             location.marker = L.marker([location.coordinates.latitude, location.coordinates.longitude], {
                 icon: L.divIcon({
                     className: 'svg-icon',
-                    html: this.getSquareMarker("green", 20),
+                    html: this.getSquareMarker("#6B8E23", fillColor, 40, markerValue),
                     iconAnchor: [20, 10],
                     iconSize: [20, 32],
                     popupAnchor: [0, -30]
@@ -324,8 +335,44 @@ export default {
             var popup = "<div style='font-size:14px'>";
             popup += "<div style='text-align:center; font-weight:bold'>" + location.location + " </div><br>";
             location.measurements.forEach(m => {
-                popup += "<li>" + m.parameter + ": " + m.value + " " + m.unit + " </li><br>";
+                if (m.parameter == "pm25") {
+                    popup += "<li>" + "PM2.5 : " + m.value + " " + m.unit + " </li><br>";
+                } else if (m.parameter == "o3") {
+                    popup += "<li>" + "O3 : " + m.value + " " + m.unit + " </li><br>";
+                }
             });
+            popup += "<div style='text-align:right; font-size: 11px'>Last Updated: " + location.measurements[0].lastUpdated + " UTC</div>";
+            popup += "</div>";
+            location.marker.bindPopup(popup);
+        },
+        loadEPA: function () {
+            epaData.getLatestCityData().then(response => {
+                response.data.forEach(result => {
+                    this.renderEPA(result);
+                })
+            });
+        },
+        renderEPA: function (location) {
+            var fillColor = "#66CDAA"; //O3 colors to be determined
+            var PM_value = "";
+            if (location.Parameter == "PM2.5") {
+                fillColor = this.getMarkerColor(location.Value)
+                PM_value = location.Value;
+            }
+            location.marker = L.marker([location.Latitude, location.Longitude], {
+                icon: L.divIcon({
+                    className: 'svg-icon',
+                    html: this.getOctagonMarker("#66CDAA", fillColor, 40, PM_value),
+                    iconAnchor: [20, 10],
+                    iconSize: [20, 32],
+                    popupAnchor: [0, -30]
+                })
+            })
+            location.marker.addTo(this.epaGroup);
+            var popup = "<div style='font-size:14px'>";
+            popup += "<div style='text-align:center; font-weight:bold'>" + location.SiteName + " </div><br>";
+            popup += "<li> " + location.Parameter + " : " + location.Value + " µg/m³ </li><br>";
+            popup += "<div style='text-align:right; font-size: 11px'>Last Updated: " + location.UTC + " UTC</div>";
             popup += "</div>";
             location.marker.bindPopup(popup);
         },
@@ -345,27 +392,34 @@ export default {
         renderSensor: function (sensor) {
             let PopupString = "<div style='font-size:14px'><div style='text-align:center; font-weight:bold'>" + "Current Sensor Data </div><br>";
             if (!isNaN(parseFloat(sensor.pm1)) && parseFloat(sensor.pm1) !== 0)
-                PopupString += "<li>PM1: " + parseFloat(sensor.pm1).toFixed(2) + " Micrograms Per Cubic Meter</li><br>";
+                PopupString += "<li>PM1: " + parseFloat(sensor.pm1).toFixed(2) + " µg/m³</li><br>";
             if (!isNaN(parseFloat(sensor.pm2_5)) && parseFloat(sensor.pm2_5) !== 0)
-                PopupString += "<li>PM2.5: " + parseFloat(sensor.pm2_5).toFixed(2) + " Micrograms Per Cubic Meter</li><br>";
+                PopupString += "<li>PM2.5: " + parseFloat(sensor.pm2_5).toFixed(2) + " µg/m³</li><br>";
             if (!isNaN(parseFloat(sensor.pm4)) && parseFloat(sensor.pm4) !== 0)
-                PopupString += "<li>PM4: " + parseFloat(sensor.pm4).toFixed(2) + " Micrograms Per Cubic Meter</li><br>";
+                PopupString += "<li>PM4: " + parseFloat(sensor.pm4).toFixed(2) + " µg/m³/li><br>";
             if (!isNaN(parseFloat(sensor.pm10)) && parseFloat(sensor.pm10) !== 0)
-                PopupString += "<li>PM10: " + parseFloat(sensor.pm10).toFixed(2) + " Micrograms Per Cubic Meter</li><br>";
-            if (!isNaN(parseFloat(sensor.temperature)) && parseFloat(sensor.temperature) !== 0)
-                PopupString += "<li>Temperature: " + ((parseFloat(sensor.temperature)*9/5)+32).toFixed(2) + " Farenheit</li><br>";
+                PopupString += "<li>PM10: " + parseFloat(sensor.pm10).toFixed(2) + " µg/m³</li><br>";
+            if (!isNaN(parseFloat(sensor.temperature)) && parseFloat(sensor.temperature) !== 0) {
+                var convertFahrenheit = (sensor.temperature * (9/5)) + 32
+                PopupString += "<li>Temperature: " + parseFloat(convertFahrenheit).toFixed(2) + "°F</li><br>";
+            }
             if (!isNaN(parseFloat(sensor.humidity)) && parseFloat(sensor.humidity) !== 0)
                 PopupString += "<li>Humidity: " + parseFloat(sensor.humidity).toFixed(2) + "%</li><br>";
             if (!isNaN(parseFloat(sensor.dewpoint)) && parseFloat(sensor.dewpoint) !== 0)
                 PopupString += "<li>DewPoint: " + parseFloat(sensor.dewpoint).toFixed(2) + "%</li></div><br>"
             if (!isNaN(parseFloat(sensor.timestamp)))
                 PopupString += "<div style='text-align:right; font-size: 11px'>Last Updated: " + sensor.timestamp + " UTC</div>";
+            
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(sensor.timestamp))).asMinutes();
-
-            sensor.marker = L.circleMarker([sensor.latitude, sensor.longitude], {
-                fillColor: timeDiffMinutes > 5 ? 'grey' : this.getMarkerColor(sensor),
-                fillOpacity: 0.8,
-                color: "#38b5e6"
+            var fillColor = timeDiffMinutes > 5 ? 'grey' : this.getMarkerColor(sensor[this.pmType]);
+            sensor.marker = L.marker([sensor.latitude, sensor.longitude], {
+                icon: L.divIcon({
+                    className: 'svg-icon',
+                    html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(sensor[this.pmType]).toFixed(2)),
+                    iconAnchor: [20, 10],
+                    iconSize: [20, 32],
+                    popupAnchor: [0, -30]
+                })
             });
 
             //handles click event for single click events
@@ -394,8 +448,7 @@ export default {
                 });
             });
         },
-        getMarkerColor(sensor) {
-            var PM = Number(sensor[this.pmType]);
+        getMarkerColor(PM) {
             if (PM >= 0 && PM <= 10) return "#ffff66";
             else if (PM > 10 && PM <= 20) return "#ff6600";
             else if (PM > 20 && PM <= 50) return "#cc0000";
@@ -414,12 +467,20 @@ export default {
                 }, "slow").addClass('visible');
             }
         },
-        getSquareMarker(color, size) {
-            var svg = `<svg id="Layer_1" enable-background="new 0 0 506.1 506.1" preserveAspectRatio="xMidYMin" height="${size}" viewBox="0 0 506.1 506.1" width="${size}" xmlns="http://www.w3.org/2000/svg"><path style="fill:${color}" d="m489.609 0h-473.118c-9.108 0-16.491 7.383-16.491 16.491v473.118c0 9.107 7.383 16.491 16.491 16.491h473.119c9.107 0 16.49-7.383 16.49-16.491v-473.118c0-9.108-7.383-16.491-16.491-16.491z"/></svg>`;
+        getCircleMarker(color, fill, size, value) {
+            var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" fill-opacity="0.8" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><text x="12" y="15" style="font-weight: 100" text-anchor="middle" font-family="PT Sans" font-size="8">${value}</text></svg>`;
             return svg;
         },
-        getTriangleMarker(color, size) {
-            var svg = `<svg version="1.1" id="Layer_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" preserveAspectRatio="xMidYMin" height="${size}" width="${size}" xml:space="preserve"><g><path style="fill:${color}" d="M507.521,427.394L282.655,52.617c-12.074-20.122-41.237-20.122-53.311,0L4.479,427.394c-12.433,20.72,2.493,47.08,26.655,47.08h449.732C505.029,474.474,519.955,448.114,507.521,427.394z"/></g></svg>`;
+        getSquareMarker(color, fill, size, value) {
+            var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" fill-opacity="0.8" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><text x="12" y="15" style="font-weight: 100" text-anchor="middle" font-family="PT Sans" font-size="8">${value}</text></svg>`;
+            return svg;
+        },
+        getHexagonMarker(color, fill, size, value) {
+            var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" fill-opacity="0.8" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 4.9V17L12 22l-9-4.9V7z"/><text x="12" y="15" style="font-weight: 100" text-anchor="middle" font-family="PT Sans" font-size="8">${value}</text></svg>`;
+            return svg;
+        },
+        getOctagonMarker(color, fill, size, value) {
+            var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" fill-opacity="0.8" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><text x="12" y="15" style="font-weight: 100" text-anchor="middle" font-family="PT Sans" font-size="8">${value}</text></svg>`;
             return svg;
         }
     }

@@ -10,7 +10,8 @@ export default new Vue({
     data: function () {
         return {
             baseUrl: "http://www.airnowapi.org/aq/data",
-            bboxRecent: "PM25&BBOX=-97.754269,31.802118,-95.966931,33.589456&dataType=A&format=application/json&verbose=1&nowcastonly=1&includerawconcentrations=0&API_KEY=743E8D00-0FD4-4B80-A52E-356DE6E4266C"
+            bboxRecent: "PM25&BBOX=-97.754269,31.802118,-95.966931,33.589456&dataType=C&format=application/json&verbose=1&nowcastonly=1&includerawconcentrations=0&API_KEY=743E8D00-0FD4-4B80-A52E-356DE6E4266C"
+            //TODO: Add ozone after the Ozone/PM2.5 universal button system has been established
         }
     },
     methods: {
