@@ -1,26 +1,40 @@
-<v-container>
-    <v-card class="mx-auto" max-width="400" tile>
-        <v-card-text>
+<div>
+    <div style="width: 400px;">
+        <div>
             <v-layout>
                 <v-flex xs11>
                     <div class="text-center primary--text">
-                        Past 24 hours ({{spot.sensor_id}})
+                        Current Sensor Data
                     </div>
                 </v-flex>
-                <v-icon class="ml-auto" @click="closeIt">close</v-icon>
+                <!-- <v-icon class="ml-auto" @click="closeIt">close</v-icon> -->
             </v-layout>
+            <div>
+                <ul>
+                    <li v-if="spot.pm1">PM1: {{parseFloat(spot.pm1).toFixed(2)}} µg/m³</li>
+                    <li v-if="spot.pm2_5">PM2.5: {{parseFloat(spot.pm2_5).toFixed(2)}} µg/m³</li>
+                    <li v-if="spot.pm4">PM4: {{parseFloat(spot.pm4).toFixed(2)}} µg/m³</li>
+                    <li v-if="spot.pm10">PM10: {{parseFloat(spot.pm10).toFixed(2)}} µg/m³</li>
+                    <li v-if="spot.temperature">Temperature: {{spotTemperature().toFixed(2)}} °F</li>
+                    <li v-if="spot.humidity">Humidity: {{parseFloat(spot.humidity).toFixed(2)}} %</li>
+                    <li v-if="spot.dewpoint">DewPoint: {{parseFloat(spot.dewpoint).toFixed(2)}} %</li>
+                </ul>
+                <div class="text-right sub-text">Last Updated: {{spot.timestamp}}</div>
+            </div>
+            <hr />
+            <div style='text-align:center; font-weight:bold'>Past 24 hours</div>
             <div class='with-3d-shadow with-transitions'>
                 <div id="chart">
                     <div class="my-4 text-center">Loading data...</div>
                 </div>
-                <h5 class="text-center">PM 2.5 (μg/m³) (1-hour average)</h5>
+                <div class="sub-text text-center">PM 2.5 (μg/m³) (1-hour average)</div>
                 <div class="text-center mt-2">
                     <a @click="showMore=true">More data</a>
                 </div>
             </div>
-        </v-card-text>
-    </v-card>
+        </div>
+    </div>
     <v-dialog v-model="showMore" max-width="90%">
         <sensor-chart :sensor="spot" @close="showMore=false;"></sensor-chart>
     </v-dialog>
-</v-container>
+</div>

@@ -3,6 +3,7 @@ import sensorData from "../../services/sensor-data";
 import purpleAirData from "../../services/purpleair-data";
 import openAqData from "../../services/openaq-data";
 import epaData from "../../services/epa-data";
+import Vue from 'vue';
 
 /**
  * Main landing page with all map functionality
@@ -271,7 +272,7 @@ export default {
             location.marker = L.marker([location.Lat, location.Lon], {
                 icon: L.divIcon({
                     className: 'svg-icon',
-                    html: this.getHexagonMarker("#9370DB", this.getMarkerColor(location.p_2_5_um),40,location.p_2_5_um),
+                    html: this.getHexagonMarker("#9370DB", this.getMarkerColor(location.p_2_5_um), 40, location.p_2_5_um),
                     iconAnchor: [20, 10],
                     iconSize: [20, 32],
                     popupAnchor: [0, -30]
@@ -290,7 +291,7 @@ export default {
             popup += "<li> Humidity : " + location.humidity + "% </li><br>";
             let unix_timestamp = location.LastUpdateCheck;
             var a = new Date(unix_timestamp * 1000);
-            var months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+            var months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
             var year = a.getFullYear();
             var month = months[a.getMonth()];
             var date = a.getDate();
@@ -315,7 +316,7 @@ export default {
             var fillColor = "#6B8E23"; //O3 colors to be determined
             if (location.measurements[0].parameter.includes("pm25")) {
                 index = 0;
-            } else if (location.measurements.length-1 > 0 && location.measurements[1].parameter.includes("pm25")) {
+            } else if (location.measurements.length - 1 > 0 && location.measurements[1].parameter.includes("pm25")) {
                 index = 1;
             }
             if (index != -1) {
@@ -380,9 +381,11 @@ export default {
             sensorData.getSensors().then(response => {
                 response.data.forEach(s => {
                     sensorData.getSensorData(s).then(sensorResponse => {
-                        sensorResponse.data.id = s;
-                        this.sensors.push(sensorResponse.data[0]);
-                        this.renderSensor(sensorResponse.data[0]);
+                        if (sensorResponse.data.length) {
+                            sensorResponse.data.id = s;
+                            this.sensors.push(sensorResponse.data[0]);
+                            this.renderSensor(sensorResponse.data[0]);
+                        }
                     });
                 });
             });
@@ -390,26 +393,6 @@ export default {
 
         // single click pop up information
         renderSensor: function (sensor) {
-            let PopupString = "<div style='font-size:14px'><div style='text-align:center; font-weight:bold'>" + "Current Sensor Data </div><br>";
-            if (!isNaN(parseFloat(sensor.pm1)) && parseFloat(sensor.pm1) !== 0)
-                PopupString += "<li>PM1: " + parseFloat(sensor.pm1).toFixed(2) + " µg/m³</li><br>";
-            if (!isNaN(parseFloat(sensor.pm2_5)) && parseFloat(sensor.pm2_5) !== 0)
-                PopupString += "<li>PM2.5: " + parseFloat(sensor.pm2_5).toFixed(2) + " µg/m³</li><br>";
-            if (!isNaN(parseFloat(sensor.pm4)) && parseFloat(sensor.pm4) !== 0)
-                PopupString += "<li>PM4: " + parseFloat(sensor.pm4).toFixed(2) + " µg/m³/li><br>";
-            if (!isNaN(parseFloat(sensor.pm10)) && parseFloat(sensor.pm10) !== 0)
-                PopupString += "<li>PM10: " + parseFloat(sensor.pm10).toFixed(2) + " µg/m³</li><br>";
-            if (!isNaN(parseFloat(sensor.temperature)) && parseFloat(sensor.temperature) !== 0) {
-                var convertFahrenheit = (sensor.temperature * (9/5)) + 32
-                PopupString += "<li>Temperature: " + parseFloat(convertFahrenheit).toFixed(2) + "°F</li><br>";
-            }
-            if (!isNaN(parseFloat(sensor.humidity)) && parseFloat(sensor.humidity) !== 0)
-                PopupString += "<li>Humidity: " + parseFloat(sensor.humidity).toFixed(2) + "%</li><br>";
-            if (!isNaN(parseFloat(sensor.dewpoint)) && parseFloat(sensor.dewpoint) !== 0)
-                PopupString += "<li>DewPoint: " + parseFloat(sensor.dewpoint).toFixed(2) + "%</li></div><br>"
-            if (!isNaN(parseFloat(sensor.timestamp)))
-                PopupString += "<div style='text-align:right; font-size: 11px'>Last Updated: " + sensor.timestamp + " UTC</div>";
-            
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(sensor.timestamp))).asMinutes();
             var fillColor = timeDiffMinutes > 5 ? 'grey' : this.getMarkerColor(sensor[this.pmType]);
             sensor.marker = L.marker([sensor.latitude, sensor.longitude], {
@@ -424,9 +407,27 @@ export default {
 
             //handles click event for single click events
             sensor.marker.addTo(this.sensorGroup);
+            var popup = L.popup({
+                offset: L.point(-200, 45),
+                maxWidth: '400px',
+                autoPan : true,
+                keepInView : true
+            }).setContent("<div id='flyCard'></div>");
+
+            sensor.marker.bindPopup(popup);
             sensor.marker.on('click', () => {
                 this.selectedSensor = sensor;
-            }).bindPopup(PopupString);
+            });
+
+            sensor.marker.on('popupopen', function () {
+                document.getElementById("flyCard") && new Vue({
+                    render: h => h(Sensor, {
+                        props: {
+                            spot: sensor
+                        }
+                    })
+                }).$mount("#flyCard");
+            });
         },
 
         buildMarkerIcon: function (sensor) {
@@ -468,7 +469,8 @@ export default {
             }
         },
         getCircleMarker(color, fill, size, value) {
-            var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" fill-opacity="0.8" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><text x="12" y="15" style="font-weight: 100" text-anchor="middle" font-family="PT Sans" font-size="8">${value}</text></svg>`;
+            var textColor = (fill == 'grey') ? '#ffffff' : '#ff0000';
+            var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" fill-opacity="0.8" stroke-linecap="round" stroke-linejoin="round"><circle stroke-width="2" stroke="${color}" cx="12" cy="12" r="10"></circle><text x="12" y="15" fill="${textColor}" text-anchor="middle" font-family="PT Sans" font-size="8">${value}</text></svg>`;
             return svg;
         },
         getSquareMarker(color, fill, size, value) {

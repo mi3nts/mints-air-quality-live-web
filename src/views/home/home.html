@@ -99,9 +99,9 @@
         </v-expansion-panels>
 
     </div>
-    <div v-if="selectedSensor" class="side-window">
+    <!-- <div v-if="selectedSensor" class="side-window">
         <Sensor :spot="selectedSensor" @close="selectedSensor=null" />
-    </div>
+    </div> -->
     <v-dialog v-model="howToUse" max-width="50%">
         <v-card>
             <v-card-title class="headline">Instructions</v-card-title>

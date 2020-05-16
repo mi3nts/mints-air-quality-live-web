@@ -39,6 +39,9 @@ export default {
         formatNumber: function (num) {
             return Number(num).toFixed(1);
         },
+        spotTemperature: function () {
+            return (this.spot.temperature * (9 / 5)) + 32;
+        },
         closeIt: function () {
             this.$emit('close');
         },
@@ -155,7 +158,7 @@ export default {
                     .tickFormat(function (d) {
                         return d3.time.format('%I:%M%p')(new Date(d))
                     })
-					.tickValues([]);
+                    .tickValues([]);
                 chart.yAxis1
                     .tickValues([10, 20, 50, 100, 150])
                     .tickFormat(function (d) {
