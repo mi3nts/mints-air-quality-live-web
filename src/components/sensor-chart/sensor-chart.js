@@ -9,8 +9,8 @@ export default {
         endDate: null
     }),
     created: function () {
-        this.startDate = this.$moment().add(-1, 'day').format("YYYY-MM-DD");
-        this.endDate = this.$moment().format("YYYY-MM-DD");
+        this.startDate = this.$moment.utc().add(-24, 'hour').format("YYYY-MM-DD");
+        this.endDate = this.$moment.utc().format("YYYY-MM-DD");
     },
     mounted: function () {
         this.initChart();
@@ -30,41 +30,40 @@ export default {
                 }
             });
         },
-		changeInterval: function (values) {
-			var length = values.length;
-			length = length / 3000;
-			length = Math.round(length);
-			
-			var newValues = [];
-			var temp = [];
-			var indexJ = 0;
-			var average = 0;
-			
-			temp.push({x:values[0].x, y:values[0].y});
-			for(var i = 1; i < values.length; i++){
-				if(temp.length >= length){
-					average = 0;
-					for(indexJ = 0; indexJ < temp.length; indexJ++){
-						average += temp[indexJ].y;
-					}
-					average = average / temp.length;
-					newValues.push({x:temp[0].x, y:average});
-					
-					temp = [];
-				}
-				temp.push({x:values[i].x, y:values[i].y});
-			}
-			if(temp.length >= 1){
-				average = 0;
-				for(indexJ = 0; indexJ < temp.length; indexJ++){
-					average += temp[indexJ].y;
-				}
-				average = average / temp.length;
-				newValues.push({x:temp[0].x, y:average});
-			}
-			console.log(newValues);
-			return newValues;
-		},
+        changeInterval: function (values) {
+            var length = values.length;
+            length = length / 3000;
+            length = Math.round(length);
+            
+            var newValues = [];
+            var temp = [];
+            var indexJ = 0;
+            var average = 0;
+            
+            temp.push({x:values[0].x, y:values[0].y});
+            for(var i = 1; i < values.length; i++){
+                if(temp.length >= length){
+                    average = 0;
+                    for(indexJ = 0; indexJ < temp.length; indexJ++){
+                        average += temp[indexJ].y;
+                    }
+                    average = average / temp.length;
+                    newValues.push({x:temp[0].x, y:average});
+                    
+                    temp = [];
+                }
+                temp.push({x:values[i].x, y:values[i].y});
+            }
+            if(temp.length >= 1){
+                average = 0;
+                for(indexJ = 0; indexJ < temp.length; indexJ++){
+                    average += temp[indexJ].y;
+                }
+                average = average / temp.length;
+                newValues.push({x:temp[0].x, y:average});
+            }
+            return newValues;
+        },
         createChart: function (data) {
             //formats the data for the chart
             var sensorValues = [];
@@ -74,9 +73,36 @@ export default {
                     y: data[i].pm2_5
                 });
             }
-			if(sensorValues.length > 3000){
-				sensorValues = this.changeInterval(sensorValues);
-			}
+            if(sensorValues.length > 3000){
+                sensorValues = this.changeInterval(sensorValues);
+            }
+            var maxYValue = Math.max.apply(Math, sensorValues.map(function(o) { return o.y; }))
+            var yellowValue = 0;
+            var orangeValue = 0;
+            var redValue = 0;
+            var purpleValue = 0;
+            var maroonValue = 0;
+            if (maxYValue < 10) {
+                yellowValue = maxYValue;
+            } else if (maxYValue < 20) {
+                yellowValue = 10;
+                orangeValue = maxYValue - yellowValue;
+            } else if (maxYValue < 50) {
+                yellowValue = 10;
+                orangeValue = 10;
+                redValue = maxYValue - (yellowValue + orangeValue);
+            } else if (maxYValue < 100) {
+                yellowValue = 10;
+                orangeValue = 10;
+                redValue = 30;
+                purpleValue = maxYValue - (yellowValue + orangeValue + redValue);
+            } else {
+                yellowValue = 10;
+                orangeValue = 10;
+                redValue = 30;
+                purpleValue = 50;
+                maroonValue = maxYValue - (yellowValue + orangeValue + redValue + purpleValue);
+            }
             var chartData = [
                 //data
                 {
@@ -88,11 +114,11 @@ export default {
                     key: "0-10µg/m³",
                     values: [{
                             x: sensorValues[0].x,
-                            y: 10
+                            y: yellowValue
                         },
                         {
                             x: sensorValues[sensorValues.length - 1].x,
-                            y: 10
+                            y: yellowValue
                         }
                     ],
                     color: '#ffff44'
@@ -101,24 +127,24 @@ export default {
                     key: "10-20µg/m³",
                     values: [{
                             x: sensorValues[0].x,
-                            y: 10
+                            y: orangeValue
                         },
                         {
                             x: sensorValues[sensorValues.length - 1].x,
-                            y: 10
+                            y: orangeValue
                         }
                     ],
                     color: '#ff5500'
                 },
                 { //20-50µg/m³ red
-                    key: "50-100µg/m³",
+                    key: "20-50µg/m³",
                     values: [{
                             x: sensorValues[0].x,
-                            y: 30
+                            y: redValue
                         },
                         {
                             x: sensorValues[sensorValues.length - 1].x,
-                            y: 30
+                            y: redValue
                         }
                     ],
                     color: '#cc0000'
@@ -127,11 +153,11 @@ export default {
                     key: "50-100µg/m³",
                     values: [{
                             x: sensorValues[0].x,
-                            y: 50
+                            y: purpleValue
                         },
                         {
                             x: sensorValues[sensorValues.length - 1].x,
-                            y: 50
+                            y: purpleValue
                         }
                     ],
                     color: '#990099'
@@ -140,11 +166,11 @@ export default {
                     key: "100+µg/m³",
                     values: [{
                             x: sensorValues[0].x,
-                            y: 50
+                            y: maroonValue
                         },
                         {
                             x: sensorValues[sensorValues.length - 1].x,
-                            y: 50
+                            y: maroonValue
                         }
                     ],
                     color: '#aa2626'
@@ -175,8 +201,8 @@ export default {
                         left: 90
                     })
                     .color(d3.scale.category10().range())
-                    .yDomain1([0, 150]);
-				chart.legend.updateState(false);
+                    .yDomain1([0, maxYValue]);
+                chart.legend.updateState(false);
                 chart.xAxis
                     .tickFormat(function (d) {
                         return d3.time.format('%b %d %I:%M:%S%p')(new Date(d))
