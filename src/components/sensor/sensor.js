@@ -54,6 +54,33 @@ export default {
                     y: data[i].pm2_5
                 });
             }
+            var maxYValue = Math.max.apply(Math, sensorValues.map(function(o) { return o.y; }))
+            var yellowValue = 0;
+            var orangeValue = 0;
+            var redValue = 0;
+            var purpleValue = 0;
+            var maroonValue = 0;
+            if (maxYValue < 10) {
+                yellowValue = maxYValue;
+            } else if (maxYValue < 20) {
+                yellowValue = 10;
+                orangeValue = maxYValue - yellowValue;
+            } else if (maxYValue < 50) {
+                yellowValue = 10;
+                orangeValue = 10;
+                redValue = maxYValue - (yellowValue + orangeValue);
+            } else if (maxYValue < 100) {
+                yellowValue = 10;
+                orangeValue = 10;
+                redValue = 30;
+                purpleValue = maxYValue - (yellowValue + orangeValue + redValue);
+            } else {
+                yellowValue = 10;
+                orangeValue = 10;
+                redValue = 30;
+                purpleValue = 50;
+                maroonValue = maxYValue - (yellowValue + orangeValue + redValue + purpleValue);
+            }
             var chartData = [
                 //data
                 {
@@ -65,24 +92,24 @@ export default {
                     key: "0-10µg/m³",
                     values: [{
                             x: sensorValues[0].x,
-                            y: 10
+                            y: yellowValue
                         },
                         {
                             x: sensorValues[sensorValues.length - 1].x,
-                            y: 10
+                            y: yellowValue
                         }
                     ],
                     color: '#ffff44'
                 },
-                { //10-20µg/m³ orange
+                { //10-20/m³ orange
                     key: "10-20µg/m³",
                     values: [{
                             x: sensorValues[0].x,
-                            y: 10
+                            y: orangeValue
                         },
                         {
                             x: sensorValues[sensorValues.length - 1].x,
-                            y: 10
+                            y: orangeValue
                         }
                     ],
                     color: '#ff5500'
@@ -91,11 +118,11 @@ export default {
                     key: "20-50µg/m³",
                     values: [{
                             x: sensorValues[0].x,
-                            y: 30
+                            y: redValue
                         },
                         {
                             x: sensorValues[sensorValues.length - 1].x,
-                            y: 30
+                            y: redValue
                         }
                     ],
                     color: '#cc0000'
@@ -104,11 +131,11 @@ export default {
                     key: "50-100µg/m³",
                     values: [{
                             x: sensorValues[0].x,
-                            y: 50
+                            y: purpleValue
                         },
                         {
                             x: sensorValues[sensorValues.length - 1].x,
-                            y: 50
+                            y: purpleValue
                         }
                     ],
                     color: '#990099'
@@ -117,11 +144,11 @@ export default {
                     key: "100+µg/m³",
                     values: [{
                             x: sensorValues[0].x,
-                            y: 50
+                            y: maroonValue
                         },
                         {
                             x: sensorValues[sensorValues.length - 1].x,
-                            y: 50
+                            y: maroonValue
                         }
                     ],
                     color: '#aa2626'
@@ -144,6 +171,7 @@ export default {
             chartData[5].yAxis = 1;
 
             nv.addGraph(function () {
+                var maxYValue = Math.max.apply(Math, chartData[0].values.map(function(o) { return o.y; }))
                 var chart = nv.models.multiChart()
                     .margin({
                         top: 30,
@@ -153,14 +181,13 @@ export default {
                     })
                     .showLegend(false)
                     .color(d3.scale.category10().range())
-                    .yDomain1([0, 150]);
+                    .yDomain1([0, maxYValue]);
                 chart.xAxis
                     .tickFormat(function (d) {
                         return d3.time.format('%I:%M%p')(new Date(d))
                     })
                     .tickValues([]);
                 chart.yAxis1
-                    .tickValues([10, 20, 50, 100, 150])
                     .tickFormat(function (d) {
                         return d3.format(',.1f')(d) + 'µg/m³'
                     })
