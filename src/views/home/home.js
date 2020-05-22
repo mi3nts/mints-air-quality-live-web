@@ -277,7 +277,7 @@ export default {
             location.marker = L.marker([location.Lat, location.Lon], {
                 icon: L.divIcon({
                     className: 'svg-icon',
-                    html: this.getHexagonMarker("#9370DB", this.getMarkerColor(location.p_2_5_um), 40, location.p_2_5_um),
+                    html: this.getHexagonMarker("#9370DB", this.getMarkerColor(location.pm2_5_atm), 40, location.pm2_5_atm),
                     iconAnchor: [20, 10],
                     iconSize: [20, 32],
                     popupAnchor: [0, -30]
@@ -286,12 +286,10 @@ export default {
             location.marker.addTo(this.purpleAirGroup);
             var popup = "<div style='font-size:14px'>";
             popup += "<div style='text-align:center; font-weight:bold'>" + location.Label + " </div><br>";
-            popup += "<li> PM0.3 : " + location.p_0_3_um + " µg/m³ </li><br>";
-            popup += "<li> PM0.5 : " + location.p_0_5_um + " µg/m³ </li><br>";
-            popup += "<li> PM1 : " + location.p_1_0_um + " µg/m³ </li><br>";
-            popup += "<li> PM2.5 : " + location.p_2_5_um + " µg/m³ </li><br>";
-            popup += "<li> PM5 : " + location.p_5_0_um + " µg/m³ </li><br>";
-            popup += "<li> PM10 : " + location.p_10_0_um + " µg/m³ </li><br>";
+            //Using channel A
+            popup += "<li> PM1 : " + location.pm1_0_atm + " µg/m³ </li><br>";
+            popup += "<li> PM2.5 : " + location.pm2_5_atm + " µg/m³ </li><br>";
+            popup += "<li> PM10 : " + location.pm10_0_atm + " µg/m³ </li><br>";
             popup += "<li> Temperature : " + location.temp_f + "°F </li><br>";
             popup += "<li> Humidity : " + location.humidity + "% </li><br>";
             let unix_timestamp = location.LastUpdateCheck;
@@ -303,7 +301,7 @@ export default {
             var hour = a.getHours();
             var min = a.getMinutes();
             var sec = a.getSeconds();
-            var time = year + '-' + month + '-' + hour + '-' + date + ' ' + hour + ':' + min + ':' + sec;
+            var time = year + '-' + month + '-' + date + ' ' + hour + ':' + min + ':' + sec;
             popup += "<div style='text-align:right; font-size: 11px'>Last Updated: " + time + " UTC</div>";
             popup += "</div>";
             location.marker.bindPopup(popup);
