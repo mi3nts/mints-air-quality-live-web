@@ -4,6 +4,7 @@ import purpleAirData from "../../services/purpleair-data";
 import openAqData from "../../services/openaq-data";
 import epaData from "../../services/epa-data";
 import Vue from 'vue';
+import vuetify from '../../plugins/vuetify';
 
 /**
  * Main landing page with all map functionality
@@ -277,7 +278,7 @@ export default {
             location.marker = L.marker([location.Lat, location.Lon], {
                 icon: L.divIcon({
                     className: 'svg-icon',
-                    html: this.getHexagonMarker("#9370DB", this.getMarkerColor(location.pm2_5_atm), 40, location.pm2_5_atm),
+                    html: this.getPentagonMarker("#9370DB", this.getMarkerColor(location.pm2_5_atm), 40, location.pm2_5_atm),
                     iconAnchor: [20, 10],
                     iconSize: [20, 32],
                     popupAnchor: [0, -30]
@@ -287,8 +288,8 @@ export default {
             var popup = "<div style='font-size:14px'>";
             popup += "<div style='text-align:center; font-weight:bold'>" + location.Label + " </div><br>";
             //Using channel A
+            popup += "<li class='pm25'> PM2.5 : " + location.pm2_5_atm + " µg/m³ </li><br>";
             popup += "<li> PM1 : " + location.pm1_0_atm + " µg/m³ </li><br>";
-            popup += "<li> PM2.5 : " + location.pm2_5_atm + " µg/m³ </li><br>";
             popup += "<li> PM10 : " + location.pm10_0_atm + " µg/m³ </li><br>";
             popup += "<li> Temperature : " + location.temp_f + "°F </li><br>";
             popup += "<li> Humidity : " + location.humidity + "% </li><br>";
@@ -340,7 +341,7 @@ export default {
             popup += "<div style='text-align:center; font-weight:bold'>" + location.location + " </div><br>";
             location.measurements.forEach(m => {
                 if (m.parameter == "pm25") {
-                    popup += "<li>" + "PM2.5 : " + m.value + " " + m.unit + " </li><br>";
+                    popup += "<li class='pm25'>" + "PM2.5 : " + m.value + " " + m.unit + " </li><br>";
                 } else if (m.parameter == "o3") {
                     popup += "<li>" + "O3 : " + m.value + " " + m.unit + " </li><br>";
                 }
@@ -375,7 +376,7 @@ export default {
             location.marker.addTo(this.epaGroup);
             var popup = "<div style='font-size:14px'>";
             popup += "<div style='text-align:center; font-weight:bold'>" + location.SiteName + " </div><br>";
-            popup += "<li> " + location.Parameter + " : " + location.Value + " µg/m³ </li><br>";
+            popup += "<li class='" + (location.Parameter == 'PM2.5' ? 'pm25' : '') + "'> " + location.Parameter + " : " + location.Value + " µg/m³ </li><br>";
             popup += "<div style='text-align:right; font-size: 11px'>Last Updated: " + location.UTC + " UTC</div>";
             popup += "</div>";
             location.marker.bindPopup(popup);
@@ -413,8 +414,8 @@ export default {
             var popup = L.popup({
                 offset: L.point(-200, 45),
                 maxWidth: '400px',
-                autoPan : true,
-                keepInView : true
+                autoPan: true,
+                keepInView: true
             }).setContent("<div id='flyCard'></div>");
 
             sensor.marker.bindPopup(popup);
@@ -424,6 +425,7 @@ export default {
 
             sensor.marker.on('popupopen', function () {
                 document.getElementById("flyCard") && new Vue({
+                    vuetify,
                     render: h => h(Sensor, {
                         props: {
                             spot: sensor
@@ -453,11 +455,11 @@ export default {
             });
         },
         getMarkerColor(PM) {
-            if (PM >= 0 && PM <= 10) return "#ffff66";
+            if (PM >= 0 && PM <= 10) return "#ffff9e" //"#ffff66";
             else if (PM > 10 && PM <= 20) return "#ff6600";
-            else if (PM > 20 && PM <= 50) return "#cc0000";
-            else if (PM > 50 && PM <= 100) return "#990099";
-            else if (PM > 100) return "#732626";
+            else if (PM > 20 && PM <= 50) return "#ff5534"; //"#cc0000";
+            else if (PM > 50 && PM <= 100) return "#D34FD0"; //"#990099";
+            else if (PM > 100) return "#AB5753"; //"#732626";
         },
         slide() {
             var hidden = $('.side-drawer');
@@ -487,6 +489,10 @@ export default {
         getOctagonMarker(color, fill, size, value) {
             var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24"><polygon fill="${fill}" fill-opacity="0.8" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><text x="12" y="15" style="font-weight: 100" text-anchor="middle" font-family="PT Sans" font-size="8">${value}</text></svg>`;
             return svg;
-        }
+        },
+        getPentagonMarker(color, fill, size, value) {
+            var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 572 545"><path fill="${fill}" fill-opacity="0.8" stroke="${color}" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" d="M 286,10 L 10,210 L 116,535 L 456,535 L 562,210 Z"/><text x="280" y="340" style="font-weight: 400" text-anchor="middle" font-family="PT Sans" font-size="180">${value}</text></svg>`;
+            return svg;
+        },
     }
 };

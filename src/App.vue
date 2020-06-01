@@ -44,6 +44,11 @@
 header .v-btn {
   text-transform: none;
 }
+.pm25 {
+    font-weight: bold;
+    font-size: 16px;
+}
+
 </style>
 
 <script>

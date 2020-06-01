@@ -11,8 +11,8 @@
             </v-layout>
             <div>
                 <ul>
+                    <li v-if="spot.pm2_5" class="pm25">PM2.5: {{parseFloat(spot.pm2_5).toFixed(2)}} µg/m³</li>
                     <li v-if="spot.pm1">PM1: {{parseFloat(spot.pm1).toFixed(2)}} µg/m³</li>
-                    <li v-if="spot.pm2_5">PM2.5: {{parseFloat(spot.pm2_5).toFixed(2)}} µg/m³</li>
                     <li v-if="spot.pm4">PM4: {{parseFloat(spot.pm4).toFixed(2)}} µg/m³</li>
                     <li v-if="spot.pm10">PM10: {{parseFloat(spot.pm10).toFixed(2)}} µg/m³</li>
                     <li v-if="spot.temperature">Temperature: {{spotTemperature().toFixed(2)}} °F</li>
