@@ -73,6 +73,7 @@ export default {
             } else {
                 this.map.removeLayer(this.epaGroup);
             }
+            this.openAQLayer = newValue;
         },
         'sensorLayer': function (newValue) {
             if (newValue) {
