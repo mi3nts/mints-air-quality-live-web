@@ -385,11 +385,16 @@ export default {
         loadData: function () {
             sensorData.getSensors().then(response => {
                 response.data.forEach(s => {
-                    sensorData.getSensorData(s).then(sensorResponse => {
-                        if (sensorResponse.data.length) {
-                            sensorResponse.data.id = s;
-                            this.sensors.push(sensorResponse.data[0]);
-                            this.renderSensor(sensorResponse.data[0]);
+                    sensorData.getSensorLocation(s).then(sensorLocatRes => {
+                        if(sensorLocatRes.data.length &&
+                            sensorLocatRes.data[0].longitude != null && sensorLocatRes.data[0].latitude != null) {
+                            sensorData.getSensorData(s).then(sensorResponse => {
+                                if (sensorResponse.data.length) {
+                                    sensorResponse.data.id = s;
+                                    this.sensors.push(sensorResponse.data[0]);
+                                    this.renderSensor(sensorResponse.data[0], sensorLocatRes.data[0]);
+                                }
+                            });
                         }
                     });
                 });
@@ -397,10 +402,10 @@ export default {
         },
 
         // single click pop up information
-        renderSensor: function (sensor) {
+        renderSensor: function (sensor, sensorLocation) {
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(sensor.timestamp))).asMinutes();
             var fillColor = timeDiffMinutes > 5 ? 'grey' : this.getMarkerColor(sensor[this.pmType]);
-            sensor.marker = L.marker([sensor.latitude, sensor.longitude], {
+            sensor.marker = L.marker([sensorLocation.latitude, sensorLocation.longitude], {
                 icon: L.divIcon({
                     className: 'svg-icon',
                     html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(sensor[this.pmType]).toFixed(2)),
