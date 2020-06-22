@@ -10,12 +10,15 @@
             </v-btn>
         </div>
 
-        <v-expansion-panels style="width:275px" :value="activePanel" accordion>
+        <v-expansion-panels style="width:320px" :value="activePanel" accordion>
             <v-expansion-panel>
                 <v-expansion-panel-header>
-                    <div @click.stop>
+                    <div @click.stop class="d-flex justify-space-between">
                         <v-checkbox class="my-0" hide-details color="primary" v-model="sensorLayer" label="SharedAir DFW Network">
                         </v-checkbox>
+                        <div id="DFW">
+
+                        </div>
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
@@ -71,9 +74,12 @@
             </v-expansion-panel> -->
             <v-expansion-panel>
                 <v-expansion-panel-header>
-                    <div @click.stop>
+                    <div @click.stop class="d-flex justify-space-between">
                         <v-checkbox class="my-0" hide-details color="primary" v-model="epaLayer" label="EPA">
                         </v-checkbox>
+                        <div id="EPA">
+
+                        </div>
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
@@ -84,10 +90,13 @@
             </v-expansion-panel>
             <v-expansion-panel>
                 <v-expansion-panel-header>
-                    <div @click.stop>
+                    <div @click.stop class="d-flex justify-space-between">
                         <v-checkbox class="my-0" hide-details color="primary" v-model="purpleAirLayer"
                             label="PurpleAir">
                         </v-checkbox>
+                        <div id="PurpleAir">
+
+                        </div>
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>

@@ -127,6 +127,11 @@ export default {
          * This will load data from PurpleAir API
          */
         this.loadPurpleAir();
+
+        /**
+         * Bind icons to accordions
+         */
+        this.bindIconsToAccordian();
     },
     methods: {
         buildLayers: function () {
@@ -244,6 +249,12 @@ export default {
                 }
             });
         },
+        bindIconsToAccordian : function(){
+            $('#PurpleAir').append(this.getPentagonMarker("#9370DB", "#ffff9e", 25, ''));
+            $('#EPA').append(this.getSquareMarker("#6B8E23", "#ffff9e", 25, ''));
+            $('#EPA').append(this.getHexagonMarker("#66CDAA", "#ffff9e", 25, ''));
+            $('#DFW').append(this.getCircleMarker("#38b5e6", "#ffff9e", 25, ''));
+        },
         initMap: function () {
             this.map = L.map('map', {
                 center: [32.89746164575043, -97.04086303710938],
@@ -253,11 +264,14 @@ export default {
             });
             window["lmap"] = this.map;
             this.map.addControl(L.control.zoom({
-                position: 'bottomright'
+                position: 'topright'
             }));
             this.map.doubleClickZoom.disable();
             this.layerControl.addTo(this.map);
             this.sensorGroup.addTo(this.map);
+            L.control.scale({
+                position : 'bottomright'
+            }).addTo(this.map);
             this.map.on('baselayerchange', (event) => {
                 if (this.windLayer) {
                     this.windLayer = false;
