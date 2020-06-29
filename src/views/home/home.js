@@ -33,6 +33,7 @@ export default {
             epaLayer: false,
             purpleAirLayer: false,
             openAQLayer: false,
+            pollutionLayer: false,
             //startDate: null,
             //endDate: null,
             /** Popup controls */
@@ -47,6 +48,7 @@ export default {
             openAQGroup: L.layerGroup(),
             purpleAirGroup: L.layerGroup(),
             epaGroup: L.layerGroup(),
+            pollutionGroup: L.layerGroup(),
         }
     },
     watch: {
@@ -65,6 +67,13 @@ export default {
                 this.purpleAirGroup.addTo(this.map)
             } else {
                 this.map.removeLayer(this.purpleAirGroup);
+            }
+        },
+        'pollutionLayer': function (newValue) {
+            if (newValue) {
+                this.pollutionGroup.addTo(this.map)
+            } else {
+                this.map.removeLayer(this.pollutionGroup);
             }
         },
         'epaLayer': function (newValue) {
@@ -127,6 +136,11 @@ export default {
          * This will load data from PurpleAir API
          */
         this.loadPurpleAir();
+
+        /**
+         * This will load data from local json file
+         */
+        this.loadPollution();
 
         /**
          * Bind icons to accordions
@@ -254,6 +268,7 @@ export default {
             $('#EPA').append(this.getSquareMarker("#6B8E23", "#ffff9e", 25, ''));
             $('#EPA').append(this.getHexagonMarker("#66CDAA", "#ffff9e", 25, ''));
             $('#DFW').append(this.getCircleMarker("#38b5e6", "#ffff9e", 25, ''));
+            $('#pollution').append(this.getCircleMarker("#38b5e6", "#000000", 20, ''));
         },
         initMap: function () {
             this.map = L.map('map', {
@@ -288,6 +303,32 @@ export default {
                     }
                 });
             });
+        },
+        loadPollution: function () {
+            this.$axios.get("/json/PollutionBurdenByCouncilDistrict.json").then(response =>{
+                console.log(response.data);
+                response.data.forEach(item => {
+                    this.renderPollution(item);
+                });
+            });
+        },
+        renderPollution: function (location) {
+            location.marker = L.marker([location.Latitude, location.Longitude], {
+                icon: L.divIcon({
+                    className: 'svg-icon',
+                    html: this.getCircleMarker("#38b5e6", "#000000", 20, ''),
+                    iconAnchor: [20, 10],
+                    iconSize: [20, 32],
+                    popupAnchor: [0, -30]
+                })
+            })
+            location.marker.addTo(this.pollutionGroup);
+            var popup = "<div style='font-size:14px'>";
+            popup += "<div style='text-align:center; font-weight:bold'>" + location['Industry Name'] + " </div><br>";
+            popup += "<li class='pm25'> Total : " + location['TOTAL'] + " </li><br>";
+            popup += "<li> Number : " + location.Number + " </li><br>";
+            popup += "</div>";
+            location.marker.bindPopup(popup);
         },
         renderPurpleAir: function (location) {
             location.marker = L.marker([location.Lat, location.Lon], {

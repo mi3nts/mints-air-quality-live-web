@@ -105,6 +105,23 @@
                     </div>
                 </v-expansion-panel-content>
             </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div @click.stop class="d-flex justify-space-between">
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="pollutionLayer"
+                            label="Pollution Burden">
+                        </v-checkbox>
+                        <div id="pollution">
+
+                        </div>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        Disclaimer: The color scale we present does not reflect how PurpleAir presents their data concerning PM2.5 levels.
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
         </v-expansion-panels>
 
     </div>
