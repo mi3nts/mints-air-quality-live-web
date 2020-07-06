@@ -193,7 +193,7 @@ export default {
             );
 
             /** Wind Layer */
-            this.buildWindLayer('Carto Positron');
+            this.buildWindLayer('Carto Positron', true);
         },
         windColorScale: function (layerName) {
             var dark = [
@@ -263,7 +263,7 @@ export default {
                 }
             });
         },
-        bindIconsToAccordian : function(){
+        bindIconsToAccordian: function () {
             $('#PurpleAir').append(this.getPentagonMarker("#9370DB", "#ffff9e", 25, ''));
             $('#EPA').append(this.getSquareMarker("#6B8E23", "#ffff9e", 25, ''));
             $('#EPA').append(this.getHexagonMarker("#66CDAA", "#ffff9e", 25, ''));
@@ -285,7 +285,7 @@ export default {
             this.layerControl.addTo(this.map);
             this.sensorGroup.addTo(this.map);
             L.control.scale({
-                position : 'bottomright'
+                position: 'bottomright'
             }).addTo(this.map);
             this.map.on('baselayerchange', (event) => {
                 if (this.windLayer) {
@@ -441,7 +441,7 @@ export default {
                 var i = 0
                 response.data.forEach(s => {
                     sensorData.getSensorLocation(s).then(sensorLocatRes => {
-                        if(sensorLocatRes.data.length &&
+                        if (sensorLocatRes.data.length &&
                             sensorLocatRes.data[0].longitude != null && sensorLocatRes.data[0].latitude != null) {
                             sensorData.getSensorName(s).then(sensorNameRes => {
                                 if(sensorNameRes.data.length && sensorNameRes.data[0].sensor_name != null) {
