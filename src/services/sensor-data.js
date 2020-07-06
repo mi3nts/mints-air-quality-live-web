@@ -19,6 +19,9 @@ export default new Vue({
         getSensorLocation: function (sensorID) {
             return this.$axios.get(this.baseUrl + "/location/" + sensorID);
         },
+        getSensorName: function (sensorID) {
+            return this.$axios.get(this.baseUrl + "/sensorNameOf/" + sensorID);
+        },
         getChartData: function (sensorID, range) {
             return this.$axios.get(this.baseUrl + `/data/${sensorID}/${range.start}/${range.end}`);
         },

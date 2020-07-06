@@ -9,7 +9,7 @@
     </v-card-title>
 
     <v-card-text>
-        <div id="chart2">
+        <div :id="'chart2_' + sensor.sensor_id" class="chart2">
             <div class="my-4 text-center">Loading data...</div>
         </div>
         <h3 class="text-center">Timeframe</h3>

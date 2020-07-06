@@ -306,7 +306,6 @@ export default {
         },
         loadPollution: function () {
             this.$axios.get("/json/PollutionBurdenByCouncilDistrict.json").then(response =>{
-                console.log(response.data);
                 response.data.forEach(item => {
                     this.renderPollution(item);
                 });
@@ -439,17 +438,22 @@ export default {
         },
         loadData: function () {
             sensorData.getSensors().then(response => {
+                var i = 0
                 response.data.forEach(s => {
                     sensorData.getSensorLocation(s).then(sensorLocatRes => {
                         if(sensorLocatRes.data.length &&
                             sensorLocatRes.data[0].longitude != null && sensorLocatRes.data[0].latitude != null) {
-                            sensorData.getSensorData(s).then(sensorResponse => {
-                                if (sensorResponse.data.length) {
-                                    sensorResponse.data.id = s;
-                                    this.sensors.push(sensorResponse.data[0]);
-                                    this.renderSensor(sensorResponse.data[0], sensorLocatRes.data[0]);
+                            sensorData.getSensorName(s).then(sensorNameRes => {
+                                if(sensorNameRes.data.length && sensorNameRes.data[0].sensor_name != null) {
+                                    sensorData.getSensorData(s).then(sensorResponse => {
+                                        if (sensorResponse.data.length) {
+                                            sensorResponse.data.id = s;
+                                            this.sensors.push(sensorResponse.data[0]);
+                                            this.renderSensor(sensorResponse.data[0], sensorLocatRes.data[0], sensorNameRes.data[0].sensor_name, i++);
+                                        }
+                                    });
                                 }
-                            });
+                            })
                         }
                     });
                 });
@@ -457,7 +461,7 @@ export default {
         },
 
         // single click pop up information
-        renderSensor: function (sensor, sensorLocation) {
+        renderSensor: function (sensor, sensorLocation, sensorName, zIndexPriority) {
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(sensor.timestamp))).asMinutes();
             var fillColor = timeDiffMinutes > 5 ? 'grey' : this.getMarkerColor(sensor[this.pmType]);
             sensor.marker = L.marker([sensorLocation.latitude, sensorLocation.longitude], {
@@ -467,7 +471,10 @@ export default {
                     iconAnchor: [20, 10],
                     iconSize: [20, 32],
                     popupAnchor: [0, -30]
-                })
+                }),
+                title: sensorName,
+                alt: sensor.sensor_id,
+                zIndexOffset: zIndexPriority*5  // Ensures more recently updated sensors will remain on top
             });
 
             //handles click event for single click events
@@ -484,16 +491,26 @@ export default {
                 this.selectedSensor = sensor;
             });
 
-            sensor.marker.on('popupopen', function () {
-                document.getElementById("flyCard") && new Vue({
+            sensor.marker.on('popupopen', function (e) {
+                // Create new pop up vue component and...
+                var newPopup = new Vue({
                     vuetify,
                     render: h => h(Sensor, {
                         props: {
-                            spot: sensor
+                            spot: sensor,
+                            spotName: sensorName
                         }
                     })
-                }).$mount("#flyCard");
+                })
+                newPopup.$mount("#flyCard")
+                // ...track it in the marker component for destruction later
+                e.popup._source.sensorPopup = newPopup
             });
+
+            // Destroy pop up dialogue after the user closes it
+            sensor.marker.on('popupclose', function (e) {
+                e.popup._source.sensorPopup.$destroy("#flyCard")
+            })
         },
 
         buildMarkerIcon: function (sensor) {

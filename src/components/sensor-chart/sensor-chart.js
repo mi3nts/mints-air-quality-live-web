@@ -17,16 +17,16 @@ export default {
     },
     methods: {
         initChart: function () {
-            $("#chart2").html("<div class='my-4 text-center'>Loading data...</div>");
+            $("#chart2_" + this.sensor.sensor_id).html("<div class='my-4 text-center'>Loading data...</div>");
             sensorData.getChartData(this.sensor.sensor_id, {
                 start: this.$moment.utc(this.startDate).toISOString(),
                 end: this.$moment.utc(this.endDate).toISOString(),
             }).then(response => {
                 if (response.data.length) {
-                    $("#chart2").html("<svg> </svg>")
+                    $("#chart2_" + this.sensor.sensor_id).html("<svg> </svg>")
                     this.createChart(response.data);
                 } else {
-                    $("#chart2").html("<div class='my-4 text-center'>No data available.</div>");
+                    $("#chart2_" + this.sensor.sensor_id).html("<div class='my-4 text-center'>No data available.</div>");
                 }
             });
         },
@@ -192,6 +192,7 @@ export default {
             chartData[5].type = "area";
             chartData[5].yAxis = 1;
 
+            var sensor_id_chart = this.sensor.sensor_id
             nv.addGraph(function () {
                 var chart = nv.models.multiChart()
                     .margin({
@@ -212,7 +213,7 @@ export default {
                     .tickFormat(function (d) {
                         return d3.format(',.2f')(d) + 'µg/m³'
                     });
-                d3.select('#chart2 svg')
+                d3.select("#chart2_" + sensor_id_chart + " svg")
                     .datum(chartData)
                     .transition()
                     .duration(500)

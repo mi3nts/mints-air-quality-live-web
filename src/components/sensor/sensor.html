@@ -3,6 +3,7 @@
         <div>
             <v-layout>
                 <v-flex xs11>
+                    <h3 class="text-center">{{spotName}}<br></h3>
                     <div class="text-center primary--text">
                         Current Sensor Data
                     </div>
@@ -10,6 +11,7 @@
                 <!-- <v-icon class="ml-auto" @click="closeIt">close</v-icon> -->
             </v-layout>
             <div>
+                <br>
                 <ul>
                     <li v-if="spot.pm2_5" class="pm25">PM2.5: {{parseFloat(spot.pm2_5).toFixed(2)}} µg/m³</li>
                     <li v-if="spot.pm1">PM1: {{parseFloat(spot.pm1).toFixed(2)}} µg/m³</li>
@@ -19,7 +21,8 @@
                     <li v-if="spot.humidity">Humidity: {{parseFloat(spot.humidity).toFixed(2)}} %</li>
                     <li v-if="spot.dewpoint">DewPoint: {{parseFloat(spot.dewpoint).toFixed(2)}} %</li>
                 </ul>
-                <div class="text-right sub-text">Last Updated: {{spot.timestamp}}</div>
+                <br>
+                <div class="text-right sub-text">Sensor ID: {{spot.sensor_id}} | Last Updated: {{spot.timestamp}}</div>
             </div>
             <hr />
             <div style='text-align:center; font-weight:bold'>Past 24 hours</div>

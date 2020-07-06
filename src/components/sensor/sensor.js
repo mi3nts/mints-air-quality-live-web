@@ -8,7 +8,7 @@ export default {
     components: {
         SensorChart
     },
-    props: ["spot"],
+    props: ["spot", "spotName"],
     data: () => ({
         showMore: false
     }),
