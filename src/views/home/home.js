@@ -245,7 +245,7 @@ export default {
                     displayValues: true,
                     displayOptions: {
                         velocityType: 'GBR Wind',
-                        position: 'topright', //REQUIRED !
+                        position: 'bottomright', //REQUIRED !
                         emptyString: 'No velocity data', //REQUIRED !
                         angleConvention: 'bearingCW',
                         displayPosition: 'topright',
@@ -481,7 +481,7 @@ export default {
             sensor.marker.addTo(this.sensorGroup);
             var popup = L.popup({
                 offset: L.point(-200, 45),
-                maxWidth: '400px',
+                maxWidth: '300px',
                 autoPan: true,
                 keepInView: true
             }).setContent("<div id='flyCard'></div>");
@@ -543,7 +543,7 @@ export default {
             var hidden = $('.side-drawer');
             if (hidden.hasClass('visible')) {
                 hidden.animate({
-                    "left": "-286px"
+                    "left": "-330px"
                 }, "slow").removeClass('visible');
             } else {
                 hidden.animate({
