@@ -480,7 +480,7 @@ export default {
             //handles click event for single click events
             sensor.marker.addTo(this.sensorGroup);
             var popup = L.popup({
-                offset: L.point(-200, 45),
+                offset: L.point(-150, 45),
                 maxWidth: '300px',
                 autoPan: true,
                 keepInView: true

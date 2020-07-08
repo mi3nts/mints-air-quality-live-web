@@ -9,16 +9,17 @@
         <span class="mr-2">Map</span>
       </v-btn>-->
       <v-btn x-large depressed exact text @click="showPM=true;">
-        <span class="mr-2">What is Particulate Matter?</span>
+        <span class="mr-2 d-none d-sm-flex">What is Particulate Matter?</span>
+        <v-icon class="d-flex d-sm-none">help</v-icon>
       </v-btn>
-      <v-dialog v-model="showPM" max-width="50%">
+      <v-dialog v-model="showPM">
         <particulate-matter @close="showPM=false;"></particulate-matter>
       </v-dialog>
       <v-spacer></v-spacer>
       <v-btn x-large exact text @click="showAbout=true;">
         <span class="mr-2">About</span>
       </v-btn>
-      <v-dialog v-model="showAbout" max-width="50%">
+      <v-dialog v-model="showAbout">
         <about @close="showAbout=false;"></about>
       </v-dialog>
     </v-app-bar>

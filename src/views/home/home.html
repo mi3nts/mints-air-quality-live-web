@@ -34,7 +34,7 @@
             </v-expansion-panel>
             <v-expansion-panel>
                 <v-expansion-panel-header>
-                    <div @click.stop>
+                    <div>
                         <v-checkbox class="my-0" hide-details color="primary" v-model="radarLayer" label="Radar">
                         </v-checkbox>
                     </div>
@@ -47,7 +47,7 @@
             </v-expansion-panel>
             <v-expansion-panel>
                 <v-expansion-panel-header>
-                    <div @click.stop>
+                    <div>
                         <v-checkbox :disabled="!wind.data_time" class="my-0" hide-details color="primary"
                             v-model="windLayer" label="NOAA (Wind)"></v-checkbox>
                     </div>
@@ -74,7 +74,7 @@
             </v-expansion-panel> -->
             <v-expansion-panel>
                 <v-expansion-panel-header>
-                    <div @click.stop class="d-flex justify-space-between">
+                    <div class="d-flex justify-space-between">
                         <v-checkbox class="my-0" hide-details color="primary" v-model="epaLayer" label="EPA">
                         </v-checkbox>
                         <div id="EPA">
@@ -90,7 +90,7 @@
             </v-expansion-panel>
             <v-expansion-panel>
                 <v-expansion-panel-header>
-                    <div @click.stop class="d-flex justify-space-between">
+                    <div class="d-flex justify-space-between">
                         <v-checkbox class="my-0" hide-details color="primary" v-model="purpleAirLayer"
                             label="PurpleAir">
                         </v-checkbox>
@@ -107,7 +107,7 @@
             </v-expansion-panel>
             <v-expansion-panel>
                 <v-expansion-panel-header>
-                    <div @click.stop class="d-flex justify-space-between">
+                    <div class="d-flex justify-space-between">
                         <v-checkbox class="my-0" hide-details color="primary" v-model="pollutionLayer"
                             label="Pollution Burden">
                         </v-checkbox>
