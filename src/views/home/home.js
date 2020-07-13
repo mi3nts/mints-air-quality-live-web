@@ -288,10 +288,9 @@ export default {
                 position: 'bottomright'
             }).addTo(this.map);
             this.map.on('baselayerchange', (event) => {
-                if (this.windLayer) {
-                    this.windLayer = false;
-                    this.buildWindLayer(event.name, true);
-                }
+                var previousValue = this.windLayer;
+                this.windLayer = false;
+                this.buildWindLayer(event.name, previousValue);
             });
         },
         loadPurpleAir: function () {
@@ -305,7 +304,7 @@ export default {
             });
         },
         loadPollution: function () {
-            this.$axios.get("/json/PollutionBurdenByCouncilDistrict.json").then(response =>{
+            this.$axios.get("/json/PollutionBurdenByCouncilDistrict.json").then(response => {
                 response.data.forEach(item => {
                     this.renderPollution(item);
                 });
@@ -444,7 +443,7 @@ export default {
                         if (sensorLocatRes.data.length &&
                             sensorLocatRes.data[0].longitude != null && sensorLocatRes.data[0].latitude != null) {
                             sensorData.getSensorName(s).then(sensorNameRes => {
-                                if(sensorNameRes.data.length && sensorNameRes.data[0].sensor_name != null) {
+                                if (sensorNameRes.data.length && sensorNameRes.data[0].sensor_name != null) {
                                     sensorData.getSensorData(s).then(sensorResponse => {
                                         if (sensorResponse.data.length) {
                                             sensorResponse.data.id = s;
@@ -474,7 +473,7 @@ export default {
                 }),
                 title: sensorName,
                 alt: sensor.sensor_id,
-                zIndexOffset: zIndexPriority*5  // Ensures more recently updated sensors will remain on top
+                zIndexOffset: zIndexPriority * 5 // Ensures more recently updated sensors will remain on top
             });
 
             //handles click event for single click events
