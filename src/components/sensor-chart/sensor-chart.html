@@ -37,7 +37,31 @@
                     </v-menu>
                 </v-col>
                 <v-col cols="12" sm="12" md="4" class="text-center">
-                    <v-btn color="primary" large @click="initChart">Update</v-btn>
+                    <v-menu offset-y>
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-btn id="interval-info" class="fullscreen-btn" color="accent" large dark v-bind="attrs" v-on="on">
+                            Interval: All data
+                          </v-btn>
+                        </template>
+                        <v-list>
+                          <v-list-item @click="updateDataInterval('1 60:60:60')">
+                            <v-list-item-title>1 day</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item @click="updateDataInterval('1:60:60')">
+                            <v-list-item-title>1 hour</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item @click="updateDataInterval('30:60')"> 
+                            <v-list-item-title>30 minutes</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item @click="updateDataInterval('10:60')">
+                            <v-list-item-title>10 minutes</v-list-item-title>
+                          </v-list-item>
+                          <v-list-item @click="updateDataInterval('')">
+                            <v-list-item-title>All data</v-list-item-title>
+                          </v-list-item>
+                        </v-list>
+                    </v-menu>
+                    <v-btn class="fullscreen-btn" color="primary" large @click="initChart">Update</v-btn>
                 </v-col>
             </v-row>
         </v-container>

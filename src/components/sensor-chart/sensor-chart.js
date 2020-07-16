@@ -6,7 +6,8 @@ export default {
         startDateModel: false,
         endDateModel: false,
         startDate: null,
-        endDate: null
+        endDate: null,
+        dataInterval: ''
     }),
     created: function () {
         this.startDate = this.$moment.utc().add(-24, 'hour').format("YYYY-MM-DD");
@@ -18,10 +19,12 @@ export default {
     methods: {
         initChart: function () {
             $("#chart2_" + this.sensor.sensor_id).html("<div class='my-4 text-center'>Loading data...</div>");
-            sensorData.getChartData(this.sensor.sensor_id, {
-                start: this.$moment.utc(this.startDate).toISOString(),
-                end: this.$moment.utc(this.endDate).toISOString(),
-            }).then(response => {
+            sensorData.getChartData(
+                this.sensor.sensor_id, {
+                    start: this.$moment.utc(this.startDate).toISOString(),
+                    end: this.$moment.utc(this.endDate).toISOString(),
+                }, this.dataInterval
+            ).then(response => {
                 if (response.data.length) {
                     $("#chart2_" + this.sensor.sensor_id).html("<svg> </svg>")
                     this.createChart(response.data);
@@ -29,6 +32,25 @@ export default {
                     $("#chart2_" + this.sensor.sensor_id).html("<div class='my-4 text-center'>No data available.</div>");
                 }
             });
+        },
+        updateDataInterval: function (value) {
+            this.dataInterval = value
+            var text = 'All data'
+            switch(value) {
+                case '1 60:60:60':
+                    text = '1 Day'
+                    break
+                case '1:60:60':
+                    text = '1 hour'
+                    break
+                case '30:60':
+                    text = '30 minutes'
+                    break
+                case '10:60':
+                    text = '10 minutes'
+                    break
+            }
+            $("#interval-info").html("Interval: " + text)
         },
         changeInterval: function (values) {
             var length = values.length;

@@ -27,7 +27,7 @@ export default {
             sensorData.getChartData(this.spot.sensor_id, {
                 start: this.$moment.utc().add(-24, 'hour').toISOString(),
                 end: this.$moment.utc().toISOString(),
-            }).then(response => {
+            }, '30:60').then(response => {
                 if (response.data.length) {
                     $("#chart").css('height', '250px').html("<svg> </svg>")
                     this.createChart(response.data);
