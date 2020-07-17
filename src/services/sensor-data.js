@@ -24,8 +24,8 @@ export default new Vue({
         },
         getChartData: function (sensorID, range, interval) {
             if(interval == '')
-                return this.$axios.get(this.baseUrl + `/data/${sensorID}/${range.start}/${range.end}`);
-            return this.$axios.get(this.baseUrl + `/data/${sensorID}/${range.start}/${range.end}/${interval}`);
+                return this.$axios.get(this.baseUrl + `/data/pm2_5/${sensorID}/${range.start}/${range.end}`);
+            return this.$axios.get(this.baseUrl + `/data/pm2_5/${sensorID}/${range.start}/${range.end}/${interval}`);
         },
         getWindData: function () {
             return this.$axios.get(this.baseUrl + "/wind_data/latest");
