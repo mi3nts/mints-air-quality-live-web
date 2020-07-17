@@ -38,17 +38,18 @@ export default {
             //endDate: null,
             /** Popup controls */
             howToUse: false,
+            epaType: "PM25",
             /** Currently selected PM type */
             pmType: "pm2_5",
             /** Default state of left side expansion panels */
             activePanel: 0,
             /** All available sensor instances  */
             sensors: [],
-            sensorGroup: L.layerGroup(),
-            openAQGroup: L.layerGroup(),
-            purpleAirGroup: L.layerGroup(),
-            epaGroup: L.layerGroup(),
-            pollutionGroup: L.layerGroup(),
+            sensorGroup: L.markerClusterGroup(),
+            openAQGroup: L.markerClusterGroup(),
+            purpleAirGroup: L.markerClusterGroup(),
+            epaGroup: L.markerClusterGroup(),
+            pollutionGroup: L.markerClusterGroup(),
         }
     },
     watch: {
@@ -83,6 +84,12 @@ export default {
                 this.map.removeLayer(this.epaGroup);
             }
             this.openAQLayer = newValue;
+        },
+        'epaType': function () {
+            if (this.epaLayer) {
+                this.loadEPA(true);
+                this.loadOpenAQ(true);
+            }
         },
         'sensorLayer': function (newValue) {
             if (newValue) {
@@ -361,7 +368,12 @@ export default {
             popup += "</div>";
             location.marker.bindPopup(popup);
         },
-        loadOpenAQ: function () {
+        loadOpenAQ: function (refresh) {
+            if (refresh) {
+                this.map.removeLayer(this.openAQGroup);
+                this.openAQGroup = L.markerClusterGroup();
+                this.openAQGroup.addTo(this.map);
+            }
             openAqData.getLatestCityData().then(response => {
                 response.data.results.forEach(result => {
                     this.renderOpenAQ(result);
@@ -369,43 +381,48 @@ export default {
             });
         },
         renderOpenAQ: function (location) {
-            var index = -1;
-            var markerValue = '';
-            var fillColor = "#6B8E23"; //O3 colors to be determined
-            if (location.measurements[0].parameter.includes("pm25")) {
-                index = 0;
-            } else if (location.measurements.length - 1 > 0 && location.measurements[1].parameter.includes("pm25")) {
-                index = 1;
-            }
-            if (index != -1) {
-                fillColor = this.getMarkerColor(location.measurements[index].value);
-                markerValue = location.measurements[index].value;
-            }
-            location.marker = L.marker([location.coordinates.latitude, location.coordinates.longitude], {
-                icon: L.divIcon({
-                    className: 'svg-icon',
-                    html: this.getSquareMarker("#6B8E23", fillColor, 40, markerValue),
-                    iconAnchor: [20, 10],
-                    iconSize: [20, 32],
-                    popupAnchor: [0, -30]
-                })
-            })
-            location.marker.addTo(this.openAQGroup);
-            var popup = "<div style='font-size:14px'>";
-            popup += "<div style='text-align:center; font-weight:bold'>" + location.location + " </div><br>";
-            location.measurements.forEach(m => {
-                if (m.parameter == "pm25") {
-                    popup += "<li class='pm25'>" + "PM2.5 : " + m.value + " " + m.unit + " </li><br>";
-                } else if (m.parameter == "o3") {
-                    popup += "<li>" + "O3 : " + m.value + " " + m.unit + " </li><br>";
+            var parameter = this.epaType.toLocaleLowerCase();
+            location.measurements.forEach((measurement) => {
+                console.log(parameter,measurement.parameter);
+                if (parameter != measurement.parameter) {
+                    return;
                 }
+                var markerValue = '';
+                var fillColor = "#6B8E23"; //O3 colors to be determined
+                if (measurement.parameter == "pm25") {
+                    fillColor = this.getMarkerColor(measurement.value);
+                    markerValue = measurement.value;
+                }
+
+                location.marker = L.marker([location.coordinates.latitude, location.coordinates.longitude], {
+                    icon: L.divIcon({
+                        className: 'svg-icon',
+                        html: this.getSquareMarker("#6B8E23", fillColor, 40, markerValue),
+                        iconAnchor: [20, 10],
+                        iconSize: [20, 32],
+                        popupAnchor: [0, -30]
+                    })
+                })
+                location.marker.addTo(this.openAQGroup);
+                var popup = "<div style='font-size:14px'>";
+                popup += "<div style='text-align:center; font-weight:bold'>" + location.location + " </div><br>";
+                if (measurement.parameter == "pm25") {
+                    popup += "<li class='pm25'>" + "PM2.5 : " + measurement.value + " " + measurement.unit + " </li><br>";
+                } else if (measurement.parameter == "o3") {
+                    popup += "<li>" + "O3 : " + measurement.value + " " + measurement.unit + " </li><br>";
+                }
+                popup += "<div style='text-align:right; font-size: 11px'>Last Updated: " + location.measurements[0].lastUpdated + " UTC</div>";
+                popup += "</div>";
+                location.marker.bindPopup(popup);
             });
-            popup += "<div style='text-align:right; font-size: 11px'>Last Updated: " + location.measurements[0].lastUpdated + " UTC</div>";
-            popup += "</div>";
-            location.marker.bindPopup(popup);
         },
-        loadEPA: function () {
-            epaData.getLatestCityData().then(response => {
+        loadEPA: function (refresh) {
+            if (refresh) {
+                this.map.removeLayer(this.epaGroup);
+                this.epaGroup = L.markerClusterGroup();
+                this.epaGroup.addTo(this.map);
+            }
+            epaData.getLatestCityData(this.epaType).then(response => {
                 response.data.forEach(result => {
                     this.renderEPA(result);
                 })

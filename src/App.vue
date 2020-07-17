@@ -30,7 +30,10 @@
 </template>
 
 <style>
-.nvd3 .nv-axis line { stroke: black; opacity: 0.6; }
+.nvd3 .nv-axis line {
+  stroke: black;
+  opacity: 0.6;
+}
 .v-overlay {
   z-index: 9999 !important;
 }
@@ -46,10 +49,14 @@ header .v-btn {
   text-transform: none;
 }
 .pm25 {
-    font-weight: bold;
-    font-size: 16px;
+  font-weight: bold;
+  font-size: 16px;
 }
-
+@media only screen and (max-width: 600px) {
+  .leaflet-control-velocity {
+    display: none;
+  }
+}
 </style>
 
 <script>

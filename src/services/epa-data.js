@@ -10,20 +10,20 @@ export default new Vue({
     data: function () {
         return {
             baseUrl: "https://www.airnowapi.org/aq/data",
-            bboxRecent: "PM25&BBOX=-97.754269,31.802118,-95.966931,33.589456&dataType=C&format=application/json&verbose=1&nowcastonly=1&includerawconcentrations=0&API_KEY=743E8D00-0FD4-4B80-A52E-356DE6E4266C"
-            //TODO: Add ozone after the Ozone/PM2.5 universal button system has been established
+            bboxRecent: "BBOX=-97.754269,31.802118,-95.966931,33.589456&dataType=C&format=application/json&verbose=1&nowcastonly=1&includerawconcentrations=0&API_KEY=743E8D00-0FD4-4B80-A52E-356DE6E4266C"
         }
     },
     methods: {
         /** 
          * EPA documentation 
          * https://docs.airnowapi.org/Data/docs
+         * epaType can be : PM25,O3
          * */
-        getLatestCityData: function () {
-            return this.$axios.get("https://cors-anywhere.herokuapp.com/" + this.baseUrl + "/?parameters=" + this.bboxRecent);
+        getLatestCityData: function (epaType) {
+            return this.$axios.get("https://cors-anywhere.herokuapp.com/" + this.baseUrl + "/?parameters=" + epaType + "&" + this.bboxRecent);
         },
         getHistoricalData: function (startDate, endDate) {
-            return this.$axios.get(this.baseUrl + "/?startDate=" + startDate + "&endDate=" + endDate +"&parameters=" + this.bboxRecent);
+            return this.$axios.get(this.baseUrl + "/?startDate=" + startDate + "&endDate=" + endDate + "&parameters=" + this.bboxRecent);
         }
     }
-}); 
+});

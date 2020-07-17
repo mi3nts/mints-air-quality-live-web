@@ -84,6 +84,10 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <div>
+                        <v-radio-group hide-details v-model="epaType" class="my-0">
+                            <v-radio :disabled="!epaLayer" color="primary" label="PM2.5" value="PM25"></v-radio>
+                            <v-radio :disabled="!epaLayer" color="primary" label="Ozone" value="O3"></v-radio>
+                        </v-radio-group>
                         Disclaimer: The color scale we present does not reflect how EPA presents their data concerning PM2.5 levels.
                     </div>
                 </v-expansion-panel-content>
