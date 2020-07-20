@@ -383,7 +383,6 @@ export default {
         renderOpenAQ: function (location) {
             var parameter = this.epaType.toLocaleLowerCase();
             location.measurements.forEach((measurement) => {
-                console.log(parameter,measurement.parameter);
                 if (parameter != measurement.parameter) {
                     return;
                 }
@@ -479,7 +478,7 @@ export default {
         // single click pop up information
         renderSensor: function (sensor, sensorLocation, sensorName, zIndexPriority) {
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(sensor.timestamp))).asMinutes();
-            var fillColor = timeDiffMinutes > 5 ? 'grey' : this.getMarkerColor(sensor[this.pmType]);
+            var fillColor = timeDiffMinutes > 5 ? '#808080' : this.getMarkerColor(sensor[this.pmType]);
             sensor.marker = L.marker([sensorLocation.latitude, sensorLocation.longitude], {
                 icon: L.divIcon({
                     className: 'svg-icon',
@@ -567,8 +566,11 @@ export default {
                 }, "slow").addClass('visible');
             }
         },
+        invertHex: function (hex) {
+            return (Number(`0x1${hex}`) ^ 0xFFFFFF).toString(16).substr(1).toUpperCase()
+        },
         getCircleMarker(color, fill, size, value) {
-            var textColor = (fill == 'grey') ? '#ffffff' : '#ff0000';
+            var textColor = this.invertHex(fill);
             var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24"><circle fill="${fill}" fill-opacity="0.8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="${color}" cx="12" cy="12" r="10"></circle><text x="12" y="15" fill="${textColor}" text-anchor="middle" font-family="PT Sans" font-size="8">${value}</text></svg>`;
             return svg;
         },
