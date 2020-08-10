@@ -47,7 +47,7 @@ export default {
             sensors: [],
             sensorGroup: L.markerClusterGroup(),
             openAQGroup: L.markerClusterGroup(),
-            purpleAirGroup: L.markerClusterGroup(),
+            purpleAirGroup: L.layerGroup(),
             epaGroup: L.markerClusterGroup(),
             pollutionGroup: L.markerClusterGroup(),
         }

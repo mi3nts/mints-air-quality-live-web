@@ -3,19 +3,19 @@
     <v-app-bar app dark color="primary" class="align-center">
       <img class="mr-2" height="50px" src="/img/logo_white.png" />
       <v-toolbar-title class="display-1 mr-10">
-        <span>SharedAirDFW</span>
+        <span>SharedAirDFW Community Air Monitoring Network</span>
       </v-toolbar-title>
       <!-- <v-btn x-large depressed exact text :to="{name : 'home'}">
         <span class="mr-2">Map</span>
       </v-btn>-->
-      <v-btn x-large depressed exact text @click="showPM=true;">
-        <span class="mr-2 d-none d-sm-flex">What is Particulate Matter?</span>
-        <v-icon class="d-flex d-sm-none">help</v-icon>
-      </v-btn>
       <v-dialog v-model="showPM">
         <particulate-matter @close="showPM=false;"></particulate-matter>
       </v-dialog>
       <v-spacer></v-spacer>
+      <v-btn x-large depressed exact text @click="showPM=true;">
+        <span class="mr-2 d-none d-lg-flex d-xl-none">Particulate Matter?</span>
+        <v-icon class="d-flex">help</v-icon>
+      </v-btn>
       <v-btn x-large exact text @click="showAbout=true;">
         <span class="mr-2">About</span>
       </v-btn>
