@@ -46,10 +46,10 @@ export default {
             /** All available sensor instances  */
             sensors: [],
             sensorGroup: L.markerClusterGroup(),
-            openAQGroup: L.markerClusterGroup(),
+            openAQGroup: L.layerGroup(),
             purpleAirGroup: L.layerGroup(),
-            epaGroup: L.markerClusterGroup(),
-            pollutionGroup: L.markerClusterGroup(),
+            epaGroup: L.layerGroup(),
+            pollutionGroup: L.layerGroup(),
         }
     },
     watch: {
@@ -328,10 +328,13 @@ export default {
                 })
             })
             location.marker.addTo(this.pollutionGroup);
+            console.log(location);
             var popup = "<div style='font-size:14px'>";
-            popup += "<div style='text-align:center; font-weight:bold'>" + location['Industry Name'] + " </div><br>";
-            popup += "<li class='pm25'> Total : " + location['TOTAL'] + " </li><br>";
-            popup += "<li> Number : " + location.Number + " </li><br>";
+            popup += "<div style='text-align:center; font-weight:bold;'>" + location['Industry Name'] + " </div><br>";
+            popup += "<div style='text-align:center;'>" + location['Address'] + " </div><br>";
+            popup += "<li> SOX : " + location['Permitted PM (TPY)'] + " </li><br>";
+            popup += "<li> PM : " + location['Permitted SOx (TPY)'] + " </li><br>";
+            popup += "<li> Voc : " + location['Permitted VoC (TPY)'] + " </li><br>";
             popup += "</div>";
             location.marker.bindPopup(popup);
         },
@@ -371,7 +374,7 @@ export default {
         loadOpenAQ: function (refresh) {
             if (refresh) {
                 this.map.removeLayer(this.openAQGroup);
-                this.openAQGroup = L.markerClusterGroup();
+                this.openAQGroup = L.layerGroup();
                 this.openAQGroup.addTo(this.map);
             }
             openAqData.getLatestCityData().then(response => {
@@ -418,7 +421,7 @@ export default {
         loadEPA: function (refresh) {
             if (refresh) {
                 this.map.removeLayer(this.epaGroup);
-                this.epaGroup = L.markerClusterGroup();
+                this.epaGroup = L.layerGroup();
                 this.epaGroup.addTo(this.map);
             }
             epaData.getLatestCityData(this.epaType).then(response => {
