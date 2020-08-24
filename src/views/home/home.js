@@ -328,7 +328,6 @@ export default {
                 })
             })
             location.marker.addTo(this.pollutionGroup);
-            console.log(location);
             var popup = "<div style='font-size:14px'>";
             popup += "<div style='text-align:center; font-weight:bold;'>" + location['Industry Name'] + " </div><br>";
             popup += "<div style='text-align:center;'>" + location['Address'] + " </div><br>";
