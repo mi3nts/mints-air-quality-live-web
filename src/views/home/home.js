@@ -273,7 +273,7 @@ export default {
         bindIconsToAccordian: function () {
             $('#PurpleAir').append(this.getPentagonMarker("#9370DB", "#ffff9e", 25, ''));
             $('#EPA').append(this.getSquareMarker("#6B8E23", "#ffff9e", 25, ''));
-            $('#EPA').append(this.getHexagonMarker("#66CDAA", "#ffff9e", 25, ''));
+            //$('#EPA').append(this.getHexagonMarker("#66CDAA", "#ffff9e", 25, ''));
             $('#DFW').append(this.getCircleMarker("#38b5e6", "#ffff9e", 25, ''));
             $('#pollution').append(this.getCircleMarker("#38b5e6", "#000000", 20, ''));
         },
@@ -439,7 +439,8 @@ export default {
             location.marker = L.marker([location.Latitude, location.Longitude], {
                 icon: L.divIcon({
                     className: 'svg-icon',
-                    html: this.getOctagonMarker("#66CDAA", fillColor, 40, PM_value),
+                    //html: this.getOctagonMarker("#66CDAA", fillColor, 40, PM_value),
+                    html: this.getSquareMarker("#66CDAA", fillColor, 40, PM_value),
                     iconAnchor: [20, 10],
                     iconSize: [20, 32],
                     popupAnchor: [0, -30]
@@ -560,7 +561,7 @@ export default {
             var hidden = $('.side-drawer');
             if (hidden.hasClass('visible')) {
                 hidden.animate({
-                    "left": "-330px"
+                    "left": "-280px"
                 }, "slow").removeClass('visible');
             } else {
                 hidden.animate({
