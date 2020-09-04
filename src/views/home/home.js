@@ -45,7 +45,9 @@ export default {
             activePanel: 0,
             /** All available sensor instances  */
             sensors: [],
-            sensorGroup: L.markerClusterGroup(),
+            sensorGroup: L.markerClusterGroup({
+                disableClusteringAtZoom: 13
+            }),
             openAQGroup: L.layerGroup(),
             purpleAirGroup: L.layerGroup(),
             epaGroup: L.layerGroup(),
@@ -153,6 +155,7 @@ export default {
          * Bind icons to accordions
          */
         this.bindIconsToAccordian();
+
     },
     methods: {
         buildLayers: function () {
@@ -593,5 +596,19 @@ export default {
             var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 572 545"><path fill="${fill}" fill-opacity="0.8" stroke="${color}" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" d="M 286,10 L 10,210 L 116,535 L 456,535 L 562,210 Z"/><text x="280" y="340" style="font-weight: 400" text-anchor="middle" font-family="PT Sans" font-size="180">${value}</text></svg>`;
             return svg;
         },
+        reset() {
+            this.selectedSensor = null;
+            this.radarLayer = false;
+            this.windLayer = true;
+            this.sensorLayer = true;
+            this.epaLayer = false;
+            this.purpleAirLayer = false;
+            this.openAQLayer = false;
+            this.pollutionLayer = false;
+            this.howToUse = false;
+            this.epaType = "PM25";
+            this.pmType = "pm2_5";
+            this.activePanel = 0;
+        }
     }
 };

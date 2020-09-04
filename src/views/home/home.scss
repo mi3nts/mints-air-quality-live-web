@@ -13,11 +13,16 @@
     background: white;
     margin: 10px;
 
+    .home
+    {
+        position: absolute;
+        left:7px;
+        top:7px;
+    }
+
     .scale {
-        background-color: #38b5e6;
-        margin-left: -25px;
-        margin-right: -25px;
-        margin-top: 10px;
+        width: 260px;
+        margin: 0 auto;
 
         img {
             width: 100%;

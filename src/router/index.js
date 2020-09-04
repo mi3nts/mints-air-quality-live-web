@@ -6,8 +6,7 @@ Vue.use(VueRouter)
 /**
  * All the url configurations go here.
  */
-const routes = [
-  {
+const routes = [{
     path: '/',
     name: 'home',
     component: Home
@@ -20,6 +19,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
+  mode: 'history',
   routes
 })
 

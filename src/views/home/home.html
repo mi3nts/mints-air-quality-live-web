@@ -5,16 +5,21 @@
             <v-icon @click="slide">menu</v-icon>
         </div>
         <div class="text-center">
+            <v-icon @click="reset" color='primary' large class="home mt-1">home</v-icon>
             <v-btn @click="howToUse=true;" class="ma-2" tile outlined color="primary">
                 <v-icon left>mdi-help</v-icon> How To Use
             </v-btn>
+        </div>
+        <div class="scale">
+            <img src="/img/graph.PNG" />
         </div>
 
         <v-expansion-panels style="width:270px" :value="activePanel" accordion>
             <v-expansion-panel>
                 <v-expansion-panel-header>
                     <div @click.stop class="d-flex justify-space-between">
-                        <v-checkbox class="my-0" hide-details color="primary" v-model="sensorLayer" label="SharedAir Monitors">
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="sensorLayer"
+                            label="SharedAir Monitors">
                         </v-checkbox>
                         <div id="DFW">
 
@@ -26,9 +31,6 @@
                         <v-radio-group hide-details v-model="pmType" class="my-0">
                             <v-radio color="primary" label="PM2.5" value="pm2_5"></v-radio>
                         </v-radio-group>
-                        <div class="scale">
-                            <img src="/img/graph.PNG" />
-                        </div>
                     </div>
                 </v-expansion-panel-content>
             </v-expansion-panel>
@@ -55,7 +57,8 @@
                 <v-expansion-panel-content>
                     <div class="body-2">
                         <div><b class="caption">Data Time: </b>{{wind.data_time? wind.data_time : 'Updating..' }}</div>
-                        <div><b class="caption">Updated Last: </b>{{wind.updated_time? wind.updated_time: 'Updating..'}}</div>
+                        <div><b class="caption">Updated Last: </b>{{wind.updated_time? wind.updated_time: 'Updating..'}}
+                        </div>
                     </div>
                 </v-expansion-panel-content>
             </v-expansion-panel>
@@ -88,7 +91,8 @@
                             <v-radio :disabled="!epaLayer" color="primary" label="PM2.5" value="PM25"></v-radio>
                             <v-radio :disabled="!epaLayer" color="primary" label="Ozone" value="O3"></v-radio>
                         </v-radio-group>
-                        Disclaimer: The color scale we present does not reflect how EPA presents their data concerning PM2.5 levels.
+                        Disclaimer: The color scale we present does not reflect how EPA presents their data concerning
+                        PM2.5 levels.
                     </div>
                 </v-expansion-panel-content>
             </v-expansion-panel>
@@ -105,7 +109,8 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <div>
-                        Disclaimer: The color scale we present does not reflect how PurpleAir presents their data concerning PM2.5 levels.
+                        Disclaimer: The color scale we present does not reflect how PurpleAir presents their data
+                        concerning PM2.5 levels.
                     </div>
                 </v-expansion-panel-content>
             </v-expansion-panel>
@@ -121,9 +126,7 @@
                     </div>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
-                    <div>
-                        Disclaimer: The color scale we present does not reflect how PurpleAir presents their data concerning PM2.5 levels.
-                    </div>
+                    
                 </v-expansion-panel-content>
             </v-expansion-panel>
         </v-expansion-panels>

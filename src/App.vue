@@ -3,7 +3,7 @@
     <v-app-bar app dark color="primary" class="align-center">
       <img class="mr-2" height="50px" src="/img/logo_white.png" />
       <v-toolbar-title class="display-1 mr-10">
-        <span>SharedAirDFW Community Air Monitoring Network</span>
+        <span>SharedAirDFW</span>
       </v-toolbar-title>
       <!-- <v-btn x-large depressed exact text :to="{name : 'home'}">
         <span class="mr-2">Map</span>
