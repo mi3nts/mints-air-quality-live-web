@@ -32,6 +32,76 @@
                             <v-radio color="primary" label="PM2.5" value="pm2_5"></v-radio>
                         </v-radio-group>
                     </div>
+                    <div class="time-label"><v-icon>access_time</v-icon> <span>30-second average</span></div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <!-- <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div @click.stop>
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="openAQLayer" label="OpenAQ">
+                        </v-checkbox>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        Disclaimer: The color scale we present does not reflect how OpenAQ presents their data concerning PM2.5 levels.
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel> -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div class="d-flex justify-space-between">
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="epaLayer" label="EPA">
+                        </v-checkbox>
+                        <div id="EPA">
+
+                        </div>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        <!-- <v-radio-group hide-details v-model="epaType" class="my-0">
+                            <v-radio :disabled="!epaLayer" color="primary" label="PM2.5" value="PM25"></v-radio>
+                            <v-radio :disabled="!epaLayer" color="primary" label="Ozone" value="O3"></v-radio>
+                        </v-radio-group> -->
+                        Disclaimer: The color scale we present does not reflect how EPA presents their data concerning
+                        PM2.5 levels.
+                        <div class="time-label"><v-icon>access_time</v-icon> <span>1-hour average</span></div>
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div class="d-flex justify-space-between">
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="purpleAirLayer"
+                            label="PurpleAir">
+                        </v-checkbox>
+                        <div id="PurpleAir">
+
+                        </div>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        Disclaimer: The color scale we present does not reflect how PurpleAir presents their data
+                        concerning PM2.5 levels.
+                        <div class="time-label"><v-icon>access_time</v-icon> <span>10-minute average</span></div>
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div class="d-flex justify-space-between">
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="pollutionLayer"
+                            label="Air Pollution Burden">
+                        </v-checkbox>
+                        <div id="pollution">
+
+                        </div>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>Major Air Pollution Permits. All numbers are in Tons Per Year</div>
                 </v-expansion-panel-content>
             </v-expansion-panel>
             <v-expansion-panel>
@@ -60,73 +130,6 @@
                         <div><b class="caption">Updated Last: </b>{{wind.updated_time? wind.updated_time: 'Updating..'}}
                         </div>
                     </div>
-                </v-expansion-panel-content>
-            </v-expansion-panel>
-            <!-- <v-expansion-panel>
-                <v-expansion-panel-header>
-                    <div @click.stop>
-                        <v-checkbox class="my-0" hide-details color="primary" v-model="openAQLayer" label="OpenAQ">
-                        </v-checkbox>
-                    </div>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                    <div>
-                        Disclaimer: The color scale we present does not reflect how OpenAQ presents their data concerning PM2.5 levels.
-                    </div>
-                </v-expansion-panel-content>
-            </v-expansion-panel> -->
-            <v-expansion-panel>
-                <v-expansion-panel-header>
-                    <div class="d-flex justify-space-between">
-                        <v-checkbox class="my-0" hide-details color="primary" v-model="epaLayer" label="EPA">
-                        </v-checkbox>
-                        <div id="EPA">
-
-                        </div>
-                    </div>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                    <div>
-                        <v-radio-group hide-details v-model="epaType" class="my-0">
-                            <v-radio :disabled="!epaLayer" color="primary" label="PM2.5" value="PM25"></v-radio>
-                            <v-radio :disabled="!epaLayer" color="primary" label="Ozone" value="O3"></v-radio>
-                        </v-radio-group>
-                        Disclaimer: The color scale we present does not reflect how EPA presents their data concerning
-                        PM2.5 levels.
-                    </div>
-                </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-                <v-expansion-panel-header>
-                    <div class="d-flex justify-space-between">
-                        <v-checkbox class="my-0" hide-details color="primary" v-model="purpleAirLayer"
-                            label="PurpleAir">
-                        </v-checkbox>
-                        <div id="PurpleAir">
-
-                        </div>
-                    </div>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                    <div>
-                        Disclaimer: The color scale we present does not reflect how PurpleAir presents their data
-                        concerning PM2.5 levels.
-                    </div>
-                </v-expansion-panel-content>
-            </v-expansion-panel>
-            <v-expansion-panel>
-                <v-expansion-panel-header>
-                    <div class="d-flex justify-space-between">
-                        <v-checkbox class="my-0" hide-details color="primary" v-model="pollutionLayer"
-                            label="Pollution Burden">
-                        </v-checkbox>
-                        <div id="pollution">
-
-                        </div>
-                    </div>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                    
                 </v-expansion-panel-content>
             </v-expansion-panel>
         </v-expansion-panels>

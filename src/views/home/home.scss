@@ -13,11 +13,10 @@
     background: white;
     margin: 10px;
 
-    .home
-    {
+    .home {
         position: absolute;
-        left:7px;
-        top:7px;
+        left: 7px;
+        top: 7px;
     }
 
     .scale {
@@ -38,6 +37,16 @@
 
         i {
             color: #38b5e6;
+        }
+    }
+
+    .time-label {
+        text-align: right;
+        font-size: 14px;
+        color: #8a8a8a;
+
+        span {
+            vertical-align: middle;
         }
     }
 }

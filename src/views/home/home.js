@@ -609,6 +609,7 @@ export default {
             this.epaType = "PM25";
             this.pmType = "pm2_5";
             this.activePanel = 0;
+            this.map.setView([32.89746164575043, -97.04086303710938], 10);
         }
     }
 };
