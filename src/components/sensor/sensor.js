@@ -12,6 +12,7 @@ export default {
     data: () => ({
         showMore: false
     }),
+    //monitoring the change
     watch: {
         'spot': function () {
             this.initChart();
@@ -54,12 +55,14 @@ export default {
                     y: data[i].pm2_5
                 });
             }
+            //define values of different color
             var maxYValue = Math.max.apply(Math, sensorValues.map(function(o) { return o.y; }))
             var yellowValue = 0;
             var orangeValue = 0;
             var redValue = 0;
             var purpleValue = 0;
             var maroonValue = 0;
+            //different color will have different value depending on the maxYValue
             if (maxYValue < 10) {
                 yellowValue = maxYValue;
             } else if (maxYValue < 20) {
@@ -169,7 +172,7 @@ export default {
             chartData[4].yAxis = 1;
             chartData[5].type = "area";
             chartData[5].yAxis = 1;
-
+            //this graph function will change the color of the node depending on the value of data.
             nv.addGraph(function () {
                 var maxYValue = Math.max.apply(Math, chartData[0].values.map(function(o) { return o.y; }))
                 var chart = nv.models.multiChart()
