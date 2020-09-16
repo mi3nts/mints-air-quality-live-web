@@ -259,8 +259,9 @@ export default {
             chartData[5].type = "area";
             chartData[5].yAxis = 1;
 
+            let hourlyTicks = this.viewHourly
             var sensor_id_chart = this.sensor.sensor_id
-            nv.addGraph(function () {
+            nv.addGraph(function () {   
                 var chart = nv.models.multiChart()
                     .margin({
                         top: 50,
@@ -273,7 +274,11 @@ export default {
                 chart.legend.updateState(false);
                 chart.xAxis
                     .tickFormat(function (d) {
-                        return d3.time.format('%b %d %I:00:00 %p')(new Date(d))
+                        if (hourlyTicks) {
+                            return d3.time.format('%b %d %I:00:00%p')(new Date(d));
+                        } else {
+                            return d3.time.format('%b %d %I:%M:%S%p')(new Date(d))
+                        }
                     })
                     .staggerLabels(true);
                 chart.yAxis1
