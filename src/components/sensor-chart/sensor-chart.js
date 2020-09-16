@@ -96,7 +96,6 @@ export default {
         },
         createChart: function (data) {
             //formats the data for the chart
-            console.log("viewHourly is " + this.viewHourly);
             var sensorValues = [];
             if(!this.viewHourly) {
                 for (var i = 0; i < data.length; i++) {
@@ -106,7 +105,7 @@ export default {
                     });
                 }
             } else {
-                var prevHour = 0;
+                var prevHour = null;
                 var currHour = 0;
             
                 var prevHourStart = 0;
@@ -117,25 +116,19 @@ export default {
                 for (var j = 0; j < data.length; j++) {
                     currHour = this.$moment.utc(data[j].timestamp).local().toDate().getHours();
                     
-                    if (currHour == prevHour) {
+                    if (currHour == prevHour || prevHour == null) {
                         sum.push(data[j].pm2_5);
                     } else {
                         // calculate average
-                        // TODO: double check this
-                        if (sum.length != 0)
-                        {
-                            avg = sum.reduce(((a, b) => a + b), 0) / sum.length;
+                        avg = sum.reduce(((a, b) => a + b), 0) / sum.length;
 
-                            console.log(avg);
-
-                            // push node
-                            sensorValues.push({
-                                x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
-                                y: avg
-                            });
-                        }
+                        // plot on graph
+                        sensorValues.push({
+                            x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
+                            y: avg
+                        });
                         
-                        // set new marker for next hour to display
+                        // set marker index for next hour to display
                         prevHourStart = j;
 
                         // reset values
@@ -144,15 +137,12 @@ export default {
 
                     prevHour = currHour;
                 }
-                // console.log(sensorValues);
             }        
             if(sensorValues.length > 3000){
                 console.log("changeInterval is called...");
                 sensorValues = this.changeInterval(sensorValues);
             }
-            // var maxYValue = Math.max.apply(Math, sensorValues.map(function(o) { return o.y; }))
-            var maxYValue = Math.max.apply(Math, Object.values(sensorValues.map((o)=>{return o.y})));
-            console.log("Max Y is ", maxYValue);
+            var maxYValue = Math.max.apply(Math, sensorValues.map(function(o) { return o.y; }))
 
             var yellowValue = 0;
             var orangeValue = 0;
