@@ -7,7 +7,9 @@ export default {
         endDateModel: false,
         startDate: null,
         endDate: null,
-        dataInterval: ''
+        dataInterval: '', 
+        switchText: "Show Hourly Averages",
+        viewHourly: false
     }),
     created: function () {
         this.startDate = this.$moment.utc().add(-24, 'hour').format("YYYY-MM-DD");
@@ -15,6 +17,12 @@ export default {
     },
     mounted: function () {
         this.initChart();
+    },
+    watch: {
+        // watch for changes to view interval
+        viewHourly() {
+            this.initChart();
+        }
     },
     methods: {
         initChart: function () {
@@ -88,17 +96,64 @@ export default {
         },
         createChart: function (data) {
             //formats the data for the chart
+            console.log("viewHourly is " + this.viewHourly);
             var sensorValues = [];
-            for (var i = 0; i < data.length; i++) {
-                sensorValues.push({
-                    x: this.$moment.utc(data[i].timestamp).local().toDate(),
-                    y: data[i].pm2_5
-                });
-            }
+            if(!this.viewHourly) {
+                for (var i = 0; i < data.length; i++) {
+                    sensorValues.push({
+                        x: this.$moment.utc(data[i].timestamp).local().toDate(),
+                        y: data[i].pm2_5
+                    });
+                }
+            } else {
+                var prevHour = 0;
+                var currHour = 0;
+            
+                var prevHourStart = 0;
+
+                var sum = [];
+                var avg = 0;
+
+                for (var j = 0; j < data.length; j++) {
+                    currHour = this.$moment.utc(data[j].timestamp).local().toDate().getHours();
+                    
+                    if (currHour == prevHour) {
+                        sum.push(data[j].pm2_5);
+                    } else {
+                        // calculate average
+                        // TODO: double check this
+                        if (sum.length != 0)
+                        {
+                            avg = sum.reduce(((a, b) => a + b), 0) / sum.length;
+
+                            console.log(avg);
+
+                            // push node
+                            sensorValues.push({
+                                x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
+                                y: avg
+                            });
+                        }
+                        
+                        // set new marker for next hour to display
+                        prevHourStart = j;
+
+                        // reset values
+                        sum = [];
+                    }
+
+                    prevHour = currHour;
+                }
+                // console.log(sensorValues);
+            }        
             if(sensorValues.length > 3000){
+                console.log("changeInterval is called...");
                 sensorValues = this.changeInterval(sensorValues);
             }
-            var maxYValue = Math.max.apply(Math, sensorValues.map(function(o) { return o.y; }))
+            // var maxYValue = Math.max.apply(Math, sensorValues.map(function(o) { return o.y; }))
+            var maxYValue = Math.max.apply(Math, Object.values(sensorValues.map((o)=>{return o.y})));
+            console.log("Max Y is ", maxYValue);
+
             var yellowValue = 0;
             var orangeValue = 0;
             var redValue = 0;
@@ -228,7 +283,7 @@ export default {
                 chart.legend.updateState(false);
                 chart.xAxis
                     .tickFormat(function (d) {
-                        return d3.time.format('%b %d %I:%M:%S%p')(new Date(d))
+                        return d3.time.format('%b %d %I:00:00 %p')(new Date(d))
                     })
                     .staggerLabels(true);
                 chart.yAxis1
