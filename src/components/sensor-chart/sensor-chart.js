@@ -107,20 +107,22 @@ export default {
             } else {
                 var prevHour = null;
                 var currHour = 0;
-            
                 var prevHourStart = 0;
-
-                var sum = [];
+                var hourlyValues = [];
                 var avg = 0;
+                var sd = 0;
 
                 for (var j = 0; j < data.length; j++) {
                     currHour = this.$moment.utc(data[j].timestamp).local().toDate().getHours();
                     
                     if (currHour == prevHour || prevHour == null) {
-                        sum.push(data[j].pm2_5);
+                        hourlyValues.push(data[j].pm2_5);
                     } else {
-                        // calculate average
-                        avg = sum.reduce(((a, b) => a + b), 0) / sum.length;
+                        // calculate average and standard deviation
+                        // avg = sum.reduce(((a, b) => a + b), 0) / sum.length;
+                        avg = d3.mean(hourlyValues);
+                        sd = d3.deviation(hourlyValues);
+                        console.log(avg + " +/- " + sd);
 
                         // plot on graph
                         sensorValues.push({
@@ -132,7 +134,7 @@ export default {
                         prevHourStart = j;
 
                         // reset values
-                        sum = [];
+                        hourlyValues = [];
                     }
 
                     prevHour = currHour;
