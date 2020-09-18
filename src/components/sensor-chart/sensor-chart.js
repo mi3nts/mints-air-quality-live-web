@@ -97,6 +97,8 @@ export default {
         createChart: function (data) {
             //formats the data for the chart
             var sensorValues = [];
+            var standardDevPos = [];
+            var standardDevNeg = [];
             if(!this.viewHourly) {
                 for (var i = 0; i < data.length; i++) {
                     sensorValues.push({
@@ -122,13 +124,20 @@ export default {
                         // avg = sum.reduce(((a, b) => a + b), 0) / sum.length;
                         avg = d3.mean(hourlyValues);
                         sd = d3.deviation(hourlyValues);
-                        console.log(avg + " +/- " + sd);
 
                         // plot on graph
                         sensorValues.push({
                             x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
                             y: avg
                         });
+                        standardDevNeg.push({
+                            x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
+                            y: avg - sd
+                        });
+                        standardDevPos.push({
+                            x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
+                            y: avg + sd
+                        })
                         
                         // set marker index for next hour to display
                         prevHourStart = j;
@@ -144,7 +153,12 @@ export default {
                 console.log("changeInterval is called...");
                 sensorValues = this.changeInterval(sensorValues);
             }
-            var maxYValue = Math.max.apply(Math, sensorValues.map(function(o) { return o.y; }))
+            var maxYValue;
+            if (this.viewHourly) {
+                maxYValue = Math.max.apply(Math, standardDevPos.map(function(o) { return o.y; }))
+            } else {
+                maxYValue = Math.max.apply(Math, sensorValues.map(function(o) { return o.y; }))
+            }   
 
             var yellowValue = 0;
             var orangeValue = 0;
@@ -243,6 +257,14 @@ export default {
                         }
                     ],
                     color: '#aa2626'
+                },
+                { // standard deviation (-)
+                    key: "PM 2.5 -SD",
+                    values: [{}]
+                },
+                { // standard deviation (+)
+                    key: "PM 2.5 +SD",
+                    values: [{}]
                 }
             ];
 
@@ -260,6 +282,12 @@ export default {
             chartData[4].yAxis = 1;
             chartData[5].type = "area";
             chartData[5].yAxis = 1;
+            chartData[6].type = "line";
+            chartData[6].yAxis = 1;
+            chartData[6].values = standardDevNeg;
+            chartData[7].type = "line";
+            chartData[7].yAxis = 1;
+            chartData[7].values = standardDevPos;
 
             let hourlyTicks = this.viewHourly
             var sensor_id_chart = this.sensor.sensor_id
