@@ -195,7 +195,18 @@ export default {
                     key: "PM 2.5",
                     values: [{}]
                 },
-                //color ranges of µg/m³
+                { // standard deviation (-)
+                    key: "PM 2.5 -SD",
+                    values: [{}],
+                    color: "#b92dd4",
+                },
+                { // standard deviation (+)
+                    key: "PM 2.5 +SD",
+                    values: [{}],
+                    color: "#427E24",
+                },
+                
+                // color ranges of µg/m³
                 { //0-10µg/m³ yellow
                     key: "0-10µg/m³",
                     values: [{
@@ -260,15 +271,6 @@ export default {
                         }
                     ],
                     color: '#aa2626'
-                },
-                // TODO: Area shading between standard deviation lines. Change colors.
-                { // standard deviation (-)
-                    key: "PM 2.5 -SD",
-                    values: [{}]
-                },
-                { // standard deviation (+)
-                    key: "PM 2.5 +SD",
-                    values: [{}]
                 }
             ];
 
@@ -276,22 +278,23 @@ export default {
             chartData[0].type = "line";
             chartData[0].yAxis = 1;
             chartData[0].values = sensorValues; //sets the data from sensor
-            chartData[1].type = "area";
+            chartData[1].type = "line";
             chartData[1].yAxis = 1;
-            chartData[2].type = "area";
+            chartData[1].values = standardDevNeg;
+            chartData[2].type = "line";
             chartData[2].yAxis = 1;
+            chartData[2].values = standardDevPos;
+
             chartData[3].type = "area";
             chartData[3].yAxis = 1;
             chartData[4].type = "area";
             chartData[4].yAxis = 1;
             chartData[5].type = "area";
             chartData[5].yAxis = 1;
-            chartData[6].type = "line";
+            chartData[6].type = "area";
             chartData[6].yAxis = 1;
-            chartData[6].values = standardDevNeg;
-            chartData[7].type = "line";
+            chartData[7].type = "area";
             chartData[7].yAxis = 1;
-            chartData[7].values = standardDevPos;
 
             let hourlyTicks = this.viewHourly
             var sensor_id_chart = this.sensor.sensor_id
