@@ -123,6 +123,9 @@ export default {
                         // calculate average and standard deviation
                         // avg = sum.reduce(((a, b) => a + b), 0) / sum.length;
                         avg = d3.mean(hourlyValues);
+
+                        // returns the standard deviation, defined as the square root of the bias-corrected variance
+                        // calculates variance using variance() from 'variance.js'
                         sd = d3.deviation(hourlyValues);
 
                         // plot on graph
@@ -258,6 +261,7 @@ export default {
                     ],
                     color: '#aa2626'
                 },
+                // TODO: Area shading between standard deviation lines. Change colors.
                 { // standard deviation (-)
                     key: "PM 2.5 -SD",
                     values: [{}]
