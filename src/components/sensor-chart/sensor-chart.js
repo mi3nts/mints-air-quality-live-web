@@ -219,7 +219,6 @@ export default {
             }
 
 
-
             var chartData = [
                 //data
                 {
@@ -352,13 +351,9 @@ export default {
             chartData[10].type = "area";
             chartData[10].yAxis = 2;
 
-
-
-
-
             let hourlyTicks = this.viewHourly;
             var sensor_id_chart = this.sensor.sensor_id;
-            nv.addGraph(function() {
+            nv.addGraph(function () {
                 var chart = nv.models.multiChart()
                     .margin({
                         top: 85,
@@ -396,10 +391,8 @@ export default {
                     .duration(500)
                     .call(chart);
 
-
-
                 return chart;
             });
         }
     }
-};
+}
