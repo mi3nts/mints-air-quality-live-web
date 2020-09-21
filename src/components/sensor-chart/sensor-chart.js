@@ -148,12 +148,10 @@ export default {
                         // reset values
                         hourlyValues = [];
                     }
-
                     prevHour = currHour;
                 }
             }
             if (sensorValues.length > 3000) {
-                console.log("changeInterval is called...");
                 sensorValues = this.changeInterval(sensorValues);
             }
             var maxYValue;
@@ -218,23 +216,21 @@ export default {
                 }
             }
 
-
             var chartData = [
-                //data
-                {
+                { // data
                     key: "PM 2.5",
                     values: [{}],
-                    strokeWidth: this.viewHourly ? 5 : 1.5,
+                    strokeWidth: this.viewHourly ? 3 : 1.5,
                 },
                 { // standard deviation (-)
                     key: "PM 2.5 -SD",
                     values: [{}],
-                    color: "#b92dd4",
+                    color: "#69b2ee",
                 },
                 { // standard deviation (+)
                     key: "PM 2.5 +SD",
                     values: [{}],
-                    color: "#427E24",
+                    color: "#69b2ee",
                 },
 
                 // color ranges of µg/m³
@@ -303,35 +299,36 @@ export default {
                     ],
                     color: '#aa2626'
                 },
-                {
-                    key: "SD Area Bottom",
-                    values: areaDataBottom,
-                    color: 'rgba(255, 255, 68,0)',
-                },
-                {
-                    key: "SD Area Middle",
-                    values: areaDataMiddle,
-                    color: "rgb(31, 119, 180)",
-                },
-                {
-                    key: "SD Area Top",
-                    values: areaDataTop,
-                    color: "#F8C630",
-                }
 
+                { // transparent layer, used to help with area shading
+                    key: "Lower Area",
+                    values: areaDataBottom,
+                    color: 'rgba(255, 255, 68, 0)',
+                },
+                { // shading for standard deviation (-)
+                    key: "-SD Area",
+                    values: areaDataMiddle,
+                    color: "#69b2ee"
+                },
+                { // shading for standard deviation (+)
+                    key: "+SD Area",
+                    values: areaDataTop,
+                    color: "#69b2ee"
+                },
             ];
 
-            //sets the chart types among other things
+            // sets the chart types among other things
             chartData[0].type = "line";
             chartData[0].yAxis = 1;
-            chartData[0].values = sensorValues; //sets the data from sensor
+            chartData[0].values = sensorValues; // sets the data from sensor
             chartData[1].type = "line";
             chartData[1].yAxis = 1;
-            chartData[1].values = standardDevNeg;
+            chartData[1].values = standardDevPos;
             chartData[2].type = "line";
             chartData[2].yAxis = 1;
-            chartData[2].values = standardDevPos;
+            chartData[2].values = standardDevNeg;
 
+            // color ranges of µg/m³
             chartData[3].type = "area";
             chartData[3].yAxis = 1;
             chartData[4].type = "area";
@@ -343,7 +340,7 @@ export default {
             chartData[7].type = "area";
             chartData[7].yAxis = 1;
 
-            //second shart above for area shading
+            // standard deviation shading
             chartData[8].type = "area";
             chartData[8].yAxis = 2;
             chartData[9].type = "area";
@@ -383,7 +380,6 @@ export default {
                     .tickFormat(function(d) {
                         return d3.format(',.2f')(d) + 'µg/m³';
                     });
-
 
                 d3.select("#chart2_" + sensor_id_chart + " svg")
                     .datum(chartData)
