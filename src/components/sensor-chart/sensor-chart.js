@@ -97,8 +97,12 @@ export default {
         createChart: function(data) {
             //formats the data for the chart
             var sensorValues = [];
-            var standardDevPos = [];
             var standardDevNeg = [];
+            var standardDevPos = [];
+            var areaBottom = [];
+            var areaSDNeg = [];
+            var areaSDPos = [];
+            
             if (!this.viewHourly) {
                 for (var i = 0; i < data.length; i++) {
                     sensorValues.push({
@@ -141,6 +145,24 @@ export default {
                             x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
                             y: avg + sd
                         });
+                        areaBottom.push({ // covers area going up to -SD line
+                            x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
+                            y: avg - sd
+                        });
+                        areaSDNeg.push({ // covers area from -SD line up to avg line
+                            x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
+                            y: sd
+                        });
+                        areaSDPos.push({ // covers area from avg line to +SD line
+                            x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
+                            y: sd
+                        });
+                        // TODO: Remove if using different colors, otherwise, this can replace the two other SD areas
+                        // areaSD.push({
+                        //     x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
+                        //     y: 2 * sd
+                        // })
+                        
 
                         // set marker index for next hour to display
                         prevHourStart = j;
@@ -186,34 +208,6 @@ export default {
                 redValue = 30;
                 purpleValue = 50;
                 maroonValue = maxYValue - (yellowValue + orangeValue + redValue + purpleValue);
-            }
-            //make data set for shading
-            var areaDataBottom = [];
-            if (standardDevPos.length != 0) {
-                for (var x = 0; x < sensorValues.length; x++) {
-                    areaDataBottom.push({
-                        x: sensorValues[x].x,
-                        y: standardDevNeg[x].y
-                    });
-                }
-            }
-            var areaDataMiddle = [];
-            if (standardDevPos.length != 0) {
-                for (x = 0; x < sensorValues.length; x++) {
-                    areaDataMiddle.push({
-                        x: sensorValues[x].x,
-                        y: sensorValues[x].y - standardDevNeg[x].y
-                    });
-                }
-            }
-            var areaDataTop = [];
-            if (standardDevPos.length != 0) {
-                for (x = 0; x < sensorValues.length; x++) {
-                    areaDataTop.push({
-                        x: sensorValues[x].x,
-                        y: standardDevPos[x].y - sensorValues[x].y
-                    });
-                }
             }
 
             var chartData = [
@@ -302,17 +296,17 @@ export default {
 
                 { // transparent layer, used to help with area shading
                     key: "Lower Area",
-                    values: areaDataBottom,
+                    values: areaBottom,
                     color: 'rgba(255, 255, 68, 0)',
                 },
                 { // shading for standard deviation (-)
                     key: "-SD Area",
-                    values: areaDataMiddle,
+                    values: areaSDNeg,
                     color: "#69b2ee"
                 },
                 { // shading for standard deviation (+)
                     key: "+SD Area",
-                    values: areaDataTop,
+                    values: areaSDPos,
                     color: "#69b2ee"
                 },
             ];
