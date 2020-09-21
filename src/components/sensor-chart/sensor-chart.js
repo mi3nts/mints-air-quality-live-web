@@ -1,4 +1,3 @@
-
 import sensorData from "../../services/sensor-data";
 
 export default {
@@ -12,11 +11,11 @@ export default {
         switchText: "Show Hourly Averages",
         viewHourly: false
     }),
-    created: function () {
+    created: function() {
         this.startDate = this.$moment.utc().add(-24, 'hour').format("YYYY-MM-DD");
         this.endDate = this.$moment.utc().format("YYYY-MM-DD");
     },
-    mounted: function () {
+    mounted: function() {
         this.initChart();
     },
     watch: {
@@ -26,42 +25,42 @@ export default {
         }
     },
     methods: {
-        initChart: function () {
+        initChart: function() {
             $("#chart2_" + this.sensor.sensor_id).html("<div class='my-4 text-center'>Loading data...</div>");
             sensorData.getChartData(
                 this.sensor.sensor_id, {
-                start: this.$moment.utc(this.startDate).toISOString(),
-                end: this.$moment.utc(this.endDate).toISOString(),
-            }, this.dataInterval
+                    start: this.$moment.utc(this.startDate).toISOString(),
+                    end: this.$moment.utc(this.endDate).toISOString(),
+                }, this.dataInterval
             ).then(response => {
                 if (response.data.length) {
-                    $("#chart2_" + this.sensor.sensor_id).html("<svg> </svg>")
+                    $("#chart2_" + this.sensor.sensor_id).html("<svg> </svg>");
                     this.createChart(response.data);
                 } else {
                     $("#chart2_" + this.sensor.sensor_id).html("<div class='my-4 text-center'>No data available.</div>");
                 }
             });
         },
-        updateDataInterval: function (value) {
-            this.dataInterval = value
-            var text = 'All data'
+        updateDataInterval: function(value) {
+            this.dataInterval = value;
+            var text = 'All data';
             switch (value) {
                 case '1 60:60:60':
-                    text = '1 Day'
-                    break
+                    text = '1 Day';
+                    break;
                 case '1:60:60':
-                    text = '1 hour'
-                    break
+                    text = '1 hour';
+                    break;
                 case '30:60':
-                    text = '30 minutes'
-                    break
+                    text = '30 minutes';
+                    break;
                 case '10:60':
-                    text = '10 minutes'
-                    break
+                    text = '10 minutes';
+                    break;
             }
-            $("#interval-info").html("Interval: " + text)
+            $("#interval-info").html("Interval: " + text);
         },
-        changeInterval: function (values) {
+        changeInterval: function(values) {
             var length = values.length;
             length = length / 3000;
             length = Math.round(length);
@@ -95,7 +94,7 @@ export default {
             }
             return newValues;
         },
-        createChart: function (data) {
+        createChart: function(data) {
             //formats the data for the chart
             var sensorValues = [];
             var standardDevPos = [];
@@ -141,7 +140,7 @@ export default {
                         standardDevPos.push({
                             x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
                             y: avg + sd
-                        })
+                        });
 
                         // set marker index for next hour to display
                         prevHourStart = j;
@@ -159,9 +158,9 @@ export default {
             }
             var maxYValue;
             if (this.viewHourly) {
-                maxYValue = Math.max.apply(Math, standardDevPos.map(function (o) { return o.y; }))
+                maxYValue = Math.max.apply(Math, standardDevPos.map(function(o) { return o.y; }));
             } else {
-                maxYValue = Math.max.apply(Math, sensorValues.map(function (o) { return o.y; }))
+                maxYValue = Math.max.apply(Math, sensorValues.map(function(o) { return o.y; }));
             }
 
             var yellowValue = 0;
@@ -192,30 +191,30 @@ export default {
             }
             //make data set for shading
             var areaDataBottom = [];
-            if (!standardDevPos.length == 0) {
+            if (standardDevPos.length != 0) {
                 for (var x = 0; x < sensorValues.length; x++) {
                     areaDataBottom.push({
                         x: sensorValues[x].x,
                         y: standardDevNeg[x].y
-                    })
+                    });
                 }
             }
             var areaDataMiddle = [];
-            if (!standardDevPos.length == 0) {
+            if (standardDevPos.length != 0) {
                 for (x = 0; x < sensorValues.length; x++) {
                     areaDataMiddle.push({
                         x: sensorValues[x].x,
                         y: sensorValues[x].y - standardDevNeg[x].y
-                    })
+                    });
                 }
             }
             var areaDataTop = [];
-            if (!standardDevPos.length == 0) {
+            if (standardDevPos.length != 0) {
                 for (x = 0; x < sensorValues.length; x++) {
                     areaDataTop.push({
                         x: sensorValues[x].x,
                         y: standardDevPos[x].y - sensorValues[x].y
-                    })
+                    });
                 }
             }
 
@@ -243,65 +242,65 @@ export default {
                 { //0-10µg/m³ yellow
                     key: "0-10µg/m³",
                     values: [{
-                        x: sensorValues[0].x,
-                        y: yellowValue
-                    },
-                    {
-                        x: sensorValues[sensorValues.length - 1].x,
-                        y: yellowValue
-                    }
+                            x: sensorValues[0].x,
+                            y: yellowValue
+                        },
+                        {
+                            x: sensorValues[sensorValues.length - 1].x,
+                            y: yellowValue
+                        }
                     ],
                     color: '#ffff44'
                 },
                 { //10-20/m³ orange
                     key: "10-20µg/m³",
                     values: [{
-                        x: sensorValues[0].x,
-                        y: orangeValue
-                    },
-                    {
-                        x: sensorValues[sensorValues.length - 1].x,
-                        y: orangeValue
-                    }
+                            x: sensorValues[0].x,
+                            y: orangeValue
+                        },
+                        {
+                            x: sensorValues[sensorValues.length - 1].x,
+                            y: orangeValue
+                        }
                     ],
                     color: '#ff5500'
                 },
                 { //20-50µg/m³ red
                     key: "20-50µg/m³",
                     values: [{
-                        x: sensorValues[0].x,
-                        y: redValue
-                    },
-                    {
-                        x: sensorValues[sensorValues.length - 1].x,
-                        y: redValue
-                    }
+                            x: sensorValues[0].x,
+                            y: redValue
+                        },
+                        {
+                            x: sensorValues[sensorValues.length - 1].x,
+                            y: redValue
+                        }
                     ],
                     color: '#cc0000'
                 },
                 { //50-100µg/m³ purple
                     key: "50-100µg/m³",
                     values: [{
-                        x: sensorValues[0].x,
-                        y: purpleValue
-                    },
-                    {
-                        x: sensorValues[sensorValues.length - 1].x,
-                        y: purpleValue
-                    }
+                            x: sensorValues[0].x,
+                            y: purpleValue
+                        },
+                        {
+                            x: sensorValues[sensorValues.length - 1].x,
+                            y: purpleValue
+                        }
                     ],
                     color: '#990099'
                 },
                 { //100+µg/m³ maroon
                     key: "100+µg/m³",
                     values: [{
-                        x: sensorValues[0].x,
-                        y: maroonValue
-                    },
-                    {
-                        x: sensorValues[sensorValues.length - 1].x,
-                        y: maroonValue
-                    }
+                            x: sensorValues[0].x,
+                            y: maroonValue
+                        },
+                        {
+                            x: sensorValues[sensorValues.length - 1].x,
+                            y: maroonValue
+                        }
                     ],
                     color: '#aa2626'
                 },
@@ -357,9 +356,9 @@ export default {
 
 
 
-            let hourlyTicks = this.viewHourly
-            var sensor_id_chart = this.sensor.sensor_id
-            nv.addGraph(function () {
+            let hourlyTicks = this.viewHourly;
+            var sensor_id_chart = this.sensor.sensor_id;
+            nv.addGraph(function() {
                 var chart = nv.models.multiChart()
                     .margin({
                         top: 85,
@@ -370,24 +369,24 @@ export default {
                     .color(d3.scale.category10().range())
                     .yDomain1([0, maxYValue]);
 
-                chart.yDomain2([0, maxYValue])
+                chart.yDomain2([0, maxYValue]);
                 chart.legend.updateState(false);
                 chart.xAxis
-                    .tickFormat(function (d) {
+                    .tickFormat(function(d) {
                         if (hourlyTicks) {
                             return d3.time.format('%b %d %I:00:00%p')(new Date(d));
                         } else {
-                            return d3.time.format('%b %d %I:%M:%S%p')(new Date(d))
+                            return d3.time.format('%b %d %I:%M:%S%p')(new Date(d));
                         }
                     })
                     .staggerLabels(true);
                 chart.yAxis1
-                    .tickFormat(function (d) {
-                        return d3.format(',.2f')(d) + 'µg/m³'
+                    .tickFormat(function(d) {
+                        return d3.format(',.2f')(d) + 'µg/m³';
                     });
                 chart.yAxis2
-                    .tickFormat(function (d) {
-                        return d3.format(',.2f')(d) + 'µg/m³'
+                    .tickFormat(function(d) {
+                        return d3.format(',.2f')(d) + 'µg/m³';
                     });
 
 
