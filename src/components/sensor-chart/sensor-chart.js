@@ -9,7 +9,7 @@ export default {
         endDate: null,
         dataInterval: '',
         switchText: "Show Hourly Averages",
-        viewHourly: false
+        viewHourly: true
     }),
     created: function() {
         this.startDate = this.$moment.utc().add(-24, 'hour').format("YYYY-MM-DD");
@@ -344,17 +344,114 @@ export default {
 
             let hourlyTicks = this.viewHourly;
             var sensor_id_chart = this.sensor.sensor_id;
+
             nv.addGraph(function () {
+            var c = 30;    
+            d3.select("#legend"+" svg")
+                .append("circle")
+                .attr("cx",10+c)
+                .attr("cy",10)
+                .attr("r", 10)
+                .style("fill", "#ffff44")
+            d3.select("#legend"+" svg")
+                .append("text")
+                .attr("x",22+c)
+                .attr("y",12)
+                .text("0-10µg/m³³")
+                .style("font-size", "15px")
+                .attr("alignment-baseline","middle")
+            d3.select("#legend"+" svg")
+                .append("circle")
+                .attr("cx",140+c)
+                .attr("cy",10)
+                .attr("r", 10)
+                .style("fill", "#ff5500")
+            d3.select("#legend"+" svg")
+                .append("text")
+                .attr("x",152+c)
+                .attr("y",12)
+                .text("10-20µg/m³")
+                .style("font-size", "15px")
+                .attr("alignment-baseline","middle")
+            d3.select("#legend"+" svg")
+                .append("circle")
+                .attr("cx",270+c)
+                .attr("cy",10)
+                .attr("r", 10)
+                .style("fill", "#cc0000")
+            d3.select("#legend"+" svg")
+                .append("text")
+                .attr("x",282+c)
+                .attr("y",12)
+                .text("20-50µg/m³")
+                .style("font-size", "15px")
+                .attr("alignment-baseline","middle")
+            d3.select("#legend"+" svg")
+                .append("circle")
+                .attr("cx",405+c)
+                .attr("cy",10)
+                .attr("r", 10)
+                .style("fill", "#990099")
+            d3.select("#legend"+" svg")
+                .append("text")
+                .attr("x",417+c)
+                .attr("y",12)
+                .text("50-100µg/m³")
+                .style("font-size", "15px")
+                .attr("alignment-baseline","middle")
+            d3.select("#legend"+" svg")
+                .append("circle")
+                .attr("cx",545+c)
+                .attr("cy",10)
+                .attr("r", 10)
+                .style("fill", "#aa2626")
+            d3.select("#legend"+" svg")
+                .append("text")
+                .attr("x",557+c)
+                .attr("y",12)
+                .text("100+µg/m³")
+                .style("font-size", "15px")
+                .attr("alignment-baseline","middle")
+            d3.select("#legend"+" svg")
+                .append("circle")
+                .attr("cx",665+c)
+                .attr("cy",10)
+                .attr("r", 10)
+                .style("fill", "#1646F0")
+            d3.select("#legend"+" svg")
+                .append("text")
+                .attr("x",677+c)
+                .attr("y",12)
+                .text("PM 2.5")
+                .style("font-size", "15px")
+                .attr("alignment-baseline","middle")
+
+            if (this.viewHourly){
+                d3.select("#legend"+" svg")
+                .append("circle")
+                .attr("cx",775+c)
+                .attr("cy",10)
+                .attr("r", 10)
+                .style("fill", "#69b2ee")
+                d3.select("#legend"+" svg")
+                .append("text")
+                .attr("x",787+c)
+                .attr("y",12)
+                .text("+-PM 2.5 SD")
+                .style("font-size", "15px")
+                .attr("alignment-baseline","middle")
+            }
+
                 var chart = nv.models.multiChart()
                     .margin({
-                        top: 85,
+                        top: 15,
                         right: 60,
                         bottom: 50,
                         left: 90
                     })
                     .color(d3.scale.category10().range())
                     .yDomain1([0, maxYValue]);
-
+                chart.showLegend(false)
                 chart.yDomain2([0, maxYValue]);
                 chart.legend.updateState(false);
                 chart.xAxis
@@ -380,7 +477,6 @@ export default {
                     .transition()
                     .duration(500)
                     .call(chart);
-
                 return chart;
             });
         }
