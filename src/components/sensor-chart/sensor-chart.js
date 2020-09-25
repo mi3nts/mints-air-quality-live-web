@@ -9,7 +9,7 @@ export default {
         endDate: null,
         dataInterval: '',
         switchText: "Show Hourly Averages",
-        viewHourly: true
+        viewHourly: false
     }),
     created: function() {
         this.startDate = this.$moment.utc().add(-24, 'hour').format("YYYY-MM-DD");
@@ -215,6 +215,7 @@ export default {
                     key: "PM 2.5",
                     values: [{}],
                     strokeWidth: this.viewHourly ? 3 : 1.5,
+                    color: "#1f77b4"
                 },
                 { // standard deviation (-)
                     key: "PM 2.5 -SD",
@@ -226,7 +227,6 @@ export default {
                     values: [{}],
                     color: "#69b2ee",
                 },
-
                 // color ranges of µg/m³
                 { //0-10µg/m³ yellow
                     key: "0-10µg/m³",
@@ -293,7 +293,6 @@ export default {
                     ],
                     color: '#aa2626'
                 },
-
                 { // transparent layer, used to help with area shading
                     key: "Lower Area",
                     values: areaBottom,
@@ -346,101 +345,25 @@ export default {
             var sensor_id_chart = this.sensor.sensor_id;
 
             nv.addGraph(function () {
-            var c = 30;    
-            d3.select("#legend"+" svg")
-                .append("circle")
-                .attr("cx",10+c)
-                .attr("cy",10)
-                .attr("r", 10)
-                .style("fill", "#ffff44")
-            d3.select("#legend"+" svg")
-                .append("text")
-                .attr("x",22+c)
-                .attr("y",12)
-                .text("0-10µg/m³³")
-                .style("font-size", "15px")
-                .attr("alignment-baseline","middle")
-            d3.select("#legend"+" svg")
-                .append("circle")
-                .attr("cx",140+c)
-                .attr("cy",10)
-                .attr("r", 10)
-                .style("fill", "#ff5500")
-            d3.select("#legend"+" svg")
-                .append("text")
-                .attr("x",152+c)
-                .attr("y",12)
-                .text("10-20µg/m³")
-                .style("font-size", "15px")
-                .attr("alignment-baseline","middle")
-            d3.select("#legend"+" svg")
-                .append("circle")
-                .attr("cx",270+c)
-                .attr("cy",10)
-                .attr("r", 10)
-                .style("fill", "#cc0000")
-            d3.select("#legend"+" svg")
-                .append("text")
-                .attr("x",282+c)
-                .attr("y",12)
-                .text("20-50µg/m³")
-                .style("font-size", "15px")
-                .attr("alignment-baseline","middle")
-            d3.select("#legend"+" svg")
-                .append("circle")
-                .attr("cx",405+c)
-                .attr("cy",10)
-                .attr("r", 10)
-                .style("fill", "#990099")
-            d3.select("#legend"+" svg")
-                .append("text")
-                .attr("x",417+c)
-                .attr("y",12)
-                .text("50-100µg/m³")
-                .style("font-size", "15px")
-                .attr("alignment-baseline","middle")
-            d3.select("#legend"+" svg")
-                .append("circle")
-                .attr("cx",545+c)
-                .attr("cy",10)
-                .attr("r", 10)
-                .style("fill", "#aa2626")
-            d3.select("#legend"+" svg")
-                .append("text")
-                .attr("x",557+c)
-                .attr("y",12)
-                .text("100+µg/m³")
-                .style("font-size", "15px")
-                .attr("alignment-baseline","middle")
-            d3.select("#legend"+" svg")
-                .append("circle")
-                .attr("cx",665+c)
-                .attr("cy",10)
-                .attr("r", 10)
-                .style("fill", "#1646F0")
-            d3.select("#legend"+" svg")
-                .append("text")
-                .attr("x",677+c)
-                .attr("y",12)
-                .text("PM 2.5")
-                .style("font-size", "15px")
-                .attr("alignment-baseline","middle")
-
-            if (this.viewHourly){
-                d3.select("#legend"+" svg")
-                .append("circle")
-                .attr("cx",775+c)
-                .attr("cy",10)
-                .attr("r", 10)
-                .style("fill", "#69b2ee")
-                d3.select("#legend"+" svg")
-                .append("text")
-                .attr("x",787+c)
-                .attr("y",12)
-                .text("+-PM 2.5 SD")
-                .style("font-size", "15px")
-                .attr("alignment-baseline","middle")
-            }
+                // create legend
+                // do not list area shading items
+                let legendOffset = 200;
+                for (var i = 0; i < chartData.length - 3; i++) {
+                    d3.select("#legend"+" svg")
+                        .append("circle")
+                        .attr("cx", legendOffset)
+                        .attr("cy", 40)
+                        .attr("r", 10)
+                        .style("fill", chartData[i].color);
+                    d3.select("#legend"+" svg")
+                        .append("text")
+                        .attr("x",  legendOffset + 20)
+                        .attr("y", 42)
+                        .text(chartData[i].key)
+                        .style("font-size", "12px")
+                        .attr("alignment-baseline","middle");
+                    legendOffset += 120;
+                }
 
                 var chart = nv.models.multiChart()
                     .margin({
