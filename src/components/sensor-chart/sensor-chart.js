@@ -344,27 +344,34 @@ export default {
             let hourlyTicks = this.viewHourly;
             var sensor_id_chart = this.sensor.sensor_id;
 
-            nv.addGraph(function () {
-                // create legend
-                // do not list area shading items
-                let legendOffset = 200;
+            function createLegend () {
+                // clear previously recreated legend
+                d3.select("#legend"+" svg").selectAll("*").remove();
+                
+                let offset = 120;
+                // do not show area shading (last 3 items in chartData)
                 for (var i = 0; i < chartData.length - 3; i++) {
-                    d3.select("#legend"+" svg")
-                        .append("circle")
-                        .attr("cx", legendOffset)
-                        .attr("cy", 40)
-                        .attr("r", 10)
-                        .style("fill", chartData[i].color);
-                    d3.select("#legend"+" svg")
-                        .append("text")
-                        .attr("x",  legendOffset + 20)
-                        .attr("y", 42)
-                        .text(chartData[i].key)
-                        .style("font-size", "12px")
-                        .attr("alignment-baseline","middle");
-                    legendOffset += 120;
+                    if (chartData[i].values.length > 0) {
+                        d3.select("#legend"+" svg")
+                            .append("circle")
+                            .attr("cx", offset)
+                            .attr("cy", 40)
+                            .attr("r", 10)
+                            .style("fill", chartData[i].color);
+                        d3.select("#legend"+" svg")
+                            .append("text")
+                            .attr("x",  offset + 20)
+                            .attr("y", 42)
+                            .text(chartData[i].key)
+                            .style("font-size", "12px")
+                            .attr("alignment-baseline","middle");
+                    offset += 120;
+                    }
                 }
+            }
 
+            nv.addGraph(function () {
+                createLegend();
                 var chart = nv.models.multiChart()
                     .margin({
                         top: 15,
