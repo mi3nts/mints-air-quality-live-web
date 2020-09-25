@@ -100,8 +100,7 @@ export default {
             var standardDevNeg = [];
             var standardDevPos = [];
             var areaBottom = [];
-            var areaSDNeg = [];
-            var areaSDPos = [];
+            var areaSD = [];
             
             if (!this.viewHourly) {
                 for (var i = 0; i < data.length; i++) {
@@ -149,20 +148,10 @@ export default {
                             x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
                             y: avg - sd
                         });
-                        areaSDNeg.push({ // covers area from -SD line up to avg line
+                        areaSD.push({
                             x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
-                            y: sd
-                        });
-                        areaSDPos.push({ // covers area from avg line to +SD line
-                            x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
-                            y: sd
-                        });
-                        // TODO: Remove if using different colors, otherwise, this can replace the two other SD areas
-                        // areaSD.push({
-                        //     x: this.$moment.utc(data[prevHourStart].timestamp).local().toDate(),
-                        //     y: 2 * sd
-                        // })
-                        
+                            y: 2 * sd
+                        })
 
                         // set marker index for next hour to display
                         prevHourStart = j;
@@ -298,14 +287,9 @@ export default {
                     values: areaBottom,
                     color: 'rgba(255, 255, 68, 0)',
                 },
-                { // shading for standard deviation (-)
-                    key: "-SD Area",
-                    values: areaSDNeg,
-                    color: "#69b2ee"
-                },
-                { // shading for standard deviation (+)
-                    key: "+SD Area",
-                    values: areaSDPos,
+                { // shading for standard deviation
+                    key: "SD Area",
+                    values: areaSD,
                     color: "#69b2ee"
                 },
             ];
@@ -338,8 +322,6 @@ export default {
             chartData[8].yAxis = 2;
             chartData[9].type = "area";
             chartData[9].yAxis = 2;
-            chartData[10].type = "area";
-            chartData[10].yAxis = 2;
 
             let hourlyTicks = this.viewHourly;
             var sensor_id_chart = this.sensor.sensor_id;
@@ -349,8 +331,8 @@ export default {
                 d3.select("#legend"+" svg").selectAll("*").remove();
                 
                 let offset = 120;
-                // do not show area shading (last 3 items in chartData)
-                for (var i = 0; i < chartData.length - 3; i++) {
+                // do not show area shading (last 2 items in chartData)
+                for (var i = 0; i < chartData.length - 2; i++) {
                     if (chartData[i].values.length > 0) {
                         d3.select("#legend"+" svg")
                             .append("circle")
@@ -358,13 +340,26 @@ export default {
                             .attr("cy", 40)
                             .attr("r", 10)
                             .style("fill", chartData[i].color);
-                        d3.select("#legend"+" svg")
-                            .append("text")
-                            .attr("x",  offset + 20)
-                            .attr("y", 42)
-                            .text(chartData[i].key)
-                            .style("font-size", "12px")
-                            .attr("alignment-baseline","middle");
+
+                        // only show 1 item for standard deviation (same color for both lines)
+                        if (i != 1) {
+                            d3.select("#legend"+" svg")
+                                .append("text")
+                                .attr("x",  offset + 20)
+                                .attr("y", 42)
+                                .text(chartData[i].key)
+                                .style("font-size", "12px")
+                                .attr("alignment-baseline","middle");
+                        } else {
+                            d3.select("#legend"+" svg")
+                                .append("text")
+                                .attr("x",  offset + 20)
+                                .attr("y", 42)
+                                .text("PM 2.5 SD")
+                                .style("font-size", "12px")
+                                .attr("alignment-baseline","middle");
+                            i++;
+                        }
                     offset += 120;
                     }
                 }
