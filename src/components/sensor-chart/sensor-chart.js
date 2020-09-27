@@ -352,14 +352,16 @@ export default {
                                 .style("background-color", chartData[i].color)
                                 .style("border-radius", "50%")
                                 .style("display", "inline-block")
-                                .style("margin-right", "5px");
+                                .style("margin-right", "5px")
+                                .style("position", "relative")
+                                .style("top", "25px");
                         d3.select("#legend")
                             .append("text")
                                 .text(labelText)
                                 .style("font-size", "12px")
                                 .style("padding-right", "20px")
                                 .style("position", "relative")
-                                .style("bottom", "4px");
+                                .style("top", "20px");
                     }
                 }
             }
