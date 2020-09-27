@@ -328,39 +328,38 @@ export default {
 
             function createLegend () {
                 // clear previously recreated legend
-                d3.select("#legend"+" svg").selectAll("*").remove();
+                d3.select("#legend").selectAll("*").remove();
                 
-                let offset = 120;
                 // do not show area shading (last 2 items in chartData)
                 for (var i = 0; i < chartData.length - 2; i++) {
                     if (chartData[i].values.length > 0) {
-                        d3.select("#legend"+" svg")
-                            .append("circle")
-                            .attr("cx", offset)
-                            .attr("cy", 40)
-                            .attr("r", 10)
-                            .style("fill", chartData[i].color);
-
-                        // only show 1 item for standard deviation (same color for both lines)
-                        if (i != 1) {
-                            d3.select("#legend"+" svg")
-                                .append("text")
-                                .attr("x",  offset + 20)
-                                .attr("y", 42)
-                                .text(chartData[i].key)
-                                .style("font-size", "12px")
-                                .attr("alignment-baseline","middle");
+                        // we don't need to display legend for both SD lines
+                        // skip over the second line
+                        // use a more general label for the first line
+                        let labelText = "";
+                        if (i == 2) {
+                            continue;
+                        } else if (i == 1) {
+                            labelText = "PM 2.5 SD";
                         } else {
-                            d3.select("#legend"+" svg")
-                                .append("text")
-                                .attr("x",  offset + 20)
-                                .attr("y", 42)
-                                .text("PM 2.5 SD")
-                                .style("font-size", "12px")
-                                .attr("alignment-baseline","middle");
-                            i++;
+                            labelText = chartData[i].key;
                         }
-                    offset += 120;
+
+                        d3.select("#legend")
+                            .append("span")
+                                .style("height", "20px")
+                                .style("width", "20px")
+                                .style("background-color", chartData[i].color)
+                                .style("border-radius", "50%")
+                                .style("display", "inline-block")
+                                .style("margin-right", "5px");
+                        d3.select("#legend")
+                            .append("text")
+                                .text(labelText)
+                                .style("font-size", "12px")
+                                .style("padding-right", "20px")
+                                .style("position", "relative")
+                                .style("bottom", "4px");
                     }
                 }
             }
