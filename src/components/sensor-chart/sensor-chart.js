@@ -377,6 +377,7 @@ export default {
                     .color(d3.scale.category10().range())
                     .yDomain1([0, maxYValue]);
                 chart.showLegend(false)
+                nv.utils.windowResize(function(){ chart.update(); });
                 chart.yDomain2([0, maxYValue]);
                 chart.legend.updateState(false);
                 chart.xAxis
@@ -402,8 +403,6 @@ export default {
                     .transition()
                     .duration(500)
                     .call(chart);
-                
-                nv.utils.windowResize(function(){ chart.update(); });
                 return chart;
             });
         }
