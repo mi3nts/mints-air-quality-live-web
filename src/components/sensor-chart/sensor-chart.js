@@ -8,8 +8,8 @@ export default {
         startDate: null,
         endDate: null,
         dataInterval: '',
-        switchText: "Show Hourly Averages",
-        viewHourly: false
+        viewSelectorItems: ["Live View", "Hourly Averages"],
+        viewMode: "Live View", // default view
     }),
     created: function() {
         this.startDate = this.$moment.utc().add(-24, 'hour').format("YYYY-MM-DD");
@@ -20,7 +20,7 @@ export default {
     },
     watch: {
         // watch for changes to view interval
-        viewHourly() {
+        viewMode() {
             this.initChart();
         }
     },
@@ -102,7 +102,7 @@ export default {
             var areaBottom = [];
             var areaSD = [];
             
-            if (!this.viewHourly) {
+            if (this.viewMode != "Hourly Averages") {
                 for (var i = 0; i < data.length; i++) {
                     sensorValues.push({
                         x: this.$moment.utc(data[i].timestamp).local().toDate(),
@@ -166,7 +166,7 @@ export default {
                 sensorValues = this.changeInterval(sensorValues);
             }
             var maxYValue;
-            if (this.viewHourly) {
+            if (this.viewMode == "Hourly Averages") {
                 maxYValue = Math.max.apply(Math, standardDevPos.map(function(o) { return o.y; }));
             } else {
                 maxYValue = Math.max.apply(Math, sensorValues.map(function(o) { return o.y; }));
@@ -203,7 +203,7 @@ export default {
                 { // data
                     key: "PM 2.5",
                     values: [{}],
-                    strokeWidth: this.viewHourly ? 3 : 1.5,
+                    strokeWidth: this.viewMode == "Hourly Averages" ? 3 : 1.5,
                     color: "#1f77b4"
                 },
                 { // standard deviation (-)
@@ -323,7 +323,7 @@ export default {
             chartData[9].type = "area";
             chartData[9].yAxis = 2;
 
-            let hourlyTicks = this.viewHourly;
+            let hourlyTicks = this.viewMode == "Hourly Averages" ? true : false;
             var sensor_id_chart = this.sensor.sensor_id;
 
             function createLegend () {
