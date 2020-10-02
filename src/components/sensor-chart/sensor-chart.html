@@ -1,0 +1,54 @@
+<v-card>
+    <v-card-title class="headline">
+        <v-layout>
+            <v-flex xs12 class="text-center">Concentrations of PM2.5 </v-flex>
+            <v-flex class="text-right">
+                <v-icon @click="$emit('close')">close</v-icon>
+            </v-flex>
+        </v-layout>
+    </v-card-title>
+    <v-card-text>
+    <div id="legend"></div>
+    </v-card-text>
+    <v-card-text>
+        <div :id="'chart2_' + sensor.sensor_id" class="chart2">
+            <div class="my-4 text-center">Loading data...</div>
+        </div>
+        <h3 class="text-center my-4">Choose any date range</h3>
+        <v-container>
+            <v-row>
+                <v-col>
+                    <v-menu v-model="startDateModel" :close-on-content-click="false" :nudge-right="40"
+                        transition="scale-transition" offset-y min-width="290px">
+                        <template v-slot:activator="{ on }">
+                            <v-text-field v-model="startDate" label="Start Date" prepend-icon="event" readonly
+                                v-on="on">
+                            </v-text-field>
+                        </template>
+                        <v-date-picker v-model="startDate" @input="startDateModel = false"></v-date-picker>
+                    </v-menu>
+                </v-col>
+                <v-col>
+                    <v-menu v-model="endDateModel" :close-on-content-click="false" :nudge-right="40"
+                        transition="scale-transition" offset-y min-width="290px">
+                        <template v-slot:activator="{ on }">
+                            <v-text-field v-model="endDate" label="End Date" prepend-icon="event" readonly v-on="on">
+                            </v-text-field>
+                        </template>
+                        <v-date-picker v-model="endDate" @input="endDateModel = false"></v-date-picker>
+                    </v-menu>
+                </v-col>
+                <v-col>
+                    <v-select v-model="viewMode" :items="viewSelectorItems" label="View" solo></v-select>
+                </v-col>
+                <v-col class="text-center">
+                    <v-btn class="fullscreen-btn" color="primary" large @click="initChart">Update</v-btn>
+                </v-col> 
+            </v-row>
+        </v-container>
+        <h3 class="text-center">Timeframe</h3>
+        <p id="para">The graph shows concentrations of PM2.5 from UT Dallas sensor.
+            Also displayed are evidence-based targets for air quality management
+            to protect populations from the adverse health effects of air pollution.</p>
+    </v-card-text>
+</v-card>

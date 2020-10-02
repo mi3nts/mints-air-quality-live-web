@@ -1,0 +1,163 @@
+<div class="home fill-height">
+    <div id="map" class="fill-height"></div>
+    <div class="side-drawer visible">
+        <div class="menu-container">
+            <v-icon @click="slide">menu</v-icon>
+        </div>
+        <div class="text-center">
+            <v-icon @click="reset" color='primary' large class="home mt-1">home</v-icon>
+            <v-btn @click="howToUse=true;" class="ma-2" tile outlined color="primary">
+                <v-icon left>mdi-help</v-icon> How To Use
+            </v-btn>
+        </div>
+        <div class="scale">
+            <img src="/img/graph.PNG" />
+        </div>
+
+        <v-expansion-panels style="width:270px" :value="activePanel" accordion>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div @click.stop class="d-flex justify-space-between">
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="sensorLayer"
+                            label="SharedAir Monitors">
+                        </v-checkbox>
+                        <div id="DFW">
+
+                        </div>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        <v-radio-group hide-details v-model="pmType" class="my-0">
+                            <v-radio color="primary" label="PM2.5" value="pm2_5"></v-radio>
+                        </v-radio-group>
+                    </div>
+                    <div class="time-label"><v-icon>access_time</v-icon> <span>30-second average</span></div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <!-- <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div @click.stop>
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="openAQLayer" label="OpenAQ">
+                        </v-checkbox>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        Disclaimer: The color scale we present does not reflect how OpenAQ presents their data concerning PM2.5 levels.
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel> -->
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div class="d-flex justify-space-between">
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="epaLayer" label="EPA">
+                        </v-checkbox>
+                        <div id="EPA">
+
+                        </div>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        <!-- <v-radio-group hide-details v-model="epaType" class="my-0">
+                            <v-radio :disabled="!epaLayer" color="primary" label="PM2.5" value="PM25"></v-radio>
+                            <v-radio :disabled="!epaLayer" color="primary" label="Ozone" value="O3"></v-radio>
+                        </v-radio-group> -->
+                        Disclaimer: The color scale we present does not reflect how EPA presents their data concerning
+                        PM2.5 levels.
+                        <div class="time-label"><v-icon>access_time</v-icon> <span>1-hour average</span></div>
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div class="d-flex justify-space-between">
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="purpleAirLayer"
+                            label="PurpleAir">
+                        </v-checkbox>
+                        <div id="PurpleAir">
+
+                        </div>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        Disclaimer: The color scale we present does not reflect how PurpleAir presents their data
+                        concerning PM2.5 levels.
+                        <div class="time-label"><v-icon>access_time</v-icon> <span>10-minute average</span></div>
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div class="d-flex justify-space-between">
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="pollutionLayer"
+                            label="Air Pollution Burden">
+                        </v-checkbox>
+                        <div id="pollution">
+
+                        </div>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>Major Air Pollution Permits. All numbers are in Tons Per Year</div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div>
+                        <v-checkbox class="my-0" hide-details color="primary" v-model="radarLayer" label="Radar">
+                        </v-checkbox>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div>
+                        See radar overlay on map...
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+                <v-expansion-panel-header>
+                    <div>
+                        <v-checkbox :disabled="!wind.data_time" class="my-0" hide-details color="primary"
+                            v-model="windLayer" label="NOAA (Wind)"></v-checkbox>
+                    </div>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div class="body-2">
+                        <div><b class="caption">Data Time: </b>{{wind.data_time? wind.data_time : 'Updating..' }}</div>
+                        <div><b class="caption">Updated Last: </b>{{wind.updated_time? wind.updated_time: 'Updating..'}}
+                        </div>
+                    </div>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+        </v-expansion-panels>
+
+    </div>
+    <!-- <div v-if="selectedSensor" class="side-window">
+        <Sensor :spot="selectedSensor" @close="selectedSensor=null" />
+    </div> -->
+    <v-dialog v-model="howToUse" max-width="50%">
+        <v-card>
+            <v-card-title class="headline">Instructions</v-card-title>
+
+            <v-card-text>
+                <ul>
+                    <li>Single Click a Map Marker to view the Real Time Sensor Information</li>
+                    <br />
+                    <li>Use left side "Layers" options to add different layers like Wind or Radar</li>
+                    <!-- <li>Double Click a Map Marker to view the Historical Time Sensor Information</li> -->
+                    <br />
+                    <li>Use The Top Right Button to change map styles</li>
+                    <br />
+                </ul>
+            </v-card-text>
+
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary darken-1" text @click="howToUse = false">Close</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+</div>
