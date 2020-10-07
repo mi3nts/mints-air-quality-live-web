@@ -12,6 +12,9 @@
         <particulate-matter @close="showPM=false;"></particulate-matter>
       </v-dialog>
       <v-spacer></v-spacer>
+      <v-btn x-large exact text @click="dashboard()">
+        <span>Dashboard</span>
+      </v-btn>
       <v-btn x-large depressed exact text @click="showPM=true;">
         <span class="mr-2 d-none d-lg-flex d-xl-none">Particulate Matter?</span>
         <v-icon class="d-flex">help</v-icon>
@@ -74,6 +77,11 @@ export default {
   }),
   created: function() {
     window["moment"] = this.$moment;
+  },
+  methods: {
+    dashboard: function() {
+      this.$router.push({path: '/.'})
+    }
   }
 };
 </script>
