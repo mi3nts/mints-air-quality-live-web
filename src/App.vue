@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar app dark color="primary" class="align-center">
       <img class="mr-2" height="50px" src="/img/logo_white.png" />
-      <v-toolbar-title class="display-1 mr-10">
+      <v-toolbar-title class="display-1 mr-10" @click="home()">
         <span>SharedAirDFW</span>
       </v-toolbar-title>
       <!-- <v-btn x-large depressed exact text :to="{name : 'home'}">
@@ -81,6 +81,9 @@ export default {
   methods: {
     dashboard: function() {
       this.$router.push({path: '/.'})
+    },
+    home: function() {
+      this.$router.push({path: '/'})
     }
   }
 };
