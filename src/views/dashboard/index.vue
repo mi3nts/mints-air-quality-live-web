@@ -1,6 +1,8 @@
 <template>
-    <div>
-        <div id="chart-container"></div>
+    <div style="height: 700px">
+        <div id="chart1"></div>
+        <div id="chart2"></div>
+        <div id="chart3"></div>
     </div>
 </template>
  
@@ -42,13 +44,19 @@ export default {
             },
             color: ["#127ac2"]
         };
-        this.echartInstance = echarts.init(document.getElementById('chart-container'));
-        this.echartInstance.setOption(chartOptionsLine);
+        this.echartInstance1 = echarts.init(document.getElementById('chart1'));
+        this.echartInstance2 = echarts.init(document.getElementById('chart2'));
+        this.echartInstance3 = echarts.init(document.getElementById('chart3'));
+        this.echartInstance1.setOption(chartOptionsLine);
+        this.echartInstance2.setOption(chartOptionsLine);
+        this.echartInstance3.setOption(chartOptionsLine);
         window.addEventListener("resize",this.resizeHandle);
     },
     methods:{
         resizeHandle(){
-            this.echartInstance.resize()
+            this.echartInstance1.resize();
+            this.echartInstance2.resize();
+            this.echartInstance3.resize();
         }
     },
     destroyed: function() {
@@ -58,9 +66,17 @@ export default {
 </script>
  
 <style>
-#chart-container{
+#chart1{
     width: 100%;
-    height: 700px;
+    height: 33%;
+}
+#chart2 {
+    width: 100%;
+    height: 33%;
+}
+#chart3 {
+    width: 100%;
+    height: 33%
 }
 </style>
 

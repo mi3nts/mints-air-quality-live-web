@@ -81,7 +81,7 @@ export default {
         },
         'epaLayer': function(newValue) {
             if (newValue) {
-                this.epaGroup.addTo(this.map)
+                this.epaGroup.addTo(this.map);
             } else {
                 this.map.removeLayer(this.epaGroup);
             }
