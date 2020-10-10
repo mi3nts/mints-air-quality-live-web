@@ -1,78 +1,85 @@
-import echarts from "echarts"
+import echarts from "echarts";
+
 export default {
-    /*data: () => ({
-        chartOptionsLine: {
-            xAxis: {
-                data: [
-                    "Jan",
-                    "Feb",
-                    "Mar",
-                    "Apr",
-                    "May",
-                    "Jun",
-                    "Jul",
-                    "Aug",
-                    "Sep",
-                    "Oct",
-                    "Nov",
-                    "Dec"
+    mounted() {
+        function randomData() {
+            now.setDate(now.getDate() + 1);
+            value = value + Math.random() * 21 - 10;
+            return {
+                name: now.toString(),
+                value: [
+                    [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
+                    Math.round(value)
                 ]
-            },
-            yAxis: {
-                type: "value"
-            },
-            series: [{
-                type: "line",
-                data: [55, 72, 84, 48, 59, 62, 87, 75, 94, 101, 127, 118]
-            }],
-            title: {
-                text: "Monthly Stock Prices",
-                x: "center",
-                textStyle: {
-                    fontSize: 24
-                }
-            },
-            color: ["#127ac2"]
+            };
         }
-    }),*/
-    mounted: function() {
+        var arr = [];
+        var now = new Date(1997, 9, 3);
+        var value = Math.random() * 1000;
+        for (var i = 0; i < 1000; i++) {
+            arr.push(randomData());
+        }
         var chartOptionsLine = {
-            xAxis: {
-                data: [
-                    "Jan",
-                    "Feb",
-                    "Mar",
-                    "Apr",
-                    "May",
-                    "Jun",
-                    "Jul",
-                    "Aug",
-                    "Sep",
-                    "Oct",
-                    "Nov",
-                    "Dec"
-                ]
-            },
-            yAxis: {
-                type: "value"
-            },
-            series: [{
-                type: "line",
-                data: [55, 72, 84, 48, 59, 62, 87, 75, 94, 101, 127, 118]
-            }],
             title: {
-                text: "Monthly Stock Prices",
-                x: "center",
-                textStyle: {
-                    fontSize: 24
+                text: '动态数据 + 时间坐标轴'
+            },
+            tooltip: {
+                trigger: 'axis',
+                formatter: function(params) {
+                    params = params[0];
+                    var date = new Date(params.name);
+                    return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' : ' + params.value[1];
+                },
+                axisPointer: {
+                    animation: false
                 }
             },
+            xAxis: {
+                type: 'time',
+                splitLine: {
+                    show: false
+                }
+            },
+            yAxis: {
+                type: "value",
+                boundaryGap: [0, '100%'],
+                splitLine: {
+                    show: false
+                }
+            },
+            series: [{
+                name: '模拟数据',
+                type: "line",
+                showSymbol: false,
+                hoverAnimation: false,
+                data: arr,
+            }],
             color: ["#127ac2"]
         };
-        this.echartInstance = echarts.init(document.getElementsByClassName('charts'));
-        this.echartInstance.setOption(chartOptionsLine)
-        window.addEventListener("resize", function() {
-            this.echartInstance.resize()
-        })
-    }
+        var echartInstance1 = echarts.init(document.getElementById("chart1"));
+        echartInstance1.setOption(chartOptionsLine);
+        window.addEventListener("resize", this.resizeHandle);
+
+        setInterval(function() {
+            for (var i = 0; i < 5; i++) {
+                arr.shift();
+                arr.push(randomData());
+            }
+            echartInstance1.setOption({
+                series: [{
+                    data: arr
+                }],
+            });
+        }, 1000);
+    },
+    methods: {
+        resizeHandle: function() {
+            this.echartInstance1.resize();
+            //this.echartInstance2.resize();
+            //this.echartInstance3.resize();
+        },
+        destroyed: function() {
+            window.removeEventListener("resize", this.resizeHandle);
+        }
+    },
 };
