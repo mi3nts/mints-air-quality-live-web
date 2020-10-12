@@ -12,7 +12,7 @@
         <particulate-matter @close="showPM=false;"></particulate-matter>
       </v-dialog>
       <v-spacer></v-spacer>
-      <v-btn x-large exact text @click="flipPage()">{{testValue}}</v-btn>
+      <v-btn x-large exact text @click="flipPage()">{{dashboardNav}}</v-btn>
       <v-btn x-large depressed exact text @click="showPM=true;">
         <span class="mr-2 d-none d-lg-flex d-xl-none">Particulate Matter?</span>
         <v-icon class="d-flex">help</v-icon>
@@ -72,19 +72,24 @@ export default {
   data: () => ({
     showAbout: false,
     showPM: false,
-    testValue: "Go to Dashboard"
+    dashboardNav: null,
   }),
   created: function() {
     window["moment"] = this.$moment;
+    if (this.$router.currentRoute.fullPath == "/dashboard") {
+      this.dashboardNav = "Go to Map";
+    } else {
+      this.dashboardNav = "Go to Dashboard";
+    }
   },
   methods: {
     flipPage: function() {
-      if (this.testValue == "Go to Dashboard") {
+      if (this.dashboardNav == "Go to Dashboard") {
         this.$router.push({path: '/dashboard'});
-        this.testValue = "Go to Map";
+        this.dashboardNav = "Go to Map";
       } else {
         this.$router.push({path: '/'});
-        this.testValue = "Go to Dashboard";
+        this.dashboardNav = "Go to Dashboard";
       }
     }
   }
