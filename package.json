@@ -11,6 +11,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "apexcharts": "^3.22.0",
     "axios": "^0.19.2",
     "core-js": "^3.6.5",
     "leaflet-velocity": "^1.7.0",
