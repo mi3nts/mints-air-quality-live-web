@@ -74,19 +74,27 @@ export default {
          * with the way things are set up currently.
          */
         addValues: function() {
+            // alternate between 0 and 7
             if (this.yTick == 0) { 
                 this.yTick = 7; 
             } else {
                 this.yTick = 0;
             }
 
+            // add item
             this.sensorValues.push({
                 x: this.xTick,
                 y: this.yTick
             })
 
+            // remove items once chart gets too full
+            if (this.sensorValues.length > 30) {
+                this.sensorValues.shift();
+            }
+
             this.xTick++;
           
+            // update chart
             this.chart.updateSeries([{
                 data: this.sensorValues
             }])
