@@ -4,16 +4,20 @@ export default {
     data: () => ({
         chart: null,
         sensorValues: [
-            {name: "test", value: [0, 1]},
-            {name: "test", value: [1, 3]},
-            {name: "test", value: [2, 2]},
-            {name: "test", value: [3, 4]}
+            { name: "test", value: [0, 1] },
+            { name: "test", value: [1, 3] },
+            { name: "test", value: [2, 2] },
+            { name: "test", value: [3, 4] }
         ],
         xTick: 4,
         yTick: 0,
     }),
     mounted: function() {
         this.initChart();
+        // adds new value every second for demonstration purposes
+        if (this.xTick == 4) {
+            setInterval(this.addValues, 500);
+        }
     },
     methods: {
         initChart: function() {
@@ -42,13 +46,9 @@ export default {
                 }],
                 color: ["#69b2ee"]
             };
-
-            this.chart =  echarts.init(document.getElementById("chart"));
+            this.chart = echarts.init(document.getElementById("chart"));
             this.chart.setOption(chartOptionsLine);
             window.addEventListener("resize", this.resizeHandle);
-
-            // adds new value every second for demonstration purposes
-            window.setInterval(this.addValues, 500);
         },
         /**
          * Currently alternates between 0 and 7 for demo purposes.
@@ -59,39 +59,32 @@ export default {
          */
         addValues: function() {
             // alternate between 0 and 7
-            if (this.yTick == 0) { 
-                this.yTick = 7; 
+            if (this.yTick == 0) {
+                this.yTick = 7;
             } else {
                 this.yTick = 0;
             }
 
-            // add item
+            /*if (this.sensorValues.length >= 20) {
+                this.sensorValues = [];
+                this.xTick = 20;
+                this.yTick = 0;
+            }*/
+
             this.sensorValues.push({
                 name: "test",
                 value: [this.xTick, this.yTick]
             });
-
-            // remove items once chart gets too full
-            if (this.sensorValues.length > 30) {
-                this.sensorValues.shift();
-            }
-
-            this.xTick++;
-
             // update chart
             this.chart.setOption({
                 series: [{
                     data: this.sensorValues
                 }]
             })
+            this.xTick += 1;
         },
         resizeHandle: function() {
             this.chart.resize();
-            //this.echartInstance2.resize();
-            //this.echartInstance3.resize();
-        },
-        destroyed: function() {
-            window.removeEventListener("resize", this.resizeHandle);
         }
     }
 }
