@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "chart.js": "^2.9.3",
     "core-js": "^3.6.5",
+    "highcharts": "^8.2.0",
     "leaflet-velocity": "^1.7.0",
     "register-service-worker": "^1.7.1",
     "vue": "^2.6.12",
