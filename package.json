@@ -14,6 +14,7 @@
     "axios": "^0.19.2",
     "core-js": "^3.6.5",
     "echarts": "^4.9.0",
+    "echarts.js": "^3.0.0-beta3",
     "leaflet-velocity": "^1.7.0",
     "register-service-worker": "^1.7.1",
     "vue": "^2.6.12",

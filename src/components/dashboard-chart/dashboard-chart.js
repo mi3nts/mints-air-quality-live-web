@@ -32,7 +32,6 @@ export default {
                 },
                 yAxis: {
                     type: "value",
-                    boundaryGap: [0, '100%'],
                     splitLine: {
                         show: false
                     }
@@ -65,11 +64,6 @@ export default {
                 this.yTick = 0;
             }
 
-            /*if (this.sensorValues.length >= 20) {
-                this.sensorValues = [];
-                this.xTick = 20;
-                this.yTick = 0;
-            }*/
 
             this.sensorValues.push({
                 name: "test",
