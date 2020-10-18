@@ -1,7 +1,22 @@
 <div>
-    <!-- TODO: Finish graph selector -->
-    <!-- <div>
-        <v-select v-model="toDisplay" :items="options" label="Select which charts to display..." multiple></v-select>
-    </div> -->
-    <DashboardChart />
+    <nav id="mysidenav" class="sideNav">
+        <a class="closeBtn">&times;</a>
+        <input type="checkbox" id="check1" name="check1" value="Chart1"/>
+        <span id="checktext">Chart1</span><br>
+        <input type="checkbox" id="check2" name="check2" value="Chart2"/>
+        <span id="checktext">Chart2</span><br>
+        <input type="checkbox" id="check3" name="check3" value="Chart3"/>
+        <span id="checktext">Chart3</span><br>
+    </nav>
+    <button class="openSideNav">
+        <div class="icon"></div>
+        <div class="icon"></div>
+        <div class="icon"></div>
+    </button>
+    <section>
+        <h1 id="test1">This is some random heading</h1>
+        <h1 id="test2">This is another heading</h1>
+        <h1 id="test3">Here is another random heading</h1>
+    </section>
+    <!--<DashboardChart class="test4"></DashboardChart>-->
 </div>

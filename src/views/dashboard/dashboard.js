@@ -8,19 +8,47 @@ export default {
     components: {
         DashboardChart
     },
-    // TODO: Finish graph select and functionality for dashboard page below
-    // data: () => ({
-    //     options: ["PM 2.5", "PM 1"],
-    //     toDisplay: [],
-    // }),
-    // watch: {
-    //     "toDisplay": function () {
-    //         this.addChart();
-    //     }
-    // },
-    // methods: {
-    //     addChart: function () {
-    //         console.log(this.toDisplay);
-    //     }
-    // }
+    mounted() {
+        var openBtn = document.querySelector(".openSideNav");
+        openBtn.addEventListener("click", () => {
+            this.showNav();
+        });
+
+        var closeBtn = document.querySelector(".closeBtn");
+        closeBtn.addEventListener("click", () => {
+            this.hideNav();
+            this.check1();
+            this.check2();
+            this.check3();
+        });
+    },
+    methods: {
+        showNav: function() {
+            document.getElementById("mysidenav").style.width = "100%";
+        },
+        hideNav: function() {
+            document.getElementById("mysidenav").style.width = "0";
+        },
+        check1: function() {
+            if (document.getElementById("check1").checked == true) {
+                document.getElementById("test1").style.display = "block";
+            } else {
+                document.getElementById("test1").style.display = "none";
+            }
+        },
+        check2: function() {
+            if (document.getElementById("check2").checked == true) {
+                document.getElementById("test2").style.display = "block";
+            } else {
+                document.getElementById("test2").style.display = "none";
+            }
+        },
+        check3: function() {
+            if (document.getElementById("check3").checked == true) {
+                document.getElementById("test3").style.display = "block";
+            } else {
+                document.getElementById("test3").style.display = "none";
+            }
+        }
+    }
 }
