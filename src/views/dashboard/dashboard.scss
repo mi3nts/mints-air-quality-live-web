@@ -72,9 +72,10 @@ input[type=checkbox] {
     -o-transform: scale(1.5);
     /* Opera */
     transform: scale(1.5);
-    padding: 10px;
+    //padding: 10px;
     position: absolute;
     left: 48%;
+    margin-top: 10px;
 }
 
 
@@ -86,5 +87,6 @@ input[type=checkbox] {
     font-size: x-large;
     display: inline;
     position: absolute;
+    margin-top: 0px;
     left: 50%;
 }
