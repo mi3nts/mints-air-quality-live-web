@@ -17,14 +17,19 @@ export default {
         var closeBtn = document.querySelector(".closeBtn");
         closeBtn.addEventListener("click", () => {
             this.hideNav();
+        });
+
+        var applyBtn = document.getElementById("apply");
+        applyBtn.addEventListener("click", () => {
             this.check1();
             this.check2();
             this.check3();
+            this.hideNav();
         });
     },
     methods: {
         showNav: function() {
-            document.getElementById("mysidenav").style.width = "100%";
+            document.getElementById("mysidenav").style.width = "20%";
         },
         hideNav: function() {
             document.getElementById("mysidenav").style.width = "0";

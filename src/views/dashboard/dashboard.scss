@@ -11,6 +11,14 @@
     transition: 0.5s;
 }
 
+#listheader {
+    color: white;
+}
+
+#apply {
+    color: white;
+}
+
 .sideNav a {
     padding: 8px 8px 8px 32px;
     text-decoration: none;
@@ -74,7 +82,7 @@ input[type=checkbox] {
     transform: scale(1.5);
     //padding: 10px;
     position: absolute;
-    left: 48%;
+    left: 8%;
     margin-top: 10px;
 }
 
@@ -88,5 +96,5 @@ input[type=checkbox] {
     display: inline;
     position: absolute;
     margin-top: 0px;
-    left: 50%;
+    left: 15%;
 }
