@@ -4,9 +4,9 @@ import Home from '../views/home/'
 import Dashboard from '../views/dashboard'
 
 Vue.use(VueRouter)
-/**
- * All the url configurations go here.
- */
+    /**
+     * All the url configurations go here.
+     */
 const routes = [{
     path: '/',
     name: 'home',
@@ -24,8 +24,8 @@ const routes = [{
 ]
 
 const router = new VueRouter({
-  mode: 'history',
-  routes
+    mode: 'history',
+    routes
 })
 
 export default router

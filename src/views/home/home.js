@@ -187,9 +187,7 @@ export default {
                     payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
 
                 }
-                console.log(payload);
-                console.log(this.sensors);
-
+                
                 // check for NaN latitude and longitude values
                 // replace invalid values with previously stored latitude/longitude values
                 if (isNaN(payload.latitude) || isNaN(payload.longitude)) {
@@ -217,9 +215,7 @@ export default {
 
                 //update or put values into the sensors array to cache last payload
                 if (this.$set(this.sensors, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, payload)) {
-                    this.redrawSensors(payload, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].name)
-                    //console.log(this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id }))
-                    //console.log(this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, "=>", payload)
+                    this.redrawSensors(payload, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].name);
                 }
             }
         }
