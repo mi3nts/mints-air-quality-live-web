@@ -182,8 +182,7 @@ export default {
                         payload = JSON.parse(payload.toString());
                     }
                 } catch (error) {
-                    // this fixes the NaN issue
-                    // makes string is parsable by JSON parse function()
+                    // handle NaN errors
                     payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
 
                 }
@@ -213,7 +212,7 @@ export default {
                     }
                 }
 
-                //update or put values into the sensors array to cache last payload
+                // update or put values into the sensors array to cache last payload
                 if (this.$set(this.sensors, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, payload)) {
                     this.redrawSensors(payload, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].name);
                 }

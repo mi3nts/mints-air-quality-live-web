@@ -3,35 +3,44 @@ import echarts from "echarts";
 export default {
     data: () => ({
         chart: null,
-        sensorValues: [
-            { name: "test", value: [0, 1] },
-            { name: "test", value: [1, 3] },
-            { name: "test", value: [2, 2] },
-            { name: "test", value: [3, 4] }
-        ],
-        xTick: 4,
-        yTick: 0,
+        dataType: "pm2_5", // this will need to be determined by chart selection
+        sensorValues: [], 
     }),
     mounted: function() {
+        // subscribe to MQTT stream
+        console.log(this.$mqtt.subscribe('#'));
         this.initChart();
-        // adds new value every second for demonstration purposes
-        if (this.xTick == 4) {
-            setInterval(this.addValues, 500);
+    },
+    mqtt: {
+        '+/calibrated'(payload) {
+            if (payload != null) {
+                try {
+                    if (JSON.parse(payload.toString())) {
+                        payload = JSON.parse(payload.toString());
+                    }
+                } catch (error) {
+                    // handle NaN errors
+                    payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
+                }
+                this.addValues(payload);
+            }
         }
     },
     methods: {
         initChart: function() {
             var chartOptionsLine = {
                 title: {
-                    text: "Test Chart"
+                    text: this.dataType,
                 },
                 xAxis: {
+                    type: "time",
                     splitLine: {
                         show: false
                     }
                 },
                 yAxis: {
                     type: "value",
+                    boundaryGap: [0, 0],
                     splitLine: {
                         show: false
                     }
@@ -49,33 +58,24 @@ export default {
             this.chart.setOption(chartOptionsLine);
             window.addEventListener("resize", this.resizeHandle);
         },
-        /**
-         * Currently alternates between 0 and 7 for demo purposes.
-         * 
-         * With MQTT, we should be able to watch for values and
-         * then call addValues() to add the data and update 
-         * the chart(s).
-         */
-        addValues: function() {
-            // alternate between 0 and 7
-            if (this.yTick == 0) {
-                this.yTick = 7;
-            } else {
-                this.yTick = 0;
-            }
-
+        addValues: function(data) {
+            console.log(data.timestamp);
+            console.log(data[this.dataType]);
 
             this.sensorValues.push({
-                name: "test",
-                value: [this.xTick, this.yTick]
+                name: this.dataType,
+                value: [
+                    data.timestamp,
+                    data[this.dataType]
+                ]
             });
+
             // update chart
             this.chart.setOption({
                 series: [{
                     data: this.sensorValues
                 }]
             })
-            this.xTick += 1;
         },
         resizeHandle: function() {
             this.chart.resize();
