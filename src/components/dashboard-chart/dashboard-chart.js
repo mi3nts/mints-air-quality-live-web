@@ -83,6 +83,9 @@ export default {
                 }]
             })
         },
+        /**
+         * Simulate MQTT payload for testing purposes.
+         */
         simulatePayload: function() {
             function addZero(i) {
                 if (i < 10) {
