@@ -5,6 +5,7 @@ export default {
         chart: null,
         dataType: "pm2_5", // this will need to be determined by chart selection
         sensorValues: [], 
+        testVal: (Math.random() * 10) + 1, // used for testing with simulated payloads
     }),
     mounted: function() {
         // subscribe to MQTT stream
@@ -87,6 +88,9 @@ export default {
          * Simulate MQTT payload for testing purposes.
          */
         simulatePayload: function() {
+            // used to add an extra 0 in from of single digit values
+            // so echarts is able to use timestamps
+            // ex: 1:27:2 is changed to 01:27:02
             function addZero(i) {
                 if (i < 10) {
                     i = "0" + i;
@@ -94,7 +98,14 @@ export default {
                 return i;
             }
 
-            var randVal = (Math.random() * 10) + 1;
+            // generate a increment to add/subtract from testVal
+            var rand = (Math.random() * 7) - 3;
+            this.testVal += rand;
+
+            // remove possibility of negative values
+            if (this.testVal < 0) {
+                this.testVal += -2 * rand;
+            }
 
             var d = new Date();
             var year = d.getFullYear();
@@ -108,9 +119,9 @@ export default {
             var payload = {
                 timestamp: time,
                 sensor_id: "000000000000",
-                pm1: randVal-1,
-                pm2_5: randVal,
-                pm10: randVal+1,
+                pm1: this.testVal - 1,
+                pm2_5: this.testVal,
+                pm10: this.testVal + 1,
                 latitude: 0,
                 longitude: 0,
                 dewpoint: 100,
