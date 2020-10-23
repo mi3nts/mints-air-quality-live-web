@@ -100,11 +100,12 @@ export default {
             }
 
             // generate a increment to add/subtract from testVal
-            var rand = (Math.random() * 7) - 3;
+            var rand = (Math.random() * 6) - 3;
             this.testVal += rand;
 
-            // remove possibility of negative values
-            if (this.testVal < 0) {
+            // add upper and lower bounds
+            // prevent negative values
+            if (this.testVal < 0 || this.testVal > 50) {
                 this.testVal += -2 * rand;
             }
 
