@@ -33,6 +33,7 @@ export default {
             var chartOptionsLine = {
                 title: {
                     text: this.dataType,
+                    left: "center",
                 },
                 xAxis: {
                     type: "time",
