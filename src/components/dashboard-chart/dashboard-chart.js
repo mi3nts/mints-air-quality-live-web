@@ -10,6 +10,7 @@ export default {
         // subscribe to MQTT stream
         console.log(this.$mqtt.subscribe('#'));
         this.initChart();
+        setInterval(this.simulatePayload, 1000);
     },
     mqtt: {
         '+/calibrated'(payload) {
@@ -22,7 +23,7 @@ export default {
                     // handle NaN errors
                     payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
                 }
-                this.addValues(payload);
+                // this.addValues(payload);
             }
         }
     },
@@ -50,6 +51,7 @@ export default {
                     type: "line",
                     showSymbol: false,
                     hoverAnimation: false,
+                    animation: false,
                     data: this.sensorValues,
                 }],
                 color: ["#69b2ee"]
@@ -69,6 +71,10 @@ export default {
                     data[this.dataType]
                 ]
             });
+ 
+            if (this.sensorValues.length > 100) {
+                this.sensorValues.shift();
+            }
 
             // update chart
             this.chart.setOption({
@@ -76,6 +82,40 @@ export default {
                     data: this.sensorValues
                 }]
             })
+        },
+        simulatePayload: function() {
+            function addZero(i) {
+                if (i < 10) {
+                    i = "0" + i;
+                }
+                return i;
+            }
+
+            var randVal = (Math.random() * 10) + 1;
+
+            var d = new Date();
+            var year = d.getFullYear();
+            var month = addZero(d.getMonth());
+            var date = addZero(d.getDate());
+            var hour = addZero(d.getHours());
+            var min = addZero(d.getMinutes());
+            var sec = addZero(d.getSeconds());
+            var time = year + "-" + month + "-" + date + " " + hour + ":" + min + ":" + sec;
+
+            var payload = {
+                timestamp: time,
+                sensor_id: "000000000000",
+                pm1: randVal-1,
+                pm2_5: randVal,
+                pm10: randVal+1,
+                latitude: 0,
+                longitude: 0,
+                dewpoint: 100,
+                humidity: 100,
+                pressure: 100,
+                temperature: 100,
+            }
+            this.addValues(payload);
         },
         resizeHandle: function() {
             this.chart.resize();
