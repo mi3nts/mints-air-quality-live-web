@@ -58,7 +58,7 @@ export default {
                 }],
                 color: ["#69b2ee"]
             };
-            this.chart = echarts.init(document.getElementById("chart"));
+            this.chart = echarts.init(document.getElementById(this.dataType));
             this.chart.setOption(chartOptionsLine);
             window.addEventListener("resize", this.resizeHandle);
         },
