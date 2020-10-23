@@ -1,9 +1,12 @@
 import echarts from "echarts";
 
 export default {
+    props: [
+        "dataType",
+    ],
     data: () => ({
         chart: null,
-        dataType: "pm2_5", // this will need to be determined by chart selection
+        // dataType: "pm2_5", // this will need to be determined by chart selection
         sensorValues: [], 
         testVal: (Math.random() * 10) + 1, // used for testing with simulated payloads
     }),
@@ -31,17 +34,19 @@ export default {
     methods: {
         initChart: function() {
             var chartOptionsLine = {
-                title: {
-                    text: this.dataType,
-                    left: "center",
-                },
                 xAxis: {
                     type: "time",
+                    show: false,
                     splitLine: {
                         show: false
                     }
                 },
                 yAxis: {
+                    name: this.dataType,
+                    nameTextStyle: {
+                        fontWeight: "bold",
+                        fontSize: 14,
+                    },
                     type: "value",
                     boundaryGap: [0, 0],
                     splitLine: {
@@ -126,10 +131,10 @@ export default {
                 pm10: this.testVal + 1,
                 latitude: 0,
                 longitude: 0,
-                dewpoint: 100,
-                humidity: 100,
-                pressure: 100,
-                temperature: 100,
+                dewpoint: this.testVal * 1.2,
+                humidity: this.testVal + 1.5,
+                pressure: this.testVal - 3,
+                temperature: this.testVal / 1.3,
             }
             this.addValues(payload);
         },
