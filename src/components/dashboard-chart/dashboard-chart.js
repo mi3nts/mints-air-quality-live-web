@@ -34,19 +34,23 @@ export default {
     methods: {
         initChart: function() {
             var chartOptionsLine = {
+                title: {
+                    text: this.dataType,
+                    left: "center"
+                },
                 xAxis: {
                     type: "time",
-                    show: false,
                     splitLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
                         show: false
                     }
                 },
                 yAxis: {
-                    name: this.dataType,
-                    nameTextStyle: {
-                        fontWeight: "bold",
-                        fontSize: 14,
-                    },
                     type: "value",
                     boundaryGap: [0, 0],
                     splitLine: {
@@ -56,13 +60,17 @@ export default {
                 series: [{
                     name: 'Test Values',
                     type: "line",
+                    lineStyle: {
+                        color: "#69b2ee",
+                        width: 3,
+                    },
                     showSymbol: false,
                     hoverAnimation: false,
                     animation: false,
                     data: this.sensorValues,
                 }],
-                color: ["#69b2ee"]
             };
+
             this.chart = echarts.init(document.getElementById(this.dataType));
             this.chart.setOption(chartOptionsLine);
             window.addEventListener("resize", this.resizeHandle);
@@ -126,15 +134,15 @@ export default {
             var payload = {
                 timestamp: time,
                 sensor_id: "000000000000",
-                pm1: this.testVal - 1,
+                pm1: this.testVal,
                 pm2_5: this.testVal,
-                pm10: this.testVal + 1,
+                pm10: this.testVal,
                 latitude: 0,
                 longitude: 0,
-                dewpoint: this.testVal * 1.2,
-                humidity: this.testVal + 1.5,
-                pressure: this.testVal - 3,
-                temperature: this.testVal / 1.3,
+                dewpoint: this.testVal,
+                humidity: this.testVal,
+                pressure: this.testVal,
+                temperature: this.testVal,
             }
             this.addValues(payload);
         },
