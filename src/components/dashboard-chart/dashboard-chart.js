@@ -36,7 +36,8 @@ export default {
             var chartOptionsLine = {
                 title: {
                     text: this.dataType,
-                    left: "center"
+                    left: "center",
+                    padding: [15, 0, 0, 0]
                 },
                 xAxis: {
                     type: "time",
