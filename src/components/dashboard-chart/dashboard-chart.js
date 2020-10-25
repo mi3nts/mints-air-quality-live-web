@@ -109,7 +109,7 @@ export default {
             }
 
             // update current value to display
-            this.currentVal = data[this.dataType].toFixed(3);
+            this.currentVal = data[this.dataType].toFixed(1);
 
             // update chart
             this.chart.setOption({
