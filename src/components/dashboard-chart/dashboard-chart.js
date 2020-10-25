@@ -8,6 +8,7 @@ export default {
         chart: null,
         // dataType: "pm2_5", // this will need to be determined by chart selection
         sensorValues: [], 
+        currentVal: null,
         testVal: (Math.random() * 10) + 1, // used for testing with simulated payloads
     }),
     mounted: function() {
@@ -37,10 +38,11 @@ export default {
                 title: {
                     text: this.dataType,
                     left: "center",
-                    padding: [15, 0, 0, 0]
+                    padding: [20, 0, 0, 0]
                 },
                 xAxis: {
                     type: "time",
+                    show: false,
                     splitLine: {
                         show: false
                     },
@@ -56,19 +58,30 @@ export default {
                     boundaryGap: [0, 0],
                     splitLine: {
                         show: false
+                    },
+                    axisLabel: {
+                        fontSize: 16,
                     }
                 },
                 series: [{
                     name: 'Test Values',
                     type: "line",
                     lineStyle: {
-                        color: "#69b2ee",
-                        width: 3,
+                        color: "#5db4e1",
+                        width: 5,
+                    },
+                    markLine: {
+                        silent: true,
+                        symbol: "circle",
+                        lineStyle: {
+                            color: "#cc0000",
+                            width: 3
+                        },
+                        label: {
+                            show: false
+                        }
                     },
                     showSymbol: false,
-                    markLine: {
-
-                    },
                     hoverAnimation: false,
                     animation: false,
                     data: this.sensorValues,
@@ -95,10 +108,18 @@ export default {
                 this.sensorValues.shift();
             }
 
+            // update current value to display
+            this.currentVal = data[this.dataType].toFixed(3);
+
             // update chart
             this.chart.setOption({
                 series: [{
-                    data: this.sensorValues
+                    data: this.sensorValues,
+                    markLine: {
+                        data: [{
+                            yAxis: data[this.dataType],
+                        }]
+                    }
                 }]
             })
         },
