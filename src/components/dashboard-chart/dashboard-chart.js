@@ -66,6 +66,9 @@ export default {
                         width: 3,
                     },
                     showSymbol: false,
+                    markLine: {
+
+                    },
                     hoverAnimation: false,
                     animation: false,
                     data: this.sensorValues,

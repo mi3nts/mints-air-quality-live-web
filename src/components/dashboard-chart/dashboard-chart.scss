@@ -1,9 +1,12 @@
+// universal height control
+$container-height: 250px;
+
 .container {
-    height: 250px; 
+    height: $container-height;
     width: 100%;
 }
 
-.background {
+.border {
     width: 100%; 
     height: 100%;
     position: relative;
@@ -16,6 +19,8 @@
     width: 100%; 
     height: 110%;
     position: relative;
-    top: -220px;
+
+    // shift chart to lay on top of border div
+    top: -1 * $container-height + 30px;
     z-index: 1;
 }
