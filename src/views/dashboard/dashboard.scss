@@ -1,100 +1,24 @@
-.sideNav {
-    width: 0;
-    height: 100%;
-    position: fixed;
-    z-index: 1;
-    top: 65px;
-    left: 0;
-    background-color: grey;
-    overflow-x: hidden;
-    padding-top: 40px;
-    transition: 0.5s;
-}
-
-#listheader {
-    color: white;
-}
-
-#apply {
-    color: white;
-}
-
-.sideNav a {
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 25px;
-    color: White;
-    font-family: "Segoe UI", Tahoma, "Geneva", Verdana, sans-serif;
-    display: block;
-    transition: 0.3s;
-}
-
-.sidenav a:hover {
-    color: #f1f1f1;
-}
-
-.sideNav .closeBtn {
+.sideBar {
     position: absolute;
     top: 0px;
-    right: 25px;
-    padding-top: 0px;
-    font-size: 36px;
-    margin-left: 50px;
+    z-index: 1002;
+    background-color: white;
+    margin: 10px;
+
+    .menu {
+        position: absolute;
+        right: -25px;
+        background: white;
+        cursor: pointer;
+        padding-left: 5px;
+    }
 }
 
-button {
-    padding: 15px;
-    color: black;
-    font-size: 20px;
-    border: none;
-    border-radius: 2%;
-}
-
-.icon {
-    width: 35px;
-    height: 5px;
-    background-color: black;
-    margin: 6px 0;
-}
-
-#test1 {
-    display: block;
-}
-
-#test2 {
-    display: block;
-}
-
-#test3 {
-    display: block;
-}
-
-input[type=checkbox] {
-    /* Double-sized Checkboxes */
-    -ms-transform: scale(1.5);
-    /* IE */
-    -moz-transform: scale(1.5);
-    /* FF */
-    -webkit-transform: scale(1.5);
-    /* Safari and Chrome */
-    -o-transform: scale(1.5);
-    /* Opera */
-    transform: scale(1.5);
-    //padding: 10px;
-    position: absolute;
-    left: 8%;
-    margin-top: 10px;
-}
-
-
-/* Might want to wrap a span around your checkbox text */
-
-#checktext {
-    /* Checkbox text */
-    color: white;
-    font-size: x-large;
-    display: inline;
-    position: absolute;
-    margin-top: 0px;
-    left: 15%;
+#test2,
+#test3,
+#test4,
+#test5,
+#test6,
+#test7 {
+    display: none;
 }

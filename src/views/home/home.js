@@ -56,32 +56,32 @@ export default {
     },
     watch: {
         'pmType': function() {
-            this.refreshIcons()
+            this.refreshIcons();
         },
         'openAQLayer': function(newValue) {
             if (newValue) {
-                this.openAQGroup.addTo(this.map)
+                this.openAQGroup.addTo(this.map);
             } else {
                 this.map.removeLayer(this.openAQGroup);
             }
         },
         'purpleAirLayer': function(newValue) {
             if (newValue) {
-                this.purpleAirGroup.addTo(this.map)
+                this.purpleAirGroup.addTo(this.map);
             } else {
                 this.map.removeLayer(this.purpleAirGroup);
             }
         },
         'pollutionLayer': function(newValue) {
             if (newValue) {
-                this.pollutionGroup.addTo(this.map)
+                this.pollutionGroup.addTo(this.map);
             } else {
                 this.map.removeLayer(this.pollutionGroup);
             }
         },
         'epaLayer': function(newValue) {
             if (newValue) {
-                this.epaGroup.addTo(this.map)
+                this.epaGroup.addTo(this.map);
             } else {
                 this.map.removeLayer(this.epaGroup);
             }
@@ -95,14 +95,14 @@ export default {
         },
         'sensorLayer': function(newValue) {
             if (newValue) {
-                this.sensorGroup.addTo(this.map)
+                this.sensorGroup.addTo(this.map);
             } else {
                 this.map.removeLayer(this.sensorGroup);
             }
         },
         'radarLayer': function(newValue) {
             if (newValue) {
-                this.layers.radar.addTo(this.map)
+                this.layers.radar.addTo(this.map);
             } else {
                 this.map.removeLayer(this.layers.radar);
             }
