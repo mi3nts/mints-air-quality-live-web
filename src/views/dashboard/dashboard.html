@@ -1,4 +1,4 @@
-<div>
+<div class="dashboard">
     <div class="sideBar visible">
         <div class="menu">
             <v-icon @click="slide">menu</v-icon>
@@ -93,12 +93,28 @@
         </v-list>
     </div>
     <div>
-        <h1 id="test1">1111111111111111111111111111111111</h1>
-        <h1 id="test2">2222222222222222222222222222222222</h1>
-        <h1 id="test3">3333333333333333333333333333333333</h1>
-        <h1 id="test4">4444444444444444444444444444444444</h1>
-        <h1 id="test5">5555555555555555555555555555555555</h1>
-        <h1 id="test6">6666666666666666666666666666666666</h1>
-        <h1 id="test7">7777777777777777777777777777777777</h1>
+        <v-container>
+            <v-row>
+                <DashboardChart dataType="pm2_5"/>
+            </v-row>
+            <v-row>
+                <DashboardChart dataType="pm1"/>
+            </v-row>
+            <v-row>
+                <DashboardChart dataType="pm10"/>
+            </v-row>
+            <v-row>
+                <DashboardChart dataType="dewpoint"/>
+            </v-row>
+            <v-row>
+                <DashboardChart dataType="humidity"/>
+            </v-row>
+            <v-row>
+                <DashboardChart dataType="pressure"/>
+            </v-row>
+            <v-row>
+                <DashboardChart dataType="temperature"/>
+            </v-row>
+        </v-container>
     </div>
 </div>
