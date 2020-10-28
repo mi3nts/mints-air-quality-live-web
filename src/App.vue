@@ -9,19 +9,19 @@
         <span class="mr-2">Map</span>
       </v-btn>-->
       <v-dialog v-model="showPM">
-        <particulate-matter @close="showPM=false;"></particulate-matter>
+        <particulate-matter @close="showPM = false"></particulate-matter>
       </v-dialog>
       <v-spacer></v-spacer>
-      <v-btn x-large exact text @click="flipPage()">{{dashboardNav}}</v-btn>
-      <v-btn x-large depressed exact text @click="showPM=true;">
+      <v-btn x-large exact text @click="flipPage()">{{ dashboardNav }}</v-btn>
+      <v-btn x-large depressed exact text @click="showPM = true">
         <span class="mr-2 d-none d-lg-flex d-xl-none">Particulate Matter?</span>
         <v-icon class="d-flex">help</v-icon>
       </v-btn>
-      <v-btn x-large exact text @click="showAbout=true;">
+      <v-btn x-large exact text @click="showAbout = true">
         <span class="mr-2">About</span>
       </v-btn>
       <v-dialog v-model="showAbout">
-        <about @close="showAbout=false;"></about>
+        <about @close="showAbout = false"></about>
       </v-dialog>
     </v-app-bar>
     <v-content>
@@ -63,18 +63,53 @@ header .v-btn {
 <script>
 import About from "@/components/about";
 import ParticulateMatter from "@/components/particulate-matter";
+import Vue from "vue";
+import Vuex from "vuex";
+
+Vue.use(Vuex);
+
+const store = new Vuex.Store({
+  state: {
+    dashChartVal: {
+      pm2_5: [],
+      pm1: [],
+      pm10: [],
+      dewpoint: [],
+      humidity: [],
+      pressure: [],
+      temperature: [],
+    },
+  },
+  mutations: {
+    pushValue(state, data) {
+      state.dashChartVal[data.name].push({
+        name: data.name,
+        value: data.value,
+      });
+    },
+    shiftPoints(state, dataType) {
+      store.state.dashChartVal[dataType].shift();
+    },
+  },
+  getters: {
+    getChart: (state) => (name) => {
+      return state.dashChartVal[name];
+    },
+  },
+});
 export default {
   name: "App",
+  store,
   components: {
     About,
-    ParticulateMatter
+    ParticulateMatter,
   },
   data: () => ({
     showAbout: false,
     showPM: false,
     dashboardNav: null,
   }),
-  created: function() {
+  created: function () {
     window["moment"] = this.$moment;
     if (this.$router.currentRoute.fullPath == "/dashboard") {
       this.dashboardNav = "Go to Map";
@@ -83,15 +118,15 @@ export default {
     }
   },
   methods: {
-    flipPage: function() {
+    flipPage: function () {
       if (this.dashboardNav == "Go to Dashboard") {
-        this.$router.push({path: '/dashboard'});
+        this.$router.push({ path: "/dashboard" });
         this.dashboardNav = "Go to Map";
       } else {
-        this.$router.push({path: '/'});
+        this.$router.push({ path: "/" });
         this.dashboardNav = "Go to Dashboard";
       }
-    }
-  }
+    },
+  },
 };
 </script>

@@ -186,7 +186,7 @@ export default {
                     payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
 
                 }
-                
+
                 // check for NaN latitude and longitude values
                 // replace invalid values with previously stored latitude/longitude values
                 if (isNaN(payload.latitude) || isNaN(payload.longitude)) {
