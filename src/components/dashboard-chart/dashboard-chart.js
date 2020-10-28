@@ -7,15 +7,16 @@ export default {
     data: () => ({
         chart: null,
         // dataType: "pm2_5", // this will need to be determined by chart selection
-        sensorValues: [], 
+        sensorValues: [],
         currentVal: null,
         testVal: (Math.random() * 10) + 1, // used for testing with simulated payloads
+        timer: null,
     }),
     mounted: function () {
         // subscribe to MQTT stream
         console.log(this.$mqtt.subscribe('#'));
         this.initChart();
-        setInterval(this.simulatePayload, 1000);
+        this.timer = setInterval(this.simulatePayload, 1000);
     },
     mqtt: {
         '+/calibrated'(payload) {
@@ -31,6 +32,9 @@ export default {
                 // this.addValues(payload);
             }
         }
+    },
+    beforeDestroy: function () {
+        clearInterval(this.timer)
     },
     computed: {
         getChart() {
@@ -101,7 +105,7 @@ export default {
             //console.log(data.timestamp);
             // console.log(data[this.dataType]);
             //console.log(this.$store.getters.getChart(this.dataType))
-            console.log(this.getChart)
+            //console.log(this.getChart)
 
             /*  this.sensorValues[this.dataType].push({
                  name: this.dataType,
