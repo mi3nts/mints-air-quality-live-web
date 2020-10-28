@@ -6,7 +6,6 @@ export default {
     ],
     data: () => ({
         chart: null,
-        // dataType: "pm2_5", // this will need to be determined by chart selection
         sensorValues: [],
         currentVal: null,
         testVal: (Math.random() * 10) + 1, // used for testing with simulated payloads
@@ -102,19 +101,6 @@ export default {
             window.addEventListener("resize", this.resizeHandle);
         },
         addValues: function (data) {
-            //console.log(data.timestamp);
-            // console.log(data[this.dataType]);
-            //console.log(this.$store.getters.getChart(this.dataType))
-            //console.log(this.getChart)
-
-            /*  this.sensorValues[this.dataType].push({
-                 name: this.dataType,
-                 value: [
-                     data.timestamp,
-                     data[this.dataType]
-                 ]
-             }); */
-
             this.$store.commit('pushValue', {
                 name: this.dataType,
                 value: [
@@ -122,7 +108,6 @@ export default {
                     data[this.dataType]
                 ]
             })
-
 
             if (this.$store.getters.getChart(this.dataType).length > 100) {
                 this.$store.commit('shiftPoints', this.dataType)
