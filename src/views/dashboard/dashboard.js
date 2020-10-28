@@ -17,7 +17,7 @@ export default {
             humidity: false,
             pressure: false,
             temperature: false,
-            chartnames: ["PM2.5", "PM1", "PM10", "Dewpoint", "Humidity", "Pressure", "Temperature"],
+            chartNames: ["PM2.5", "PM1", "PM10", "Dewpoint", "Humidity", "Pressure", "Temperature"],
         }
     },
     mounted: function() {
