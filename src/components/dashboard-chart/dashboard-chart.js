@@ -7,10 +7,10 @@ export default {
     data: () => ({
         chart: null,
         // dataType: "pm2_5", // this will need to be determined by chart selection
-        sensorValues: [], 
+        sensorValues: [],
         testVal: (Math.random() * 10) + 1, // used for testing with simulated payloads
     }),
-    mounted: function() {
+    mounted: function () {
         // subscribe to MQTT stream
         console.log(this.$mqtt.subscribe('#'));
         this.initChart();
@@ -31,8 +31,13 @@ export default {
             }
         }
     },
+    computed: {
+        getChart() {
+            return this.$store.getters.getChart(this.dataType)
+        }
+    },
     methods: {
-        initChart: function() {
+        initChart: function () {
             var chartOptionsLine = {
                 title: {
                     text: this.dataType,
@@ -67,7 +72,7 @@ export default {
                     showSymbol: false,
                     hoverAnimation: false,
                     animation: false,
-                    data: this.sensorValues,
+                    data: this.getChart,
                 }],
             };
 
@@ -75,33 +80,44 @@ export default {
             this.chart.setOption(chartOptionsLine);
             window.addEventListener("resize", this.resizeHandle);
         },
-        addValues: function(data) {
-            console.log(data.timestamp);
-            console.log(data[this.dataType]);
+        addValues: function (data) {
+            //console.log(data.timestamp);
+            // console.log(data[this.dataType]);
+            //console.log(this.$store.getters.getChart(this.dataType))
+            console.log(this.getChart)
 
-            this.sensorValues.push({
+            /*  this.sensorValues[this.dataType].push({
+                 name: this.dataType,
+                 value: [
+                     data.timestamp,
+                     data[this.dataType]
+                 ]
+             }); */
+
+            this.$store.commit('pushValue', {
                 name: this.dataType,
                 value: [
                     data.timestamp,
                     data[this.dataType]
                 ]
-            });
- 
-            if (this.sensorValues.length > 100) {
-                this.sensorValues.shift();
+            })
+
+
+            if (this.$store.getters.getChart(this.dataType).length > 100) {
+                this.$store.commit('shiftPoints', this.dataType)
             }
 
             // update chart
             this.chart.setOption({
                 series: [{
-                    data: this.sensorValues
+                    data: this.getChart,
                 }]
             })
         },
         /**
          * Simulate MQTT payload for testing purposes.
          */
-        simulatePayload: function() {
+        simulatePayload: function () {
             // used to add an extra 0 in from of single digit values
             // so echarts is able to use timestamps
             // ex: 1:27:2 is changed to 01:27:02
@@ -146,7 +162,7 @@ export default {
             }
             this.addValues(payload);
         },
-        resizeHandle: function() {
+        resizeHandle: function () {
             this.chart.resize();
         }
     }
