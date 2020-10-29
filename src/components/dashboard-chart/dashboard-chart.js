@@ -6,7 +6,6 @@ export default {
     ],
     data: () => ({
         chart: null,
-        sensorValues: [],
         currentVal: null,
         testVal: (Math.random() * 10) + 1, // used for testing with simulated payloads
         timer: null,
@@ -33,11 +32,11 @@ export default {
         }
     },
     beforeDestroy: function () {
-        clearInterval(this.timer)
+        clearInterval(this.timer);
     },
     computed: {
         getChart() {
-            return this.$store.getters.getChart(this.dataType)
+            return this.$store.getters.getChart(this.dataType);
         }
     },
     methods: {
@@ -54,12 +53,6 @@ export default {
                     splitLine: {
                         show: false
                     },
-                    axisTick: {
-                        show: false
-                    },
-                    axisLabel: {
-                        show: false
-                    }
                 },
                 yAxis: {
                     type: "value",
@@ -72,18 +65,18 @@ export default {
                     }
                 },
                 series: [{
-                    name: 'Test Values',
+                    name: 'Values',
                     type: "line",
+                    color: "#33ccff",
                     lineStyle: {
-                        color: "#5db4e1",
-                        width: 5,
+                        width: 4,
                     },
                     markLine: {
                         silent: true,
-                        symbol: "circle",
+                        symbol: "none",
                         lineStyle: {
-                            color: "#cc0000",
-                            width: 3
+                            color: "#999999",
+                            width: 2
                         },
                         label: {
                             show: false
@@ -99,6 +92,35 @@ export default {
             this.chart = echarts.init(document.getElementById(this.dataType));
             this.chart.setOption(chartOptionsLine);
             window.addEventListener("resize", this.resizeHandle);
+
+            // define color ranges for each data type
+            if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
+                this.chart.setOption({
+                    visualMap: {
+                        show: false,
+                        pieces: [{
+                            gt: 0,
+                            lt: 10,
+                            color: "#33cc33"
+                        }, {
+                            gt: 10,
+                            lt: 20,
+                            color: "#ff9900"
+                        }, {
+                            gt: 20,
+                            lt: 50,
+                            color: "#ff3300"
+                        }, {
+                            gt: 50,
+                            ls: 100,
+                            color: "#cc0000"
+                        }],
+                        outOfRange: {
+                            color: "#800000"
+                        }
+                    },
+                })
+            }
         },
         addValues: function (data) {
             this.$store.commit('pushValue', {
@@ -119,7 +141,6 @@ export default {
             // update chart
             this.chart.setOption({
                 series: [{
-
                     data: this.getChart,
                     markLine: {
                         data: [{
@@ -149,7 +170,7 @@ export default {
 
             // add upper and lower bounds
             // prevent negative values
-            if (this.testVal < 0 || this.testVal > 50) {
+            if (this.testVal < 0 || this.testVal > 120) {
                 this.testVal += -2 * rand;
             }
 
