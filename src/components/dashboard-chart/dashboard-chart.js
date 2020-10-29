@@ -7,6 +7,7 @@ export default {
     data: () => ({
         chart: null,
         currentVal: null,
+        readout: null,
         testVal: (Math.random() * 10) + 1, // used for testing with simulated payloads
         timer: null,
     }),
@@ -67,7 +68,7 @@ export default {
                 series: [{
                     name: 'Values',
                     type: "line",
-                    color: "#33ccff",
+                    color: "#38b6e6",
                     lineStyle: {
                         width: 4,
                     },
@@ -114,10 +115,10 @@ export default {
                             gt: 50,
                             ls: 100,
                             color: "#cc0000"
+                        }, {
+                            gt: 100,
+                            color: "#80000"
                         }],
-                        outOfRange: {
-                            color: "#800000"
-                        }
                     },
                 })
             }
@@ -135,8 +136,27 @@ export default {
                 this.$store.commit('shiftPoints', this.dataType)
             }
 
-            // update current value to display
-            this.currentVal = data[this.dataType].toFixed(1);
+            // update current value and live readout
+            // reflect trends on PM values
+            if (data[this.dataType] == this.currentVal) {
+                this.currentVal = data[this.dataType]
+                this.readout = this.currentVal.toFixed(1);
+                if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
+                    document.getElementById("readout").style.color = "#a6a6a6";
+                }
+            } else if (data[this.dataType] > this.currentVal) {
+                this.currentVal = data[this.dataType];
+                this.readout = "\u25B2" + " " + this.currentVal.toFixed(1);
+                if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
+                    document.getElementById("readout").style.color = "#f90000";
+                }
+            } else if (data[this.dataType] < this.currentVal) {
+                this.currentVal = data[this.dataType];
+                this.readout = "\u25BC" + " " + this.currentVal.toFixed(1);
+                if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
+                    document.getElementById("readout").style.color = "#00b300";
+                }
+            }
 
             // update chart
             this.chart.setOption({
@@ -165,7 +185,7 @@ export default {
             }
 
             // generate a increment to add/subtract from testVal
-            var rand = (Math.random() * 6) - 3;
+            var rand = (Math.random() * 8) - 4;
             this.testVal += rand;
 
             // add upper and lower bounds
