@@ -31,10 +31,10 @@ export default {
             var hidden = $('.sideBar');
             var chart = $('.charts');
             if (hidden.hasClass('visible')) {
-                chart.animate({ "left": "150px", "width": "1100px" }, "slow")
-                hidden.animate({ "left": "-280px" }, "slow").removeClass("visible");
+                chart.animate({ "width": "100%" }, "slow")
+                hidden.animate({ "left": "-260px" }, "slow").removeClass("visible");
             } else {
-                chart.animate({ "left": "320px", "width": "1100px" }, "slow");
+                chart.animate({ "width": "75%" }, "slow");
                 hidden.animate({ "left": "0px" }, "slow").addClass('visible');
             }
         }
