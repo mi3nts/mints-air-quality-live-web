@@ -185,7 +185,7 @@ export default {
             }
 
             // generate a increment to add/subtract from testVal
-            var rand = (Math.random() * 8) - 4;
+            var rand = (Math.random() * 8) - 4.5;
             this.testVal += rand;
 
             // add upper and lower bounds
