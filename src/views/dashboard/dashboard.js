@@ -29,10 +29,13 @@ export default {
     methods: {
         slide() {
             var hidden = $('.sideBar');
+            var chart = $('.charts');
             if (hidden.hasClass('visible')) {
-                hidden.animate({"left": "-180px"}, "slow").removeClass('visible');
+                chart.animate({ "left": "150px", "width": "1100px" }, "slow")
+                hidden.animate({ "left": "-280px" }, "slow").removeClass("visible");
             } else {
-                hidden.animate({"left": "0px"}, "slow").addClass('visible');
+                chart.animate({ "left": "320px", "width": "1100px" }, "slow");
+                hidden.animate({ "left": "0px" }, "slow").addClass('visible');
             }
         }
     }
