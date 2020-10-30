@@ -3,6 +3,7 @@ import echarts from "echarts";
 export default {
     props: [
         "dataType",
+        "sidebarOpen",
     ],
     data: () => ({
         chart: null,
@@ -17,6 +18,11 @@ export default {
         this.initChart();
         this.timer = setInterval(this.simulatePayload, 1000);
     },
+    watch: {
+        sidebarOpen() {
+            this.resizeHandle();
+        }
+    }, 
     mqtt: {
         '+/calibrated'(payload) {
             if (payload != null) {
@@ -185,7 +191,7 @@ export default {
             }
 
             // generate a increment to add/subtract from testVal
-            var rand = (Math.random() * 8) - 4.5;
+            var rand = (Math.random() * 8) - 4;
             this.testVal += rand;
 
             // add upper and lower bounds
@@ -220,6 +226,9 @@ export default {
         },
         resizeHandle: function () {
             this.chart.resize();
+        }, 
+        testFunction: function () {
+            console.log("function called");
         }
     }
 }

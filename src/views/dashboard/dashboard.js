@@ -18,6 +18,7 @@ export default {
             pressure: false,
             temperature: false,
             chartNames: ["PM2.5", "PM1", "PM10", "Dewpoint", "Humidity", "Pressure", "Temperature"],
+            sidebarOpen: true,
         }
     },
     mounted: function() {
@@ -27,14 +28,18 @@ export default {
         }
     },
     methods: {
-        slide() {
+        slide: function () {
             var hidden = $('.sideBar');
             var chart = $('.charts');
             if (hidden.hasClass('visible')) {
-                chart.animate({ "width": "100%" }, "slow")
+                chart.animate({ "width": "100%" }, "slow", () => {
+                    this.sidebarOpen = !this.sidebarOpen;
+                })
                 hidden.animate({ "left": "-260px" }, "slow").removeClass("visible");
             } else {
-                chart.animate({ "width": "75%" }, "slow");
+                chart.animate({ "width": "75%" }, "slow", () => {
+                    this.sidebarOpen = !this.sidebarOpen;
+                });
                 hidden.animate({ "left": "0px" }, "slow").addClass('visible');
             }
         }

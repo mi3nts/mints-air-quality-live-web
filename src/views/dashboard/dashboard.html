@@ -93,12 +93,12 @@
         </v-list>
     </div>
     <div class="charts">
-        <DashboardChart v-if="pm2_5" dataType="pm2_5" />
-        <DashboardChart v-if="pm1" dataType="pm1" />
-        <DashboardChart v-if="pm10" dataType="pm10" />
-        <DashboardChart v-if="dewpoint" dataType="dewpoint" />
-        <DashboardChart v-if="humidity" dataType="humidity" />
-        <DashboardChart v-if="pressure" dataType="pressure" />
-        <DashboardChart v-if="temperature" dataType="temperature" />
+        <DashboardChart v-if="pm2_5" dataType="pm2_5" :sidebarOpen="sidebarOpen"/>
+        <DashboardChart v-if="pm1" dataType="pm1" :sidebarOpen="sidebarOpen"/>
+        <DashboardChart v-if="pm10" dataType="pm10" :sidebarOpen="sidebarOpen"/>
+        <DashboardChart v-if="dewpoint" dataType="dewpoint" :sidebarOpen="sidebarOpen"/>
+        <DashboardChart v-if="humidity" dataType="humidity" :sidebarOpen="sidebarOpen"/>
+        <DashboardChart v-if="pressure" dataType="pressure" :sidebarOpen="sidebarOpen"/>
+        <DashboardChart v-if="temperature" dataType="temperature" :sidebarOpen="sidebarOpen"/>
     </div>
 </div>
