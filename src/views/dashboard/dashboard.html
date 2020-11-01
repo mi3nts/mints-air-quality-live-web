@@ -5,100 +5,14 @@
         </div>
         <v-list style="width: 250px" shaped flat>
             <v-list-item-group multiple>
-                <v-list-item value="PM2.5">
-                    <template>
-                        <v-list-item-content>
-                            <v-list-item-title>{{chartNames[0]}}</v-list-item-title>
-                        </v-list-item-content>
-
-                        <v-list-item-action>
-                            <v-checkbox v-model="pm2_5"></v-checkbox>
-                        </v-list-item-action>
-                    </template>
-                </v-list-item>
-
-                <v-list-item value="PM1">
-                    <template>
-                        <v-list-item-content>
-                            <v-list-item-title>{{chartNames[1]}}</v-list-item-title>
-                        </v-list-item-content>
-
-                        <v-list-item-action>
-                            <v-checkbox v-model="pm1"></v-checkbox>
-                        </v-list-item-action>
-                    </template>
-                </v-list-item>
-
-                <v-list-item value="PM10">
-                    <template>
-                        <v-list-item-content>
-                            <v-list-item-title>{{chartNames[2]}}</v-list-item-title>
-                        </v-list-item-content>
-
-                        <v-list-item-action>
-                            <v-checkbox v-model="pm10"></v-checkbox>
-                        </v-list-item-action>
-                    </template>
-                </v-list-item>
-
-                <v-list-item value="Dewpoint">
-                    <template>
-                        <v-list-item-content>
-                            <v-list-item-title>{{chartNames[3]}}</v-list-item-title>
-                        </v-list-item-content>
-
-                        <v-list-item-action>
-                            <v-checkbox v-model="dewpoint"></v-checkbox>
-                        </v-list-item-action>
-                    </template>
-                </v-list-item>
-
-                <v-list-item value="Humidity">
-                    <template>
-                        <v-list-item-content>
-                            <v-list-item-title>{{chartNames[4]}}</v-list-item-title>
-                        </v-list-item-content>
-
-                        <v-list-item-action>
-                            <v-checkbox v-model="humidity"></v-checkbox>
-                        </v-list-item-action>
-                    </template>
-                </v-list-item>
-
-                <v-list-item value="Pressure">
-                    <template>
-                        <v-list-item-content>
-                            <v-list-item-title>{{chartNames[5]}}</v-list-item-title>
-                        </v-list-item-content>
-
-                        <v-list-item-action>
-                            <v-checkbox v-model="pressure"></v-checkbox>
-                        </v-list-item-action>
-                    </template>
-                </v-list-item>
-
-                <v-list-item value="Temperature">
-                    <template>
-                        <v-list-item-content>
-                            <v-list-item-title>{{chartNames[6]}}</v-list-item-title>
-                        </v-list-item-content>
-
-                        <v-list-item-action>
-                            <v-checkbox v-model="temperature">
-                            </v-checkbox>
-                        </v-list-item-action>
-                    </template>
-                </v-list-item>
+                <v-checkbox class="black-label" v-for="(chart,id) in chartNames" :key="id" v-model="selected"
+                    :label="chart.name" :value="chart">
+                </v-checkbox>
             </v-list-item-group>
         </v-list>
     </div>
     <div class="charts">
-        <DashboardChart v-if="pm2_5" dataType="pm2_5" :sidebarOpen="sidebarOpen"/>
-        <DashboardChart v-if="pm1" dataType="pm1" :sidebarOpen="sidebarOpen"/>
-        <DashboardChart v-if="pm10" dataType="pm10" :sidebarOpen="sidebarOpen"/>
-        <DashboardChart v-if="dewpoint" dataType="dewpoint" :sidebarOpen="sidebarOpen"/>
-        <DashboardChart v-if="humidity" dataType="humidity" :sidebarOpen="sidebarOpen"/>
-        <DashboardChart v-if="pressure" dataType="pressure" :sidebarOpen="sidebarOpen"/>
-        <DashboardChart v-if="temperature" dataType="temperature" :sidebarOpen="sidebarOpen"/>
+        <DashboardChart v-for="(chart,id) in chartNames" :key="chart.id" v-if="filterSelection(chart.dataType)"
+            :dataType="chart.dataType" :sidebarOpen="sidebarOpen" />
     </div>
 </div>
