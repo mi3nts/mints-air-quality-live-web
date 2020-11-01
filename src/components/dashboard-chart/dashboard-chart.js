@@ -108,22 +108,23 @@ export default {
                         pieces: [{
                             gt: 0,
                             lt: 10,
-                            color: "#33cc33"
+                            // color: "#33cc33",
+                            color: "#ffff44"
                         }, {
                             gt: 10,
                             lt: 20,
-                            color: "#ff9900"
+                            color: "#ff5500"
                         }, {
                             gt: 20,
                             lt: 50,
-                            color: "#ff3300"
-                        }, {
-                            gt: 50,
-                            ls: 100,
                             color: "#cc0000"
                         }, {
+                            gt: 50,
+                            lt: 100,
+                            color: "#990099"
+                        }, {
                             gt: 100,
-                            color: "#80000"
+                            color: "#aa2626"
                         }],
                     },
                 })
