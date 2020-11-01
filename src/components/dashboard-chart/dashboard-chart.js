@@ -52,18 +52,25 @@ export default {
                 title: {
                     text: this.dataType,
                     left: "center",
-                    padding: [20, 0, 0, 0]
+                    padding: [30, 0, 0, 0]
                 },
                 xAxis: {
                     type: "time",
-                    show: false,
                     splitLine: {
                         show: false
                     },
+                    axisLabel: {
+                        margin: 8,
+                        formatter: function (value) {
+                            var min = echarts.format.formatTime("mm", value);
+                            var sec = echarts.format.formatTime("ss", value);
+                            return min + ":" + sec;
+                        }
+                    }
                 },
                 yAxis: {
                     type: "value",
-                    boundaryGap: [0, 0],
+                    boundaryGap: false,
                     splitLine: {
                         show: false
                     },
@@ -203,7 +210,7 @@ export default {
 
             var d = new Date();
             var year = d.getFullYear();
-            var month = addZero(d.getMonth());
+            var month = addZero(d.getMonth() + 1);
             var date = addZero(d.getDate());
             var hour = addZero(d.getHours());
             var min = addZero(d.getMinutes());

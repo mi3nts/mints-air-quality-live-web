@@ -1,4 +1,4 @@
-$container-height: 240px;
+$container-height: 250px;
 
 .container {
     height: $container-height;
@@ -16,9 +16,9 @@ $container-height: 240px;
 
 .chart {
     width: 85%; 
-    height: 110%;
+    height: 120%;
     position: relative;
-    top: -1 * $container-height + 25px;
+    top: -1 * $container-height + 5px;
     z-index: 1;
 }
 
@@ -27,8 +27,8 @@ $container-height: 240px;
     height: 20%;
     position: relative;
     float: right;
-    right: 50px;
-    top: -1.5 * $container-height - 15px;
+    right: 40px;
+    top: -1.5 * $container-height - 35px;
     z-index: 2;
     font-size: 30px;
     text-align: center;
