@@ -35,9 +35,9 @@ export default {
                 chart.animate({ "width": "100%" }, "slow", () => {
                     this.sidebarOpen = !this.sidebarOpen;
                 })
-                hidden.animate({ "left": "-260px" }, "slow").removeClass("visible");
+                hidden.animate({ "left": "-270px" }, "slow").removeClass("visible");
             } else {
-                chart.animate({ "width": "75%" }, "slow", () => {
+                chart.animate({ "width": "70%" }, "slow", () => {
                     this.sidebarOpen = !this.sidebarOpen;
                 });
                 hidden.animate({ "left": "0px" }, "slow").addClass('visible');
