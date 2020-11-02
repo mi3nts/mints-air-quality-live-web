@@ -70,18 +70,15 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
-    dashChartVal: {
-      pm2_5: [],
-      pm1: [],
-      pm10: [],
-      dewpoint: [],
-      humidity: [],
-      pressure: [],
-      temperature: [],
-    },
+    dashChartVal: {},
+    selected: [],
   },
   mutations: {
     pushValue(state, data) {
+      if (!state.dashChartVal[data.name]) {
+        state.dashChartVal[data.name] = [];
+      }
+
       state.dashChartVal[data.name].push({
         name: data.name,
         value: data.value,
@@ -90,9 +87,15 @@ const store = new Vuex.Store({
     shiftPoints(state, dataType) {
       store.state.dashChartVal[dataType].shift();
     },
+    storeSelected(state, data) {
+      state.selected = data;
+    },
   },
   getters: {
     getChart: (state) => (name) => {
+      if (!state.dashChartVal[name]) {
+        state.dashChartVal[name] = [];
+      }
       return state.dashChartVal[name];
     },
   },
@@ -130,3 +133,11 @@ export default {
   },
 };
 </script>
+
+
+<style>
+/* hacky way of getting the color of the labels on the checkboxes to be black */
+.black-label label {
+  color: rgba(0, 0, 0) !important;
+}
+</style>

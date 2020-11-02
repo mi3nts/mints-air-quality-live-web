@@ -22,7 +22,7 @@ export default {
         sidebarOpen() {
             this.resizeHandle();
         }
-    }, 
+    },
     mqtt: {
         '+/calibrated'(payload) {
             if (payload != null) {
@@ -234,7 +234,7 @@ export default {
         },
         resizeHandle: function () {
             this.chart.resize();
-        }, 
+        },
         testFunction: function () {
             console.log("function called");
         }
