@@ -45,12 +45,19 @@ export default {
         slide: function () {
             var hidden = $('.sideBar');
             var chart = $('.charts');
+            var close_icon = $('#icon1');
+            var open_icon = $('#icon2');
             if (hidden.hasClass('visible')) {
+                close_icon.css("display", "none");
+                open_icon.css("display", "block");
                 chart.animate({ "width": "100%" }, "slow", () => {
                     this.sidebarOpen = !this.sidebarOpen;
                 })
                 hidden.animate({ "left": "-270px" }, "slow").removeClass("visible");
+                
             } else {
+                close_icon.css("display", "block");
+                open_icon.css("display", "none");
                 chart.animate({ "width": "70%" }, "slow", () => {
                     this.sidebarOpen = !this.sidebarOpen;
                 });

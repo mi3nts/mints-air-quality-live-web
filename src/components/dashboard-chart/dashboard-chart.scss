@@ -1,8 +1,9 @@
-$container-height: 250px;
+$container-height: 240px;
 
 .container {
     height: $container-height;
     width: 100%;
+    overflow: hidden;
 }
 
 .border {
@@ -15,7 +16,7 @@ $container-height: 250px;
 }
 
 .chart {
-    width: 85%; 
+    width: 85%;
     height: 120%;
     position: relative;
     top: -1 * $container-height + 5px;
