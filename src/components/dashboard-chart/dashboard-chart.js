@@ -4,6 +4,7 @@ export default {
     props: [
         "dataType",
         "sidebarOpen",
+        "name"
     ],
     data: () => ({
         chart: null,
@@ -50,7 +51,7 @@ export default {
         initChart: function () {
             var chartOptionsLine = {
                 title: {
-                    text: this.dataType,
+                    text: this.name,
                     left: "center",
                     padding: [30, 0, 0, 0]
                 },

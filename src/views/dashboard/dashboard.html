@@ -13,6 +13,6 @@
     </div>
     <div class="charts">
         <DashboardChart v-for="(chart,id) in chartNames" :key="chart.id" v-if="filterSelection(chart.dataType)"
-            :dataType="chart.dataType" :sidebarOpen="sidebarOpen" />
+            :name="chart.name" :dataType="chart.dataType" :sidebarOpen="sidebarOpen" />
     </div>
 </div>
