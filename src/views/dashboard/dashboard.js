@@ -1,26 +1,20 @@
 import DashboardChart from "@/components/dashboard-chart";
-
+import draggable from "vuedraggable";
 /**
  * Dashboard page used to display live updating charts
  */
 export default {
     name: "dashboard",
     components: {
-        DashboardChart
+        DashboardChart,
+        draggable,
     },
     data: function () {
         return {
-            chartNames: [
-                { name: "PM 2.5", id: 0, dataType: "pm2_5" },
-                { name: "PM 1", id: 1, dataType: "pm1" },
-                { name: "PM 10", id: 2, dataType: "pm10" },
-                { name: "Dewpoint", id: 3, dataType: "dewpoint" },
-                { name: "Humidity", id: 4, dataType: "humidity" },
-                { name: "Pressure", id: 5, dataType: "pressure" },
-                { name: "Temperature", id: 6, dataType: "temperature" }
-            ],
-            selected: [],
+            chartNames: [],
             sidebarOpen: true,
+            dragging: false,
+            enabled: true,
         }
     },
     mounted: function () {
@@ -28,10 +22,10 @@ export default {
         if ($(window).width() < 600) {
             this.slide();
         }
-        this.selected = this.$store.state.selected;
+        this.chartNames = this.$store.state.selected;
     },
     beforeDestroy: function () {
-        this.$store.commit('storeSelected', this.selected);
+        this.$store.commit('storeSelected', this.chartNames);
     },
     methods: {
         //filtering to find whats select
@@ -54,7 +48,7 @@ export default {
                     this.sidebarOpen = !this.sidebarOpen;
                 })
                 hidden.animate({ "left": "-270px" }, "slow").removeClass("visible");
-                
+
             } else {
                 close_icon.css("display", "block");
                 open_icon.css("display", "none");

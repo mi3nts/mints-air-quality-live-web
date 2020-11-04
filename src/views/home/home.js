@@ -71,7 +71,7 @@ export default {
         };
     },
     watch: {
-        'pmType': function() {
+        'pmType': function () {
             this.refreshIcons();
         },
 
@@ -221,7 +221,6 @@ export default {
     },
     methods: {
         redrawSensors(payload, sensor, sensorName) {
-
             //modifying the DOM according to the received data
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(payload.timestamp))).asMinutes();
             var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(payload[this.pmType]);

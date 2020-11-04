@@ -6,14 +6,22 @@
         </div>
         <v-list class="list" shaped flat>
             <v-list-item-group multiple>
-                <v-checkbox class="black-label" v-for="(chart,id) in chartNames" :key="id" v-model="selected"
-                    :label="chart.name" :value="chart">
-                </v-checkbox>
+                <draggable :list="chartNames" :disabled="!enabled" class="list-group" ghost-class="ghost"
+                    @start="dragging=true" @end="dragging=false">
+                    <v-checkbox class="black-label" v-for="(chart,id) in chartNames" :key="id" v-model="chart.select"
+                        :label="chart.name">
+                    </v-checkbox>
+                </draggable>
+
             </v-list-item-group>
         </v-list>
     </div>
     <div class="charts">
-        <DashboardChart v-for="(chart,id) in chartNames" :key="chart.id" v-if="filterSelection(chart.dataType)"
-            :name="chart.name" :dataType="chart.dataType" :sidebarOpen="sidebarOpen" />
+        <draggable :list="chartNames" :disabled="!enabled" class="list-group" ghost-class="ghost" @start="dragging=true"
+            @end="dragging=false">
+            <DashboardChart v-for="(chart,id) in chartNames" :key="chart.id" v-if="chart.select" :name="chart.name"
+                :dataType="chart.dataType" :sidebarOpen="sidebarOpen" />
+        </draggable>
+
     </div>
 </div>
