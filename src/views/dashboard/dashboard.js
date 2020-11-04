@@ -28,14 +28,6 @@ export default {
         this.$store.commit('storeSelected', this.chartNames);
     },
     methods: {
-        //filtering to find whats select
-        filterSelection: function (dataType) {
-            return this.selected.find((x) => x.dataType == dataType);
-        },
-        //placeholder function to get chartNames object to load the charts
-        getChartNames: function () {
-
-        },
         slide: function () {
             var hidden = $('.sideBar');
             var chart = $('.charts');
