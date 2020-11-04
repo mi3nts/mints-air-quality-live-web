@@ -6,35 +6,28 @@ $container-height: 240px;
     overflow: hidden;
 }
 
-.border {
+.chart {
     width: 100%;
     height: 100%;
-    position: relative;
-    background-color: #ffffff;
+    padding-top: 10px;
     border-radius: 10px;
+    background-color: #ffffff;
     box-shadow: 0px 0px 10px #999999;
 }
 
-.chart {
-    width: 85%;
-    height: 120%;
-    position: relative;
-    top: -1 * $container-height + 5px;
-    z-index: 1;
-}
-
 #readout {
-    width: 15%;
-    height: 20%;
     position: relative;
+    z-index: 1;
+    width: 130px;
+    height: 40px;
     float: right;
-    right: 40px;
-    top: -1.5 * $container-height - 35px;
-    z-index: 2;
+    right: 35px;
+    top: -0.55 * $container-height;
     font-size: 30px;
     text-align: center;
     vertical-align: middle;
     color: #38b6e6;
     border-radius: 10px;
+    background-color: #ffffff;
     box-shadow: 0px 0px 10px #999999;
 }

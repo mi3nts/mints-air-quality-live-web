@@ -53,7 +53,7 @@ export default {
                 title: {
                     text: this.name,
                     left: "center",
-                    padding: [30, 0, 0, 0]
+                    // padding: [30, 0, 0, 0]
                 },
                 xAxis: {
                     type: "time",
@@ -78,6 +78,12 @@ export default {
                     axisLabel: {
                         fontSize: 16,
                     }
+                },
+                grid: {
+                    left: 70,
+                    top: 30,
+                    right: 200,
+                    bottom: 30
                 },
                 series: [{
                     name: 'Values',
