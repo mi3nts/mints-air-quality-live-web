@@ -50,7 +50,7 @@ export default {
             if (hidden.hasClass('visible')) {
                 close_icon.css("display", "none");
                 open_icon.css("display", "block");
-                chart.animate({ "width": "100%" }, "slow", () => {
+                chart.animate({ "padding-left": "0px" }, "slow", () => {
                     this.sidebarOpen = !this.sidebarOpen;
                 })
                 hidden.animate({ "left": "-270px" }, "slow").removeClass("visible");
@@ -58,7 +58,7 @@ export default {
             } else {
                 close_icon.css("display", "block");
                 open_icon.css("display", "none");
-                chart.animate({ "width": "70%" }, "slow", () => {
+                chart.animate({ "padding-left": "320px" }, "slow", () => {
                     this.sidebarOpen = !this.sidebarOpen;
                 });
                 hidden.animate({ "left": "0px" }, "slow").addClass('visible');
