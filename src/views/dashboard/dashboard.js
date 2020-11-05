@@ -13,8 +13,15 @@ export default {
         return {
             chartNames: [],
             sidebarOpen: true,
+
+            // used for drag and drop reordering
             dragging: false,
             enabled: true,
+
+            // values used for mqtt simulation for testing
+            testVal: (Math.random() * 10) + 1,
+            timer: null,
+            data: null,
         }
     },
     mounted: function () {
@@ -23,6 +30,7 @@ export default {
             this.slide();
         }
         this.chartNames = this.$store.state.selected;
+        this.timer = setInterval(this.simulatePayload, 1000);
     },
     beforeDestroy: function () {
         this.$store.commit('storeSelected', this.chartNames);
@@ -33,6 +41,7 @@ export default {
             var chart = $('.charts');
             var close_icon = $('#icon1');
             var open_icon = $('#icon2');
+
             if (hidden.hasClass('visible')) {
                 close_icon.css("display", "none");
                 open_icon.css("display", "block");
@@ -49,6 +58,54 @@ export default {
                 });
                 hidden.animate({ "left": "0px" }, "slow").addClass('visible');
             }
-        }
+        },
+
+        /**
+         * Simulate MQTT payload for testing purposes.
+         */
+        simulatePayload: function () {
+            // used to add an extra 0 in front of single digit values for echarts
+            // ex: 1:27:2 is changed to 01:27:02
+            function addZero(i) {
+                if (i < 10) {
+                    i = "0" + i;
+                }
+                return i;
+            }
+
+            // generate a increment to add/subtract from testVal
+            var rand = (Math.random() * 8) - 4.5;
+            this.testVal += rand;
+
+            // add upper and lower bounds
+            // prevent negative values
+            if (this.testVal < 0 || this.testVal > 120) {
+                this.testVal += -2 * rand;
+            }
+
+            var d = new Date();
+            var year = d.getFullYear();
+            var month = addZero(d.getMonth() + 1);
+            var date = addZero(d.getDate());
+            var hour = addZero(d.getHours());
+            var min = addZero(d.getMinutes());
+            var sec = addZero(d.getSeconds());
+            var time = year + "-" + month + "-" + date + " " + hour + ":" + min + ":" + sec;
+
+            var payload = {
+                timestamp: time,
+                sensor_id: "000000000000",
+                pm1: this.testVal,
+                pm2_5: this.testVal,
+                pm10: this.testVal,
+                latitude: 0,
+                longitude: 0,
+                dewpoint: this.testVal,
+                humidity: this.testVal,
+                pressure: this.testVal,
+                temperature: this.testVal,
+            }    
+            this.data = payload;
+        },
     }
 }

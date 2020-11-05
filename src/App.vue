@@ -108,6 +108,7 @@ const store = new Vuex.Store({
     },
   },
 });
+
 export default {
   name: "App",
   store,
@@ -141,7 +142,6 @@ export default {
   },
 };
 </script>
-
 
 <style>
 /* hacky way of getting the color of the labels on the checkboxes to be black */

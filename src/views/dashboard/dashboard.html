@@ -8,20 +8,15 @@
             <v-list-item-group multiple>
                 <draggable :list="chartNames" :disabled="!enabled" class="list-group" ghost-class="ghost"
                     @start="dragging=true" @end="dragging=false">
-                    <v-checkbox class="black-label" v-for="(chart,id) in chartNames" :key="id" v-model="chart.select"
-                        :label="chart.name">
-                    </v-checkbox>
+                    <v-checkbox class="black-label" v-for="(chart,id) in chartNames" :key="id" v-model="chart.select" :label="chart.name"></v-checkbox>
                 </draggable>
-
             </v-list-item-group>
         </v-list>
     </div>
     <div class="charts">
         <draggable :list="chartNames" :disabled="!enabled" class="list-group" ghost-class="ghost" @start="dragging=true"
             @end="dragging=false">
-            <DashboardChart v-for="(chart,id) in chartNames" :key="chart.id" v-if="chart.select" :name="chart.name"
-                :dataType="chart.dataType" :sidebarOpen="sidebarOpen" />
+            <DashboardChart v-for="(chart,id) in chartNames" :key="chart.id" v-if="chart.select" :name="chart.name" :dataType="chart.dataType" :sidebarOpen="sidebarOpen" :data="data"/>
         </draggable>
-
     </div>
 </div>

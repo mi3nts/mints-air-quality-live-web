@@ -3,25 +3,26 @@ import echarts from "echarts";
 export default {
     props: [
         "dataType",
+        "name",
         "sidebarOpen",
-        "name"
+        "data"
     ],
     data: () => ({
         chart: null,
         currentVal: null,
         readout: null,
-        testVal: (Math.random() * 10) + 1, // used for testing with simulated payloads
-        timer: null,
     }),
     mounted: function () {
         // subscribe to MQTT stream
         console.log(this.$mqtt.subscribe('#'));
         this.initChart();
-        this.timer = setInterval(this.simulatePayload, 1000);
     },
     watch: {
         sidebarOpen() {
             this.resizeHandle();
+        },
+        data(data) {
+            this.addValues(data);
         }
     },
     mqtt: {
@@ -38,9 +39,6 @@ export default {
                 // this.addValues(payload);
             }
         }
-    },
-    beforeDestroy: function () {
-        clearInterval(this.timer);
     },
     computed: {
         getChart() {
@@ -109,7 +107,6 @@ export default {
                     data: this.getChart,
                 }],
             };
-
             this.chart = echarts.init(document.getElementById(this.dataType));
             this.chart.setOption(chartOptionsLine);
             window.addEventListener("resize", this.resizeHandle);
@@ -177,8 +174,7 @@ export default {
                 if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
                     document.getElementById("readout").style.color = "#00b300";
                 }
-            }
-
+            }  
             // update chart
             this.chart.setOption({
                 series: [{
@@ -191,59 +187,8 @@ export default {
                 }]
             })
         },
-        /**
-         * Simulate MQTT payload for testing purposes.
-         */
-        simulatePayload: function () {
-            // used to add an extra 0 in from of single digit values
-            // so echarts is able to use timestamps
-            // ex: 1:27:2 is changed to 01:27:02
-            function addZero(i) {
-                if (i < 10) {
-                    i = "0" + i;
-                }
-                return i;
-            }
-
-            // generate a increment to add/subtract from testVal
-            var rand = (Math.random() * 8) - 4.5;
-            this.testVal += rand;
-
-            // add upper and lower bounds
-            // prevent negative values
-            if (this.testVal < 0 || this.testVal > 120) {
-                this.testVal += -2 * rand;
-            }
-
-            var d = new Date();
-            var year = d.getFullYear();
-            var month = addZero(d.getMonth() + 1);
-            var date = addZero(d.getDate());
-            var hour = addZero(d.getHours());
-            var min = addZero(d.getMinutes());
-            var sec = addZero(d.getSeconds());
-            var time = year + "-" + month + "-" + date + " " + hour + ":" + min + ":" + sec;
-
-            var payload = {
-                timestamp: time,
-                sensor_id: "000000000000",
-                pm1: this.testVal,
-                pm2_5: this.testVal,
-                pm10: this.testVal,
-                latitude: 0,
-                longitude: 0,
-                dewpoint: this.testVal,
-                humidity: this.testVal,
-                pressure: this.testVal,
-                temperature: this.testVal,
-            }
-            this.addValues(payload);
-        },
         resizeHandle: function () {
             this.chart.resize();
         },
-        testFunction: function () {
-            console.log("function called");
-        }
     }
 }
