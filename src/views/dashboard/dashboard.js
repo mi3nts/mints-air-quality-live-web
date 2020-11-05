@@ -79,7 +79,7 @@ export default {
 
             // add upper and lower bounds
             // prevent negative values
-            if (this.testVal < 0 || this.testVal > 120) {
+            if (this.testVal < 0 || this.testVal > 100) {
                 this.testVal += -2 * rand;
             }
 
@@ -95,15 +95,15 @@ export default {
             var payload = {
                 timestamp: time,
                 sensor_id: "000000000000",
-                pm1: this.testVal,
-                pm2_5: this.testVal,
-                pm10: this.testVal,
+                pm1: this.testVal + (Math.random() * (sec % 3)),
+                pm2_5: this.testVal + (Math.random() * (sec % 5)),
+                pm10: this.testVal + (Math.random() * (sec % 9)),
                 latitude: 0,
                 longitude: 0,
-                dewpoint: this.testVal,
-                humidity: this.testVal,
-                pressure: this.testVal,
-                temperature: this.testVal,
+                dewpoint: this.testVal + (Math.random() * 7),
+                humidity: this.testVal + (Math.random() * 7),
+                pressure: this.testVal + (Math.random() * 7),
+                temperature: this.testVal + (Math.random() * 7),
             }    
             this.data = payload;
         },
