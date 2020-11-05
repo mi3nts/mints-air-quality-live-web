@@ -51,14 +51,22 @@ export default {
                 title: {
                     text: this.name,
                     left: "center",
-                    // padding: [30, 0, 0, 0]
+                    textStyle: {
+                        color: "#ffffff",
+                    }
                 },
                 xAxis: {
                     type: "time",
                     splitLine: {
                         show: false
                     },
+                    axisLine: {
+                        lineStyle: {
+                            color: "#ffffff",
+                        }    
+                    },
                     axisLabel: {
+                        color: "#ffffff",
                         margin: 8,
                         formatter: function (value) {
                             var min = echarts.format.formatTime("mm", value);
@@ -73,11 +81,19 @@ export default {
                     splitLine: {
                         show: false
                     },
+                    axisLine: {
+                        lineStyle: {
+                            color: "#ffffff",
+                        }    
+                    },
                     axisLabel: {
+                        color: "#ffffff",
                         fontSize: 16,
                     }
                 },
                 grid: {
+                    // show: true,
+                    // backgroundColor: "#707070",
                     left: 70,
                     top: 30,
                     right: 200,
