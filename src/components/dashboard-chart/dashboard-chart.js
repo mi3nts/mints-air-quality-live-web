@@ -163,19 +163,19 @@ export default {
                 this.currentVal = data[this.dataType]
                 this.readout = this.currentVal.toFixed(1);
                 if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
-                    document.getElementById("readout").style.color = "#a6a6a6";
+                    document.getElementById(this.dataType + "-readout").style.color = "#a6a6a6";
                 }
             } else if (data[this.dataType] > this.currentVal) {
                 this.currentVal = data[this.dataType];
                 this.readout = "\u25B2" + " " + this.currentVal.toFixed(1);
                 if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
-                    document.getElementById("readout").style.color = "#f90000";
+                    document.getElementById(this.dataType + "-readout").style.color = "#f90000";
                 }
             } else if (data[this.dataType] < this.currentVal) {
                 this.currentVal = data[this.dataType];
                 this.readout = "\u25BC" + " " + this.currentVal.toFixed(1);
                 if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
-                    document.getElementById("readout").style.color = "#00b300";
+                    document.getElementById(this.dataType + "-readout").style.color = "#00b300";
                 }
             }
 
