@@ -23,6 +23,7 @@ export default {
         },
 
         // read from simulated data stream
+        // comment out when using MQTT
         data(data) {
             this.addValues(data);
         }
@@ -62,6 +63,7 @@ export default {
                     axisLabel: {
                         margin: 8,
                         formatter: function (value) {
+                            // show timestamp in minute:second format
                             var min = echarts.format.formatTime("mm", value);
                             var sec = echarts.format.formatTime("ss", value);
                             return min + ":" + sec;
@@ -97,7 +99,7 @@ export default {
                         silent: true,
                         symbol: "none",
                         lineStyle: {
-                            color: "#999999",
+                            color: "#777777",
                             width: 2
                         },
                         label: {

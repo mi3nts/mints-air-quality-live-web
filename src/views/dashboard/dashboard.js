@@ -30,6 +30,9 @@ export default {
             this.slide();
         }
         this.chartNames = this.$store.state.selected;
+
+        // begin data simulation
+        // comment out when using MQTT
         this.timer = setInterval(this.simulatePayload, 1000);
     },
     beforeDestroy: function () {
