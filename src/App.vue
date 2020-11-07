@@ -72,13 +72,11 @@ const store = new Vuex.Store({
   state: {
     dashChartVal: {},
     selected: [
-      { name: "PM 2.5", id: 0, dataType: "pm2_5", select: false },
-      { name: "PM 1", id: 1, dataType: "pm1", select: false },
-      { name: "PM 10", id: 2, dataType: "pm10", select: false },
-      { name: "Dewpoint", id: 3, dataType: "dewpoint", select: false },
-      { name: "Humidity", id: 4, dataType: "humidity", select: false },
-      { name: "Pressure", id: 5, dataType: "pressure", select: false },
-      { name: "Temperature", id: 6, dataType: "temperature", select: false },
+      { name: "PM", id: 0, dataType: "PM", select: false },
+      { name: "BC", id: 1, dataType: "BC", select: false },
+      { name: "Humidity", id: 2, dataType: "humidity", select: false },
+      { name: "Pressure", id: 3, dataType: "pressure", select: false },
+      { name: "Temperature", id: 4, dataType: "temperature", select: false },
     ],
   },
   mutations: {

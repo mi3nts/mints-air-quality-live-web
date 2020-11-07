@@ -31,38 +31,32 @@ export default {
         }
         this.chartNames = this.$store.state.selected;
 
+        // subscribe to MQTT stream
+        console.log(this.$mqtt.subscribe("001e0610c2e7/2B-BC"));
+
         // begin data simulation
         // comment out when using MQTT
-        this.timer = setInterval(this.simulatePayload, 1000);
+        // this.timer = setInterval(this.simulatePayload, 1000);
+    },
+    mqtt: {
+        '001e0610c2e7/2B-BC'(payload) {
+            if (payload != null) {
+                try {
+                    if (JSON.parse(payload.toString())) {
+                        payload = JSON.parse(payload.toString());
+                    }
+                } catch (error) {
+                    // handle NaN errors
+                    payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
+                }
+                this.data = this.removeMilliseconds(payload);
+            }
+        }
     },
     beforeDestroy: function () {
         this.$store.commit('storeSelected', this.chartNames);
     },
     methods: {
-        slide: function () {
-            var hidden = $('.sideBar');
-            var chart = $('.charts');
-            var close_icon = $('#icon1');
-            var open_icon = $('#icon2');
-
-            if (hidden.hasClass('visible')) {
-                close_icon.css("display", "none");
-                open_icon.css("display", "block");
-                chart.animate({ "padding-left": "0px" }, "slow", () => {
-                    this.sidebarOpen = !this.sidebarOpen;
-                })
-                hidden.animate({ "left": "-270px" }, "slow").removeClass("visible");
-
-            } else {
-                close_icon.css("display", "block");
-                open_icon.css("display", "none");
-                chart.animate({ "padding-left": "320px" }, "slow", () => {
-                    this.sidebarOpen = !this.sidebarOpen;
-                });
-                hidden.animate({ "left": "0px" }, "slow").addClass('visible');
-            }
-        },
-
         /**
          * Simulate MQTT payload for testing purposes.
          */
@@ -96,19 +90,48 @@ export default {
             var time = year + "-" + month + "-" + date + " " + hour + ":" + min + ":" + sec;
 
             var payload = {
-                timestamp: time,
-                sensor_id: "000000000000",
-                pm1: this.testVal + (Math.random() * (sec % 3)),
-                pm2_5: this.testVal + (Math.random() * (sec % 5)),
-                pm10: this.testVal + (Math.random() * (sec % 9)),
-                latitude: 0,
-                longitude: 0,
-                dewpoint: this.testVal + (Math.random() * 7),
+                dateTime: time,
+                PM: this.testVal + (Math.random() * (sec % 5)),
+                BC: this.testVal + (Math.random() * (sec % 9)),
                 humidity: this.testVal + (Math.random() * 7),
                 pressure: this.testVal + (Math.random() * 7),
                 temperature: this.testVal + (Math.random() * 7),
             }    
             this.data = payload;
+        },
+        /**
+         * Remove the milliseconds from the timestamp for ECharts
+         */
+        removeMilliseconds: function (payload) {
+            var timestamp = payload.dateTime.split(".");
+            payload.dateTime = timestamp[0];
+            return payload;
+        },
+        /**
+         * Handle sidebar related animations
+         */
+        slide: function () {
+            var hidden = $('.sideBar');
+            var chart = $('.charts');
+            var close_icon = $('#icon1');
+            var open_icon = $('#icon2');
+
+            if (hidden.hasClass('visible')) {
+                close_icon.css("display", "none");
+                open_icon.css("display", "block");
+                chart.animate({ "padding-left": "0px" }, "slow", () => {
+                    this.sidebarOpen = !this.sidebarOpen;
+                })
+                hidden.animate({ "left": "-270px" }, "slow").removeClass("visible");
+
+            } else {
+                close_icon.css("display", "block");
+                open_icon.css("display", "none");
+                chart.animate({ "padding-left": "320px" }, "slow", () => {
+                    this.sidebarOpen = !this.sidebarOpen;
+                });
+                hidden.animate({ "left": "0px" }, "slow").addClass('visible');
+            }
         },
     }
 }

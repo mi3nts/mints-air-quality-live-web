@@ -13,34 +13,14 @@ export default {
         readout: null,
     }),
     mounted: function () {
-        // subscribe to MQTT stream
-        console.log(this.$mqtt.subscribe('#'));
         this.initChart();
     },
     watch: {
         sidebarOpen() {
             this.resizeHandle();
         },
-
-        // read from simulated data stream
-        // comment out when using MQTT
         data(data) {
             this.addValues(data);
-        }
-    },
-    mqtt: {
-        '+/calibrated'(payload) {
-            if (payload != null) {
-                try {
-                    if (JSON.parse(payload.toString())) {
-                        payload = JSON.parse(payload.toString());
-                    }
-                } catch (error) {
-                    // handle NaN errors
-                    payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
-                }
-                // this.addValues(payload);
-            }
         }
     },
     computed: {
@@ -117,14 +97,12 @@ export default {
             window.addEventListener("resize", this.resizeHandle);
 
             // define color ranges for each data type
-            if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
+            if (this.dataType == "PM") {
                 this.chart.setOption({
                     visualMap: {
                         show: false,
                         pieces: [{
-                            gt: 0,
                             lt: 10,
-                            // color: "#33cc33",
                             color: "#ffff44"
                         }, {
                             gt: 10,
@@ -150,7 +128,7 @@ export default {
             this.$store.commit('pushValue', {
                 name: this.dataType,
                 value: [
-                    data.timestamp,
+                    data.dateTime,
                     data[this.dataType]
                 ]
             })
@@ -161,22 +139,22 @@ export default {
 
             // update current value and live readout
             // reflect trends on PM values
-            if (data[this.dataType] == this.currentVal) {
-                this.currentVal = data[this.dataType]
+            if (parseFloat(data[this.dataType]) == this.currentVal) {
+                this.currentVal = parseFloat(data[this.dataType])
                 this.readout = this.currentVal.toFixed(1);
-                if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
+                if (this.dataType == "PM") {
                     document.getElementById(this.dataType + "-readout").style.color = "#a6a6a6";
                 }
-            } else if (data[this.dataType] > this.currentVal) {
-                this.currentVal = data[this.dataType];
+            } else if (parseFloat(data[this.dataType]) > this.currentVal) {
+                this.currentVal = parseFloat(data[this.dataType]);
                 this.readout = "\u25B2" + " " + this.currentVal.toFixed(1);
-                if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
+                if (this.dataType == "PM") {
                     document.getElementById(this.dataType + "-readout").style.color = "#f90000";
                 }
-            } else if (data[this.dataType] < this.currentVal) {
-                this.currentVal = data[this.dataType];
+            } else if (parseFloat(data[this.dataType]) < this.currentVal) {
+                this.currentVal = parseFloat(data[this.dataType]);
                 this.readout = "\u25BC" + " " + this.currentVal.toFixed(1);
-                if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
+                if (this.dataType == "PM") {
                     document.getElementById(this.dataType + "-readout").style.color = "#00b300";
                 }
             }  
