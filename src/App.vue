@@ -74,9 +74,15 @@ const store = new Vuex.Store({
     selected: [
       { name: "PM", id: 0, dataType: "PM", select: false },
       { name: "BC", id: 1, dataType: "BC", select: false },
-      { name: "Humidity", id: 2, dataType: "humidity", select: false },
-      { name: "Pressure", id: 3, dataType: "pressure", select: false },
-      { name: "Temperature", id: 4, dataType: "temperature", select: false },
+      { name: "Extinction 405nm", id: 2, dataType: "Extinction-405nm", select: false },
+      { name: "Extinction 880nm", id: 3, dataType: "Extinction-880nm", select: false },
+      { name: "Current 405nm", id: 4, dataType: "current-405nm", select: false },
+      { name: "Flow Temperature", id: 5, dataType: "flow-temperature", select: false },
+      { name: "Humidity", id: 6, dataType: "humidity", select: false },
+      { name: "Pressure", id: 7, dataType: "pressure", select: false },
+      { name: "Temperature", id: 8, dataType: "temperature", select: false },
+      { name: "Voltage 405nm", id: 9, dataType: "voltage-405nm", select: false },
+      { name: "Voltage 880nm", id: 10, dataType: "voltage-880nm", select: false },
     ],
   },
   mutations: {
