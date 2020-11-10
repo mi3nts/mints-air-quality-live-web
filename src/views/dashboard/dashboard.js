@@ -19,24 +19,27 @@ export default {
             enabled: true,
 
             // values used for mqtt simulation for testing
-            testVal: (Math.random() * 10) + 1,
+            testVal: 0,
             timer: null,
             data: null,
+
+            // selection between MQTT stream and simulated data
+            simulatedData: false, 
+            simulationInterval: 1500, // speed of simulation in milliseconds
         }
     },
     mounted: function () {
-        // If the page is less than 600px wide, the sidebar starts off hidden
+        // if the page is less than 600px wide, the sidebar starts off hidden
         if ($(window).width() < 600) {
             this.slide();
         }
         this.chartNames = this.$store.state.selected;
 
-        // subscribe to MQTT stream
-        console.log(this.$mqtt.subscribe("001e0610c2e7/2B-BC"));
-
-        // begin data simulation
-        // comment out when using MQTT
-        // this.timer = setInterval(this.simulatePayload, 1000);
+        if (this.simulatedData) {
+            this.timer = setInterval(this.simulatePayload, this.simulationInterval);
+        } else {
+            console.log(this.$mqtt.subscribe("001e0610c2e7/2B-BC"));
+        }      
     },
     mqtt: {
         '001e0610c2e7/2B-BC'(payload) {
@@ -60,7 +63,7 @@ export default {
         /**
          * Simulate MQTT payload for testing purposes.
          */
-        simulatePayload: function () {
+        simulatePayload: function (stepSize = 8, upperCap = 120, randomByType = 0, rangeTest = false) {
             // used to add an extra 0 in front of single digit values for echarts
             // ex: 1:27:2 is changed to 01:27:02
             function addZero(i) {
@@ -71,15 +74,18 @@ export default {
             }
 
             // generate a increment to add/subtract from testVal
-            var rand = (Math.random() * 8) - 4.5;
+            var rand = (Math.random() * stepSize);
+            if (!rangeTest) {
+                rand *= Math.round(Math.random()) ? 1 : -1;
+            }
             this.testVal += rand;
 
-            // add upper and lower bounds
-            // prevent negative values
-            if (this.testVal < 0 || this.testVal > 100) {
+            // prevent negative values and add upper bound
+            if (this.testVal < 0 || this.testVal > upperCap) {
                 this.testVal += -2 * rand;
             }
 
+            // get current time in "YYYY-MM-DD HH:MM:SS" format
             var d = new Date();
             var year = d.getFullYear();
             var month = addZero(d.getMonth() + 1);
@@ -89,14 +95,11 @@ export default {
             var sec = addZero(d.getSeconds());
             var time = year + "-" + month + "-" + date + " " + hour + ":" + min + ":" + sec;
 
-            var payload = {
-                dateTime: time,
-                PM: this.testVal + (Math.random() * (sec % 5)),
-                BC: this.testVal + (Math.random() * (sec % 9)),
-                humidity: this.testVal + (Math.random() * 7),
-                pressure: this.testVal + (Math.random() * 7),
-                temperature: this.testVal + (Math.random() * 7),
-            }    
+            // create payload
+            var payload = { dateTime: time }; 
+            for (var i = 0; i < this.chartNames.length; i++) {
+                payload[this.chartNames[i].dataType] = randomByType ? this.testVal + (Math.random() * randomByType) : this.testVal;
+            }
             this.data = payload;
         },
         /**
