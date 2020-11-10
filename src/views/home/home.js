@@ -179,6 +179,9 @@ export default {
          */
         this.bindIconsToAccordian();
     },
+    beforeDestroy: function () {
+        //store marker
+    },
     mqtt: {
         '001e0610c2e7/2B-BC'(payload) {
             if (payload != null) {
@@ -194,7 +197,7 @@ export default {
 
                 }
             }
-            if (this.lastReadPM.PM < 0) {
+            if (payload.PM < 0) {
                 console.log(payload.toString())
             }
             else {
