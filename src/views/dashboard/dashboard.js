@@ -57,7 +57,7 @@ export default {
                 if (payload.PM >= 0 && payload.BC >= 0) {
                     this.data = this.removeMilliseconds(payload);
                 } else {
-                    console.log("Negative values recieved: PM = " + payload.PM + ", BC = " + payload.BC);
+                    console.log("Negative value(s) recieved: PM = " + payload.PM + ", BC = " + payload.BC);
                 }
             }
         }
