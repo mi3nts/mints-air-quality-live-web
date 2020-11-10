@@ -52,7 +52,13 @@ export default {
                     // handle NaN errors
                     payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
                 }
-                this.data = this.removeMilliseconds(payload);
+
+                // discard negative PM and BC values
+                if (payload.PM >= 0 && payload.BC >= 0) {
+                    this.data = this.removeMilliseconds(payload);
+                } else {
+                    console.log("Negative values recieved: PM = " + payload.PM + ", BC = " + payload.BC);
+                }
             }
         }
     },
