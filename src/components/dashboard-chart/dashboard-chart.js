@@ -133,7 +133,7 @@ export default {
                 ]
             })
 
-            if (this.$store.getters.getChart(this.dataType).length > 100) {
+            if (this.$store.getters.getChart(this.dataType).length > 200) {
                 this.$store.commit('shiftPoints', this.dataType)
             }
 
