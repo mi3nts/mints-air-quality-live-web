@@ -8,6 +8,7 @@ import vuetify from '../../plugins/vuetify';
 import VueMqtt from 'vue-mqtt';
 //import sensor from "../../components/sensor/sensor";
 
+
 var userID = "Mints" + parseInt(Math.random() * 100000);
 var options = {
     clientId: userID,
@@ -68,6 +69,10 @@ export default {
             /** store latitude and longitude values in case of invalid input */
             latitudeCache: {},
             longitudeCache: {},
+            path: null,
+            lastReadPM: {},
+            marker: null,
+            focused: true,
         };
     },
     watch: {
@@ -175,7 +180,78 @@ export default {
         this.bindIconsToAccordian();
     },
     mqtt: {
-        '+/calibrated'(payload) {
+        '001e0610c2e7/2B-BC'(payload) {
+            if (payload != null) {
+
+                try {
+                    if (JSON.parse(payload.toString())) {
+                        payload = JSON.parse(payload.toString());
+                    }
+                } catch (error) {
+                    alert(error)
+                    // handle NaN errors
+                    payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
+
+                }
+            }
+            if (this.lastReadPM.PM < 0) {
+                console.log(payload.toString())
+            }
+            else {
+                this.lastReadPM = payload;
+            }
+
+
+        },
+
+        '001e0610c2e7/GPSGPGGA1'(payload) {
+            if (payload != null) {
+
+                try {
+                    if (JSON.parse(payload.toString())) {
+                        payload = JSON.parse(payload.toString());
+
+                        //update array for latitude and longitude
+                        this.addPoint(payload);
+                    }
+                } catch (error) {
+                    alert(error, "=>", payload.toString())
+                    // handle NaN errors
+                    payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
+
+                }
+
+                /*   // check for NaN latitude and longitude values
+                  // replace invalid values with previously stored latitude/longitude values
+                  if (isNaN(payload.latitude) || isNaN(payload.longitude)) {
+                      // check for stored values
+                      if (this.latitudeCache[payload.sensor_id] && this.longitudeCache[payload.sensor_id]) {
+                          payload.latitude = this.latitudeCache[payload.sensor_id];
+                          payload.longitude = this.longitudeCache[payload.sensor_id];
+                      }
+                  } else {
+                      // makes sure the data exists before hand latitude
+                      if (this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.latitude) {
+                          this.latitudeCache[payload.sensor_id] = this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.latitude;
+                      }
+                      else {
+                          this.latitudeCache[payload.sensor_id] = this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].location.latitude;
+                      }
+                      // makes sure the data exists before hand longitude
+                      if (this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.longitude) {
+                          this.longitudeCache[payload.sensor_id] = this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.longitude;
+                      }
+                      else {
+                          this.longitudeCache[payload.sensor_id] = this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].location.longitude;
+                      }
+                  } */
+
+
+
+            }
+        },
+
+        /* '+/calibrated'(payload) {
             if (payload != null) {
                 try {
                     if (JSON.parse(payload.toString())) {
@@ -217,10 +293,87 @@ export default {
                     this.redrawSensors(payload, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].name);
                 }
             }
-        }
+        } */
     },
     methods: {
-        redrawSensors(payload, sensor, sensorName) {
+        toggleFocus: function () {
+            if (this.focused) {
+                this.focused = false
+            } else {
+                this.focused = true
+            }
+        },
+        addPoint: function (payload) {
+            console.log("lat:", payload.latitudeCoordinate, "\tlng:", payload.longitudeCoordinate);
+            console.log(this.lastReadPM.PM)
+            //calling a method to add a point
+            this.$store.commit('addPointPath', payload);
+
+            //need car Icons for direction
+
+            /* var northIcon = L.icon({
+               iconUrl: '../../src/assets/north.png',
+               iconSize: [20, 35]
+           })
+           var southIcon = L.icon({
+                iconUrl: '../../img/south.png',
+                iconSize: [20, 35]
+            })
+           var leftCar = L.icon({
+               iconUrl: '../../src/assets/left.png',
+               iconSize: [20, 35]
+           })
+           var rightCar = L.icon({
+               iconUrl: '../../src/assets/right.png',
+               iconSize: [25, 40]
+           })  */
+
+            var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(this.$store.state.carPath[this.$store.state.carPath.length - 1].timestamp))).asMinutes();
+            var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(this.lastReadPM.PM);
+            if (this.$store.state.carPath.length > 1) {
+
+                this.path = L.polyline([this.$store.state.carPath[this.$store.state.carPath.length - 2], this.$store.state.carPath[this.$store.state.carPath.length - 1]], { color: this.getMarkerColor(this.lastReadPM.PM ? this.lastReadPM.PM : 0) }).addTo(this.map);
+                this.path.bringToFront();
+
+                //deals with creation of an Icon
+                //TO-DO write logic for directional icons based on latitude & longitude
+                if (this.marker) {
+                    this.marker.setIcon(
+                        L.divIcon({
+                            className: 'svg-icon-car',
+                            html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.lastReadPM.PM ? this.lastReadPM.PM : 0).toFixed(2)),
+                            iconAnchor: [20, 32],
+                            iconSize: [20, 32],
+                        })
+                    );
+                    this.marker.setLatLng(this.$store.state.carPath[this.$store.state.carPath.length - 1])
+                }
+                else {
+                    this.marker = L.marker(this.$store.state.carPath[this.$store.state.carPath.length - 1], {
+                        icon: L.divIcon({
+                            className: 'svg-icon-car',
+                            html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.lastReadPM.PM ? this.lastReadPM.PM : 0).toFixed(2)),
+                            iconAnchor: [20, 32],
+                            iconSize: [20, 32],
+                        }),
+                    });
+                }
+
+                if (this.focused) {
+                    this.map.fitBounds(this.path.getBounds())
+                }
+
+            }
+
+            //this.map.addLayer(this.path)
+            if (this.$store.state.carPath.length == 2) {
+                this.map.fitBounds(this.path.getBounds());
+                this.marker.addTo(this.map)
+            }
+
+
+        },
+        redrawSensors: function (payload, sensor, sensorName) {
             //modifying the DOM according to the received data
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(payload.timestamp))).asMinutes();
             var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(payload[this.pmType]);
@@ -681,7 +834,7 @@ export default {
             });
         },
         getMarkerColor(PM) {
-            if (PM >= 0 && PM <= 10) return "#ffff9e"; //"#ffff66";
+            if (PM >= 0 && PM <= 10) return "#ffff52";//"#ffff9e"; //"#ffff66";
             else if (PM > 10 && PM <= 20) return "#ff6600";
             else if (PM > 20 && PM <= 50) return "#ff5534"; //"#cc0000";
             else if (PM > 50 && PM <= 100) return "#D34FD0"; //"#990099";

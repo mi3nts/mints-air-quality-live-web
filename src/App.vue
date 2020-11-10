@@ -80,9 +80,10 @@ const store = new Vuex.Store({
       { name: "Pressure", id: 5, dataType: "pressure", select: false },
       { name: "Temperature", id: 6, dataType: "temperature", select: false },
     ],
+    carPath: [],
   },
   mutations: {
-    pushValue(state, data) {
+    pushValue: function (state, data) {
       if (!state.dashChartVal[data.name]) {
         state.dashChartVal[data.name] = [];
       }
@@ -92,11 +93,14 @@ const store = new Vuex.Store({
         value: data.value,
       });
     },
-    shiftPoints(state, dataType) {
+    shiftPoints: function (state, dataType) {
       store.state.dashChartVal[dataType].shift();
     },
-    storeSelected(state, data) {
+    storeSelected: function (state, data) {
       state.selected = data;
+    },
+    addPointPath: function (state, data) {
+      state.carPath.push([data.latitudeCoordinate, data.longitudeCoordinate]);
     },
   },
   getters: {

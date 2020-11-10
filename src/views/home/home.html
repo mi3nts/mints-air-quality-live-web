@@ -1,4 +1,9 @@
 <div class="home fill-height">
+    <div class="tracking">
+        <v-btn @click="toggleFocus" class="mx-2" fab small>
+            <i class="material-icons">gps_fixed</i>
+        </v-btn>
+    </div>
     <div id="map" class="fill-height"></div>
     <div class="side-drawer visible">
         <div class="menu-container">
@@ -30,7 +35,9 @@
                             <v-radio color="primary" label="PM2.5" value="pm2_5"></v-radio>
                         </v-radio-group>
                     </div>
-                    <div class="time-label"><v-icon>access_time</v-icon> <span>30-second average</span></div>
+                    <div class="time-label">
+                        <v-icon>access_time</v-icon> <span>30-second average</span>
+                    </div>
                 </v-expansion-panel-content>
             </v-expansion-panel>
             <!-- <v-expansion-panel>
@@ -64,7 +71,9 @@
                         </v-radio-group> -->
                         Disclaimer: The color scale we present does not reflect how EPA presents their data concerning
                         PM2.5 levels.
-                        <div class="time-label"><v-icon>access_time</v-icon> <span>1-hour average</span></div>
+                        <div class="time-label">
+                            <v-icon>access_time</v-icon> <span>1-hour average</span>
+                        </div>
                     </div>
                 </v-expansion-panel-content>
             </v-expansion-panel>
@@ -83,7 +92,9 @@
                     <div>
                         Disclaimer: The color scale we present does not reflect how PurpleAir presents their data
                         concerning PM2.5 levels.
-                        <div class="time-label"><v-icon>access_time</v-icon> <span>10-minute average</span></div>
+                        <div class="time-label">
+                            <v-icon>access_time</v-icon> <span>10-minute average</span>
+                        </div>
                     </div>
                 </v-expansion-panel-content>
             </v-expansion-panel>
