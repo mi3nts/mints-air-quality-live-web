@@ -4,8 +4,8 @@ export default {
     props: [
         "dataType",
         "name",
-        "sidebarOpen",
-        "data"
+        "sidebarOpen", // tracks sidebar status
+        "data" // data recieved from MQTT or data simulation
     ],
     data: () => ({
         chart: null,
@@ -24,6 +24,7 @@ export default {
         }
     },
     computed: {
+        // get the last version of the chart stored in VueX if possible
         getChart() {
             return this.$store.getters.getChart(this.dataType);
         }
@@ -53,6 +54,7 @@ export default {
                 yAxis: {
                     type: "value",
                     boundaryGap: false,
+                    min: 0,
                     splitLine: {
                         show: false
                     },
@@ -97,11 +99,13 @@ export default {
             window.addEventListener("resize", this.resizeHandle);
 
             // define color ranges for each data type
+            // TODO: define color ranges for other data types
             if (this.dataType == "PM") {
                 this.chart.setOption({
                     visualMap: {
                         show: false,
                         pieces: [{
+                            gt: 0,
                             lt: 10,
                             color: "#ffff44"
                         }, {
@@ -124,6 +128,10 @@ export default {
                 })
             }
         },
+
+        /**
+         * Add values to the chart and update live readout
+         */
         addValues: function (data) {
             this.$store.commit('pushValue', {
                 name: this.dataType,
@@ -133,31 +141,39 @@ export default {
                 ]
             })
 
+            // if the number of points in the chart exceeds 200, shift out the oldest point
             if (this.$store.getters.getChart(this.dataType).length > 200) {
                 this.$store.commit('shiftPoints', this.dataType)
             }
 
             // update current value and live readout
             // reflect trends on PM values
+
+            // TODO: consider making the live readout an SVG with d3 (see sensor-chart legends for reference)
+            // TODO: round values based on number of digits to make the readout fit within the box
             if (parseFloat(data[this.dataType]) == this.currentVal) {
                 this.currentVal = parseFloat(data[this.dataType])
                 this.readout = this.currentVal.toFixed(1);
+
                 if (this.dataType == "PM") {
                     document.getElementById(this.dataType + "-readout").style.color = "#a6a6a6";
                 }
             } else if (parseFloat(data[this.dataType]) > this.currentVal) {
                 this.currentVal = parseFloat(data[this.dataType]);
                 this.readout = "\u25B2" + " " + this.currentVal.toFixed(1);
+
                 if (this.dataType == "PM") {
                     document.getElementById(this.dataType + "-readout").style.color = "#f90000";
                 }
             } else if (parseFloat(data[this.dataType]) < this.currentVal) {
                 this.currentVal = parseFloat(data[this.dataType]);
                 this.readout = "\u25BC" + " " + this.currentVal.toFixed(1);
+
                 if (this.dataType == "PM") {
                     document.getElementById(this.dataType + "-readout").style.color = "#00b300";
                 }
             }  
+            
             // update chart
             this.chart.setOption({
                 series: [{
@@ -170,6 +186,7 @@ export default {
                 }]
             })
         },
+
         resizeHandle: function () {
             this.chart.resize();
         },

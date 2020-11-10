@@ -70,7 +70,9 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
-    dashChartVal: {},
+    dashChartVal: {}, // temporary cache for chart data
+    
+    // array used to select data types and charts
     selected: [
       { name: "PM", id: 0, dataType: "PM", select: false },
       { name: "BC", id: 1, dataType: "BC", select: false },
