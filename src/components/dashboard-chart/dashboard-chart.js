@@ -34,6 +34,7 @@ export default {
     },
 
     methods: {
+        // Echart initiatation
         initChart: function () {
             var chartOptionsLine = {
                 title: {
@@ -98,8 +99,10 @@ export default {
                     data: this.getChart,
                 }],
             };
+            // create echart
             this.chart = echarts.init(document.getElementById(this.dataType));
             this.chart.setOption(chartOptionsLine);
+            // resize chart with window
             window.addEventListener("resize", this.resizeHandle);
 
             // define color ranges for each data type
@@ -181,7 +184,7 @@ export default {
                 })
             }
         },
-
+        // function for resize chart with window
         resizeHandle: function () {
             this.chart.resize();
         },

@@ -12,6 +12,7 @@ export default {
     data: function () {
         return {
             charts: [],
+            // used for working with charts showing
             sidebarOpen: true,
 
             // used for drag and drop reordering
@@ -42,8 +43,7 @@ export default {
             var close_icon = $('#icon1');
             var open_icon = $('#icon2');
             //Start with sidebar hidden
-            if (hidden.hasClass('visible')) {
-                // hide sidebar
+            if (hidden.hasClass('visible')) {// hide sidebar
                 close_icon.css("display", "none");
                 open_icon.css("display", "block");
                 chart.animate({ "padding-left": "0px" }, "slow", () => {
@@ -51,8 +51,7 @@ export default {
                     this.sidebarOpen = !this.sidebarOpen;
                 })
                 hidden.animate({ "left": "-270px" }, "slow").removeClass("visible");
-            } else {
-                // show sidebar
+            } else {// show sidebar
                 close_icon.css("display", "block");
                 open_icon.css("display", "none");
                 chart.animate({ "padding-left": "320px" }, "slow", () => {
