@@ -283,6 +283,10 @@ export default {
                             iconSize: [20, 32],
                         }),
                     });
+
+                    if (!this.map.hasLayer(this.marker)) {
+                        this.marker.addTo(this.map)
+                    }
                 }
 
                 if (this.focused) {
