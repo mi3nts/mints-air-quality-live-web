@@ -81,6 +81,7 @@ const store = new Vuex.Store({
       { name: "Temperature", id: 6, dataType: "temperature", select: false },
     ],
     carPath: [],
+    pmTypeCache: 0,
   },
   mutations: {
     pushValue: function (state, data) {
@@ -99,8 +100,17 @@ const store = new Vuex.Store({
     storeSelected: function (state, data) {
       state.selected = data;
     },
+    storePMThresh: function (state, data) {
+      state.pmTypeCache = data;
+    },
     addPointPath: function (state, data) {
-      state.carPath.push([data.latitudeCoordinate, data.longitudeCoordinate]);
+      state.carPath.push({
+        pmThresh: data.pmThresh,
+        coord: [
+          data.payload.latitudeCoordinate,
+          data.payload.longitudeCoordinate,
+        ],
+      });
     },
   },
   getters: {
