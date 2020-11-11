@@ -230,39 +230,42 @@ export default {
          * Add point for car
          */
         addPoint: function (payload) {
-            // console.log("lat:", payload.latitudeCoordinate, "\tlng:", payload.longitudeCoordinate);
-            // console.log(this.getLastRead.PM)
-            // calling a method to add a point
-            this.$store.commit('addPointPath', payload);
 
-            // need car Icons for direction
+            console.log("lat:", payload.latitudeCoordinate, "\tlng:", payload.longitudeCoordinate);
+            //console.log(this.lastReadPM.PM)
+            //calling a method to add a point
+            this.$store.commit('addPointPath', { pmThresh: this.lastReadPM.PM ? this.lastReadPM.PM : 0, payload: payload });
 
-            //  var northIcon = L.icon({
-            //    iconUrl: '../../src/assets/north.png',
-            //    iconSize: [20, 35]
-            // })
-            // var southIcon = L.icon({
-            //     iconUrl: '../../img/south.png',
-            //     iconSize: [20, 35]
-            // })
-            // var leftCar = L.icon({
-            //     iconUrl: '../../src/assets/left.png',
-            //     iconSize: [20, 35]
-            // })
-            // var rightCar = L.icon({
-            //     iconUrl: '../../src/assets/right.png',
-            //     iconSize: [25, 40]
-            // })
+            //need car Icons for direction
 
+            /* var northIcon = L.icon({
+               iconUrl: '../../src/assets/north.png',
+               iconSize: [20, 35]
+           })
+           var southIcon = L.icon({
+                iconUrl: '../../img/south.png',
+                iconSize: [20, 35]
+            })
+           var leftCar = L.icon({
+               iconUrl: '../../src/assets/left.png',
+               iconSize: [20, 35]
+           })
+           var rightCar = L.icon({
+               iconUrl: '../../src/assets/right.png',
+               iconSize: [25, 40]
+           })  */
+            var carPathLength = this.$store.state.carPath.length;
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(this.$store.state.carPath[this.$store.state.carPath.length - 1].timestamp))).asMinutes();
-            var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(this.getLastRead.PM);
-            if (this.$store.state.carPath.length > 1) {
-
-                this.path = L.polyline([this.$store.state.carPath[this.$store.state.carPath.length - 2], this.$store.state.carPath[this.$store.state.carPath.length - 1]], { color: this.getMarkerColor(this.getLastRead.PM ? this.getLastRead.PM : 0) }).addTo(this.map);
+            var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(this.lastReadPM.PM);
+            if (carPathLength > 1) {
+                console.log([this.$store.state.carPath[carPathLength - 2].coord, this.$store.state.carPath[carPathLength - 1].coord])
+                console.log(this.$store.state.carPath[carPathLength - 1].pmThresh)
+                this.path = L.polyline([this.$store.state.carPath[carPathLength - 2].coord, this.$store.state.carPath[carPathLength - 1].coord], { color: this.getMarkerColor(this.$store.state.carPath[carPathLength - 1].pmThresh) }).addTo(this.map);
                 this.path.bringToFront();
 
-                // deals with creation of an Icon
-                // TO-DO write logic for directional icons based on latitude & longitude
+                //deals with creation of an Icon
+                //TO-DO write logic for directional icons based on latitude & longitude
+                console.log(this.marker)
                 if (this.marker) {
                     this.marker.setIcon(
                         L.divIcon({
@@ -272,10 +275,10 @@ export default {
                             iconSize: [20, 32],
                         })
                     );
-                    this.marker.setLatLng(this.$store.state.carPath[this.$store.state.carPath.length - 1])
+                    this.marker.setLatLng(this.$store.state.carPath[carPathLength - 1].coord)
                 }
                 else {
-                    this.marker = L.marker(this.$store.state.carPath[this.$store.state.carPath.length - 1], {
+                    this.marker = L.marker(this.$store.state.carPath[carPathLength - 1].coord, {
                         icon: L.divIcon({
                             className: 'svg-icon-car',
                             html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.getLastRead.PM ? this.getLastRead.PM : 0).toFixed(2)),
@@ -294,8 +297,8 @@ export default {
                 }
             }
 
-            // this.map.addLayer(this.path)
-            if (this.$store.state.carPath.length == 2) {
+            //this.map.addLayer(this.path)
+            if (carPathLength == 2) {
                 this.map.fitBounds(this.path.getBounds());
                 this.marker.addTo(this.map)
             }
