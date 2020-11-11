@@ -176,6 +176,11 @@ export default {
          * Bind icons to accordions
          */
         this.bindIconsToAccordian();
+
+        /*
+         *replots line if there is existing data in the session
+         */
+        this.replotLine();
     },
     beforeDestroy: function () {
         // store marker
@@ -225,7 +230,15 @@ export default {
                 this.focused = true
             }
         },
-
+        replotLine: function () {
+            var carPathLength = this.$store.state.carPath.length
+            if (carPathLength > 1) {
+                for (var index = 2; index < carPathLength; index++) {
+                    this.path = L.polyline([this.$store.state.carPath[index - 2].coord, this.$store.state.carPath[index - 1].coord], { color: this.getMarkerColor(this.$store.state.carPath[index - 1].pmThresh) }).addTo(this.map);
+                    this.path.bringToFront();
+                }
+            }
+        },
         /**
          * Add point for car
          */
@@ -258,14 +271,12 @@ export default {
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(this.$store.state.carPath[this.$store.state.carPath.length - 1].timestamp))).asMinutes();
             var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(this.getLastRead.PM);
             if (carPathLength > 1) {
-                console.log([this.$store.state.carPath[carPathLength - 2].coord, this.$store.state.carPath[carPathLength - 1].coord])
                 // console.log(this.$store.state.carPath[carPathLength - 1].pmThresh)
                 this.path = L.polyline([this.$store.state.carPath[carPathLength - 2].coord, this.$store.state.carPath[carPathLength - 1].coord], { color: this.getMarkerColor(this.getLastRead.PM ? this.getLastRead.PM : 0) }).addTo(this.map);
                 this.path.bringToFront();
 
                 //deals with creation of an Icon
                 //TO-DO write logic for directional icons based on latitude & longitude
-                console.log(this.marker)
                 if (this.marker) {
                     this.marker.setIcon(
                         L.divIcon({

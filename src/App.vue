@@ -73,20 +73,50 @@ const store = new Vuex.Store({
     dashChartVal: {}, // temporary cache for chart data
     trigger: 0, // updated to trigger real time updates while on dashboard
     prevPayload: [], // stores the last valid payload recieved, used for mapping
-    
+
     // array used to select data types and charts
     selected: [
       { name: "PM", id: 0, dataType: "PM", select: false },
       { name: "BC", id: 1, dataType: "BC", select: false },
-      { name: "Extinction 405nm", id: 2, dataType: "Extinction-405nm", select: false },
-      { name: "Extinction 880nm", id: 3, dataType: "Extinction-880nm", select: false },
-      { name: "Current 405nm", id: 4, dataType: "current-405nm", select: false },
-      { name: "Flow Temperature", id: 5, dataType: "flow-temperature", select: false },
+      {
+        name: "Extinction 405nm",
+        id: 2,
+        dataType: "Extinction-405nm",
+        select: false,
+      },
+      {
+        name: "Extinction 880nm",
+        id: 3,
+        dataType: "Extinction-880nm",
+        select: false,
+      },
+      {
+        name: "Current 405nm",
+        id: 4,
+        dataType: "current-405nm",
+        select: false,
+      },
+      {
+        name: "Flow Temperature",
+        id: 5,
+        dataType: "flow-temperature",
+        select: false,
+      },
       { name: "Humidity", id: 6, dataType: "humidity", select: false },
       { name: "Pressure", id: 7, dataType: "pressure", select: false },
       { name: "Temperature", id: 8, dataType: "temperature", select: false },
-      { name: "Voltage 405nm", id: 9, dataType: "voltage-405nm", select: false },
-      { name: "Voltage 880nm", id: 10, dataType: "voltage-880nm", select: false },
+      {
+        name: "Voltage 405nm",
+        id: 9,
+        dataType: "voltage-405nm",
+        select: false,
+      },
+      {
+        name: "Voltage 880nm",
+        id: 10,
+        dataType: "voltage-880nm",
+        select: false,
+      },
     ],
     carPath: [],
     pmTypeCache: 0,
@@ -139,7 +169,10 @@ const store = new Vuex.Store({
       } else if (chart.length == 1) {
         return [parseFloat(chart[chart.length - 1].value[1]), null];
       } else {
-        return [parseFloat(chart[chart.length - 1].value[1]), parseFloat(chart[chart.length - 2].value[1])];
+        return [
+          parseFloat(chart[chart.length - 1].value[1]),
+          parseFloat(chart[chart.length - 2].value[1]),
+        ];
       }
     },
   },
@@ -171,10 +204,10 @@ export default {
     this.charts = this.$store.state.selected;
 
     // subscribe to the sensor topics
-    console.log(this.$mqtt.subscribe('#'));
+    console.log(this.$mqtt.subscribe("#"));
   },
   mqtt: {
-    '001e0610c2e7/2B-BC'(payload) {
+    "001e0610c2e7/2B-BC"(payload) {
       if (payload != null) {
         try {
           if (JSON.parse(payload.toString())) {
@@ -182,12 +215,12 @@ export default {
           }
         } catch (error) {
           // handle NaN errors
-          payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
+          payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
         }
 
         // Remove the milliseconds from the timestamp for ECharts
         // ECharts seems to be unable to process timestamps with millisecond
-        // values of greater than 3 decimal points of accuracy 
+        // values of greater than 3 decimal points of accuracy
         let timestamp = payload.dateTime.split(".");
         payload.dateTime = timestamp[0];
 
@@ -200,9 +233,16 @@ export default {
 
         // discard negative PM and BC values for charts
         if (payload.PM < 0 || payload.BC < 0) {
-          console.log("Negative value(s) received: PM = " + payload.PM + ", BC = " + payload.BC);
+          console.log(
+            "Negative value(s) received: PM = " +
+              payload.PM +
+              ", BC = " +
+              payload.BC
+          );
         } else {
-          console.log("New incoming data: PM = " + payload.PM + ", BC = " + payload.BC);
+          console.log(
+            "New incoming data: PM = " + payload.PM + ", BC = " + payload.BC
+          );
           this.addChartValues(payload);
         }
       }
@@ -224,19 +264,16 @@ export default {
      */
     addChartValues: function (data) {
       for (var i = 0; i < this.charts.length; i++) {
-        this.$store.commit('pushValue', {
+        this.$store.commit("pushValue", {
           name: this.charts[i].dataType,
-          value: [
-            data.dateTime,
-            data[this.charts[i].dataType]
-          ]
-        })
+          value: [data.dateTime, data[this.charts[i].dataType]],
+        });
 
         // if the number of points in the chart exceeds 50, shift out the oldest point
         if (this.$store.getters.getChart(this.charts[i].dataType).length > 50) {
-          this.$store.commit('shiftPoints', this.charts[i].dataType)
+          this.$store.commit("shiftPoints", this.charts[i].dataType);
         }
-      }  
+      }
       this.$store.state.trigger++;
     },
   },
