@@ -71,6 +71,7 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     dashChartVal: {}, // temporary cache for chart data
+    trigger: 0, // updated to trigger real time updates while on dashboard
     
     // array used to select data types and charts
     selected: [
@@ -116,6 +117,20 @@ const store = new Vuex.Store({
       }
       return state.dashChartVal[name];
     },
+    getPreviousTwoValues: (state) => (name) => {
+      if (!state.dashChartVal[name]) {
+        return null;
+      }
+
+      let chart = state.dashChartVal[name];
+      if (chart.length == 0) {
+        return [null, null];
+      } else if (chart.length == 1) {
+        return [parseFloat(chart[chart.length - 1].value[1]), null];
+      } else {
+        return [parseFloat(chart[chart.length - 1].value[1]), parseFloat(chart[chart.length - 2].value[1])];
+      }
+    },
   },
 });
 
@@ -129,7 +144,8 @@ export default {
   data: () => ({
     showAbout: false,
     showPM: false,
-    dashboardNav: null,
+    dashboardNav: null, // navigation between map and dashboard
+    charts: [], // list of data types pulled from Vuex
   }),
   created: function () {
     window["moment"] = this.$moment;
@@ -138,6 +154,41 @@ export default {
     } else {
       this.dashboardNav = "Go to Dashboard";
     }
+  },
+  mounted: function () {
+    // retrieve array for chart and data type information from Vuex
+    this.charts = this.$store.state.selected;
+
+    // subscribe to the sensor topics
+    console.log(this.$mqtt.subscribe('#'));
+  },
+  mqtt: {
+    '001e0610c2e7/2B-BC'(payload) {
+      if (payload != null) {
+        try {
+          if (JSON.parse(payload.toString())) {
+            payload = JSON.parse(payload.toString());
+          }
+        } catch (error) {
+          // handle NaN errors
+          payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
+        }
+
+        // Remove the milliseconds from the timestamp for ECharts
+        // ECharts seems to be unable to process timestamps with millisecond
+        // values of greater than 3 decimal points of accuracy 
+        let timestamp = payload.dateTime.split(".");
+        payload.dateTime = timestamp[0];
+
+        // discard negative PM and BC values
+        if (payload.PM < 0 || payload.BC < 0) {
+          console.log("Negative value(s) received: PM = " + payload.PM + ", BC = " + payload.BC);
+        } else {
+          console.log("New incoming data: PM = " + payload.PM + ", BC = " + payload.BC);
+          this.addChartValues(payload);
+        }
+      }
+    },
   },
   methods: {
     flipPage: function () {
@@ -148,6 +199,27 @@ export default {
         this.$router.push({ path: "/" });
         this.dashboardNav = "Go to Dashboard";
       }
+    },
+    /**
+     * Add data to the arrays used by the charts.
+     * Loop through every data type in the charts array and adds all values in one go.
+     */
+    addChartValues: function (data) {
+      for (var i = 0; i < this.charts.length; i++) {
+        this.$store.commit('pushValue', {
+          name: this.charts[i].dataType,
+          value: [
+            data.dateTime,
+            data[this.charts[i].dataType]
+          ]
+        })
+
+        // if the number of points in the chart exceeds 50, shift out the oldest point
+        if (this.$store.getters.getChart(this.charts[i].dataType).length > 50) {
+          this.$store.commit('shiftPoints', this.charts[i].dataType)
+        }
+      }  
+      this.$store.state.trigger++;
     },
   },
 };

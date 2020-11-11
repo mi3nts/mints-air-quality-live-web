@@ -5,30 +5,34 @@ export default {
         "dataType",
         "name",
         "sidebarOpen", // tracks sidebar status
-        "data" // data recieved from MQTT or data simulation
     ],
     data: () => ({
         chart: null,
-        currentVal: null,
+        previousTwoValues: null,
         readout: null,
     }),
     mounted: function () {
         this.initChart();
+        this.updateChart();
+    },
+    computed: {
+        // get the last version of the chart stored in VueX if possible
+        getChart () {
+            return this.$store.getters.getChart(this.dataType);
+        }, 
+        getTrigger () {
+            return this.$store.state.trigger;
+        }
     },
     watch: {
         sidebarOpen() {
             this.resizeHandle();
         },
-        data(data) {
-            this.addValues(data);
+        getTrigger() {
+            this.updateChart();
         }
     },
-    computed: {
-        // get the last version of the chart stored in VueX if possible
-        getChart() {
-            return this.$store.getters.getChart(this.dataType);
-        }
-    },
+
     methods: {
         initChart: function () {
             var chartOptionsLine = {
@@ -130,61 +134,52 @@ export default {
         },
 
         /**
-         * Add values to the chart and update live readout
+         * Add stored values to the chart and update live readout
          */
-        addValues: function (data) {
-            this.$store.commit('pushValue', {
-                name: this.dataType,
-                value: [
-                    data.dateTime,
-                    data[this.dataType]
-                ]
-            })
-
-            // if the number of points in the chart exceeds 200, shift out the oldest point
-            if (this.$store.getters.getChart(this.dataType).length > 200) {
-                this.$store.commit('shiftPoints', this.dataType)
-            }
+        updateChart: function () {
+            this.previousTwoValues = this.$store.getters.getPreviousTwoValues(this.dataType);
 
             // update current value and live readout
             // reflect trends on PM values
-
             // TODO: consider making the live readout an SVG with d3 (see sensor-chart legends for reference)
             // TODO: round values based on number of digits to make the readout fit within the box
-            if (parseFloat(data[this.dataType]) == this.currentVal) {
-                this.currentVal = parseFloat(data[this.dataType])
-                this.readout = this.currentVal.toFixed(1);
+            let newest = this.previousTwoValues[0];
+            let older = this.previousTwoValues[1];
 
-                if (this.dataType == "PM") {
-                    document.getElementById(this.dataType + "-readout").style.color = "#a6a6a6";
-                }
-            } else if (parseFloat(data[this.dataType]) > this.currentVal) {
-                this.currentVal = parseFloat(data[this.dataType]);
-                this.readout = "\u25B2" + " " + this.currentVal.toFixed(1);
+            // check that there is a value before attempting comparisons
+            if (newest) { 
+                if (older == null) { 
+                    // only one value (no older value)
+                    this.readout = newest.toFixed(1);
 
-                if (this.dataType == "PM") {
-                    document.getElementById(this.dataType + "-readout").style.color = "#f90000";
-                }
-            } else if (parseFloat(data[this.dataType]) < this.currentVal) {
-                this.currentVal = parseFloat(data[this.dataType]);
-                this.readout = "\u25BC" + " " + this.currentVal.toFixed(1);
-
-                if (this.dataType == "PM") {
-                    document.getElementById(this.dataType + "-readout").style.color = "#00b300";
-                }
-            }  
-            
-            // update chart
-            this.chart.setOption({
-                series: [{
-                    data: this.getChart,
-                    markLine: {
-                        data: [{
-                            yAxis: data[this.dataType],
-                        }]
+                } else if (newest == older) {
+                    this.readout = newest.toFixed(1);
+                    if (this.dataType == "PM") {
+                        document.getElementById(this.dataType + "-readout").style.color = "#a6a6a6";
                     }
-                }]
-            })
+                } else if (newest > older) {
+                    this.readout = "\u25B2" + " " + newest.toFixed(1);
+                    if (this.dataType == "PM") {
+                        document.getElementById(this.dataType + "-readout").style.color = "#f90000";
+                    }
+                } else if (newest < older) {
+                    this.readout = "\u25BC" + " " + newest.toFixed(1);
+                    if (this.dataType == "PM") {
+                        document.getElementById(this.dataType + "-readout").style.color = "#00b300";
+                    }
+                }
+                
+                this.chart.setOption({
+                    series: [{
+                        data: this.getChart,
+                        markLine: {
+                            data: [{
+                                yAxis: newest,
+                            }]
+                        }
+                    }]
+                })
+            }
         },
 
         resizeHandle: function () {
