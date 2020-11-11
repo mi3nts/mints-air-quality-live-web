@@ -4,50 +4,35 @@ export default {
     props: [
         "dataType",
         "name",
-        "sidebarOpen",
-        "data"
+        "sidebarOpen", // tracks sidebar status
     ],
     data: () => ({
         chart: null,
-        currentVal: null,
+        previousTwoValues: null,
         readout: null,
     }),
     mounted: function () {
-        // subscribe to MQTT stream
-        console.log(this.$mqtt.subscribe('#'));
         this.initChart();
+        this.updateChart();
+    },
+    computed: {
+        // get the last version of the chart stored in VueX if possible
+        getChart () {
+            return this.$store.getters.getChart(this.dataType);
+        }, 
+        getTrigger () {
+            return this.$store.state.trigger;
+        }
     },
     watch: {
         sidebarOpen() {
             this.resizeHandle();
         },
+        getTrigger() {
+            this.updateChart();
+        }
+    },
 
-        // read from simulated data stream
-        // comment out when using MQTT
-        data(data) {
-            this.addValues(data);
-        }
-    },
-    mqtt: {
-        '+/calibrated'(payload) {
-            if (payload != null) {
-                try {
-                    if (JSON.parse(payload.toString())) {
-                        payload = JSON.parse(payload.toString());
-                    }
-                } catch (error) {
-                    // handle NaN errors
-                    payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
-                }
-                // this.addValues(payload);
-            }
-        }
-    },
-    computed: {
-        getChart() {
-            return this.$store.getters.getChart(this.dataType);
-        }
-    },
     methods: {
         initChart: function () {
             var chartOptionsLine = {
@@ -73,6 +58,7 @@ export default {
                 yAxis: {
                     type: "value",
                     boundaryGap: false,
+                    min: 0,
                     splitLine: {
                         show: false
                     },
@@ -117,14 +103,14 @@ export default {
             window.addEventListener("resize", this.resizeHandle);
 
             // define color ranges for each data type
-            if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
+            // TODO: define color ranges for other data types
+            if (this.dataType == "PM") {
                 this.chart.setOption({
                     visualMap: {
                         show: false,
                         pieces: [{
                             gt: 0,
                             lt: 10,
-                            // color: "#33cc33",
                             color: "#ffff44"
                         }, {
                             gt: 10,
@@ -146,52 +132,56 @@ export default {
                 })
             }
         },
-        addValues: function (data) {
-            this.$store.commit('pushValue', {
-                name: this.dataType,
-                value: [
-                    data.timestamp,
-                    data[this.dataType]
-                ]
-            })
 
-            if (this.$store.getters.getChart(this.dataType).length > 100) {
-                this.$store.commit('shiftPoints', this.dataType)
-            }
+        /**
+         * Add stored values to the chart and update live readout
+         */
+        updateChart: function () {
+            this.previousTwoValues = this.$store.getters.getPreviousTwoValues(this.dataType);
 
             // update current value and live readout
             // reflect trends on PM values
-            if (data[this.dataType] == this.currentVal) {
-                this.currentVal = data[this.dataType]
-                this.readout = this.currentVal.toFixed(1);
-                if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
-                    document.getElementById(this.dataType + "-readout").style.color = "#a6a6a6";
-                }
-            } else if (data[this.dataType] > this.currentVal) {
-                this.currentVal = data[this.dataType];
-                this.readout = "\u25B2" + " " + this.currentVal.toFixed(1);
-                if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
-                    document.getElementById(this.dataType + "-readout").style.color = "#f90000";
-                }
-            } else if (data[this.dataType] < this.currentVal) {
-                this.currentVal = data[this.dataType];
-                this.readout = "\u25BC" + " " + this.currentVal.toFixed(1);
-                if (this.dataType == "pm2_5" || this.dataType == "pm1" || this.dataType == "pm10") {
-                    document.getElementById(this.dataType + "-readout").style.color = "#00b300";
-                }
-            }  
-            // update chart
-            this.chart.setOption({
-                series: [{
-                    data: this.getChart,
-                    markLine: {
-                        data: [{
-                            yAxis: data[this.dataType],
-                        }]
+            // TODO: consider making the live readout an SVG with d3 (see sensor-chart legends for reference)
+            // TODO: round values based on number of digits to make the readout fit within the box
+            let newest = this.previousTwoValues[0];
+            let older = this.previousTwoValues[1];
+
+            // check that there is a value before attempting comparisons
+            if (newest) { 
+                if (older == null) { 
+                    // only one value (no older value)
+                    this.readout = newest.toFixed(1);
+
+                } else if (newest == older) {
+                    this.readout = newest.toFixed(1);
+                    if (this.dataType == "PM") {
+                        document.getElementById(this.dataType + "-readout").style.color = "#a6a6a6";
                     }
-                }]
-            })
+                } else if (newest > older) {
+                    this.readout = "\u25B2" + " " + newest.toFixed(1);
+                    if (this.dataType == "PM") {
+                        document.getElementById(this.dataType + "-readout").style.color = "#f90000";
+                    }
+                } else if (newest < older) {
+                    this.readout = "\u25BC" + " " + newest.toFixed(1);
+                    if (this.dataType == "PM") {
+                        document.getElementById(this.dataType + "-readout").style.color = "#00b300";
+                    }
+                }
+                
+                this.chart.setOption({
+                    series: [{
+                        data: this.getChart,
+                        markLine: {
+                            data: [{
+                                yAxis: newest,
+                            }]
+                        }
+                    }]
+                })
+            }
         },
+
         resizeHandle: function () {
             this.chart.resize();
         },

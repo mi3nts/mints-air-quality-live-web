@@ -11,104 +11,56 @@ export default {
     },
     data: function () {
         return {
-            chartNames: [],
+            charts: [],
             sidebarOpen: true,
 
             // used for drag and drop reordering
             dragging: false,
             enabled: true,
-
-            // values used for mqtt simulation for testing
-            testVal: (Math.random() * 10) + 1,
-            timer: null,
-            data: null,
         }
     },
     mounted: function () {
-        // If the page is less than 600px wide, the sidebar starts off hidden
+        // retrieve array for chart and data type information from Vuex
+        this.charts = this.$store.state.selected;
+
+        // if the page is less than 600px wide, the sidebar starts off hidden
         if ($(window).width() < 600) {
             this.slide();
         }
-        this.chartNames = this.$store.state.selected;
-
-        // begin data simulation
-        // comment out when using MQTT
-        this.timer = setInterval(this.simulatePayload, 1000);
     },
     beforeDestroy: function () {
-        this.$store.commit('storeSelected', this.chartNames);
+        this.$store.commit('storeSelected', this.charts);
     },
     methods: {
+        /**
+         * Handle sidebar related animations
+         * TODO: Make the sidebar work with smaller screens, where the sidebar tab currently intrudes into the charts
+         */
         slide: function () {
             var hidden = $('.sideBar');
             var chart = $('.charts');
             var close_icon = $('#icon1');
             var open_icon = $('#icon2');
-
+            //Start with sidebar hidden
             if (hidden.hasClass('visible')) {
+                // hide sidebar
                 close_icon.css("display", "none");
                 open_icon.css("display", "block");
                 chart.animate({ "padding-left": "0px" }, "slow", () => {
+                    // set new sidebar status and trigger chart resizing
                     this.sidebarOpen = !this.sidebarOpen;
                 })
                 hidden.animate({ "left": "-270px" }, "slow").removeClass("visible");
-
             } else {
+                // show sidebar
                 close_icon.css("display", "block");
                 open_icon.css("display", "none");
                 chart.animate({ "padding-left": "320px" }, "slow", () => {
+                    // set new sidebar status and trigger chart resizing
                     this.sidebarOpen = !this.sidebarOpen;
                 });
                 hidden.animate({ "left": "0px" }, "slow").addClass('visible');
             }
-        },
-
-        /**
-         * Simulate MQTT payload for testing purposes.
-         */
-        simulatePayload: function () {
-            // used to add an extra 0 in front of single digit values for echarts
-            // ex: 1:27:2 is changed to 01:27:02
-            function addZero(i) {
-                if (i < 10) {
-                    i = "0" + i;
-                }
-                return i;
-            }
-
-            // generate a increment to add/subtract from testVal
-            var rand = (Math.random() * 8) - 4.5;
-            this.testVal += rand;
-
-            // add upper and lower bounds
-            // prevent negative values
-            if (this.testVal < 0 || this.testVal > 100) {
-                this.testVal += -2 * rand;
-            }
-
-            var d = new Date();
-            var year = d.getFullYear();
-            var month = addZero(d.getMonth() + 1);
-            var date = addZero(d.getDate());
-            var hour = addZero(d.getHours());
-            var min = addZero(d.getMinutes());
-            var sec = addZero(d.getSeconds());
-            var time = year + "-" + month + "-" + date + " " + hour + ":" + min + ":" + sec;
-
-            var payload = {
-                timestamp: time,
-                sensor_id: "000000000000",
-                pm1: this.testVal + (Math.random() * (sec % 3)),
-                pm2_5: this.testVal + (Math.random() * (sec % 5)),
-                pm10: this.testVal + (Math.random() * (sec % 9)),
-                latitude: 0,
-                longitude: 0,
-                dewpoint: this.testVal + (Math.random() * 7),
-                humidity: this.testVal + (Math.random() * 7),
-                pressure: this.testVal + (Math.random() * 7),
-                temperature: this.testVal + (Math.random() * 7),
-            }    
-            this.data = payload;
         },
     }
 }

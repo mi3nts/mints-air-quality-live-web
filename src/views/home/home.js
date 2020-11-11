@@ -6,7 +6,7 @@ import epaData from "../../services/epa-data";
 import Vue from 'vue';
 import vuetify from '../../plugins/vuetify';
 import VueMqtt from 'vue-mqtt';
-//import sensor from "../../components/sensor/sensor";
+// import sensor from "../../components/sensor/sensor";
 
 
 var userID = "Mints" + parseInt(Math.random() * 100000);
@@ -38,8 +38,7 @@ export default {
                 data_time: null,
                 updated_time: null
             },
-            //stores the status of the popup only tracks one
-            PopupStatus: false,
+            popupStatus: false, // stores the status of the popup, only tracks one
             sensorComponents: [],
             radarLayer: false,
             windLayer: false,
@@ -48,8 +47,8 @@ export default {
             purpleAirLayer: false,
             openAQLayer: false,
             pollutionLayer: false,
-            //startDate: null,
-            //endDate: null,
+            // startDate: null,
+            // endDate: null,
             /** Popup controls */
             howToUse: false,
             epaType: "PM25",
@@ -66,14 +65,16 @@ export default {
             purpleAirGroup: L.layerGroup(),
             epaGroup: L.layerGroup(),
             pollutionGroup: L.layerGroup(),
-            /** store latitude and longitude values in case of invalid input */
-            latitudeCache: {},
-            longitudeCache: {},
             path: null,
-            lastReadPM: {},
             marker: null,
             focused: true,
         };
+    },
+    computed: {
+        // get last read value from mqtt data
+        getLastRead() {
+            return this.$store.state.prevPayload;
+        }
     },
     watch: {
         'pmType': function () {
@@ -138,10 +139,7 @@ export default {
         }
     },
     mounted: function () {
-        // subscribe to the sensor topics
-        console.log(this.$mqtt.subscribe('#'));
-
-        // If the page is less than 600px wide, the sidebar starts off hidden
+        // if the page is less than 600px wide, the sidebar starts off hidden
         if ($(window).width() < 600) {
             this.slide();
         }
@@ -180,42 +178,16 @@ export default {
         this.bindIconsToAccordian();
     },
     beforeDestroy: function () {
-        //store marker for recordkeeping
-        this.$store.commit('storePMThresh', this.lastReadPM);
+        // store marker
     },
     mqtt: {
-        '001e0610c2e7/2B-BC'(payload) {
-            if (payload != null) {
-
-                try {
-                    if (JSON.parse(payload.toString())) {
-                        payload = JSON.parse(payload.toString());
-                    }
-                } catch (error) {
-                    alert(error)
-                    // handle NaN errors
-                    payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
-
-                }
-            }
-            if (payload.PM < 0) {
-                console.log(payload.toString())
-            }
-            else {
-                this.lastReadPM = payload;
-            }
-
-
-        },
-
         '001e0610c2e7/GPSGPGGA1'(payload) {
             if (payload != null) {
-
                 try {
                     if (JSON.parse(payload.toString())) {
                         payload = JSON.parse(payload.toString());
 
-                        //update array for latitude and longitude
+                        // update array for latitude and longitude
                         this.addPoint(payload);
                     }
                 } catch (error) {
@@ -224,80 +196,26 @@ export default {
                     payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
 
                 }
-
-                /*   // check for NaN latitude and longitude values
-                  // replace invalid values with previously stored latitude/longitude values
-                  if (isNaN(payload.latitude) || isNaN(payload.longitude)) {
-                      // check for stored values
-                      if (this.latitudeCache[payload.sensor_id] && this.longitudeCache[payload.sensor_id]) {
-                          payload.latitude = this.latitudeCache[payload.sensor_id];
-                          payload.longitude = this.longitudeCache[payload.sensor_id];
-                      }
-                  } else {
-                      // makes sure the data exists before hand latitude
-                      if (this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.latitude) {
-                          this.latitudeCache[payload.sensor_id] = this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.latitude;
-                      }
-                      else {
-                          this.latitudeCache[payload.sensor_id] = this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].location.latitude;
-                      }
-                      // makes sure the data exists before hand longitude
-                      if (this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.longitude) {
-                          this.longitudeCache[payload.sensor_id] = this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.longitude;
-                      }
-                      else {
-                          this.longitudeCache[payload.sensor_id] = this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].location.longitude;
-                      }
-                  } */
-
-
-
             }
         },
 
-        /* '+/calibrated'(payload) {
-            if (payload != null) {
-                try {
-                    if (JSON.parse(payload.toString())) {
-                        payload = JSON.parse(payload.toString());
-                    }
-                } catch (error) {
-                    // handle NaN errors
-                    payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
+        // '+/calibrated'(payload) {
+        //     if (payload != null) {
+        //         try {
+        //             if (JSON.parse(payload.toString())) {
+        //                 payload = JSON.parse(payload.toString());
+        //             }
+        //         } catch (error) {
+        //             // handle NaN errors
+        //             payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
+        //         }
 
-                }
-
-                // check for NaN latitude and longitude values
-                // replace invalid values with previously stored latitude/longitude values
-                if (isNaN(payload.latitude) || isNaN(payload.longitude)) {
-                    // check for stored values
-                    if (this.latitudeCache[payload.sensor_id] && this.longitudeCache[payload.sensor_id]) {
-                        payload.latitude = this.latitudeCache[payload.sensor_id];
-                        payload.longitude = this.longitudeCache[payload.sensor_id];
-                    }
-                } else {
-                    // makes sure the data exists before hand latitude
-                    if (this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.latitude) {
-                        this.latitudeCache[payload.sensor_id] = this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.latitude;
-                    }
-                    else {
-                        this.latitudeCache[payload.sensor_id] = this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].location.latitude;
-                    }
-                    // makes sure the data exists before hand longitude
-                    if (this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.longitude) {
-                        this.longitudeCache[payload.sensor_id] = this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.longitude;
-                    }
-                    else {
-                        this.longitudeCache[payload.sensor_id] = this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].location.longitude;
-                    }
-                }
-
-                // update or put values into the sensors array to cache last payload
-                if (this.$set(this.sensors, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, payload)) {
-                    this.redrawSensors(payload, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].name);
-                }
-            }
-        } */
+        //         // update or put values into the sensors array to cache last payload
+        //         if (this.$set(this.sensors, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, payload)) {
+        //             this.redrawSensors(payload, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].name);
+        //         }
+        //     }
+        // }
     },
     methods: {
         toggleFocus: function () {
@@ -307,7 +225,12 @@ export default {
                 this.focused = true
             }
         },
+
+        /**
+         * Add point for car
+         */
         addPoint: function (payload) {
+
             console.log("lat:", payload.latitudeCoordinate, "\tlng:", payload.longitudeCoordinate);
             //console.log(this.lastReadPM.PM)
             //calling a method to add a point
@@ -347,7 +270,7 @@ export default {
                     this.marker.setIcon(
                         L.divIcon({
                             className: 'svg-icon-car',
-                            html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.lastReadPM.PM ? this.lastReadPM.PM : 0).toFixed(2)),
+                            html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.getLastRead.PM ? this.getLastRead.PM : 0).toFixed(2)),
                             iconAnchor: [20, 32],
                             iconSize: [20, 32],
                         })
@@ -358,11 +281,12 @@ export default {
                     this.marker = L.marker(this.$store.state.carPath[carPathLength - 1].coord, {
                         icon: L.divIcon({
                             className: 'svg-icon-car',
-                            html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.lastReadPM.PM ? this.lastReadPM.PM : 0).toFixed(2)),
+                            html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.getLastRead.PM ? this.getLastRead.PM : 0).toFixed(2)),
                             iconAnchor: [20, 32],
                             iconSize: [20, 32],
                         }),
                     });
+
                     if (!this.map.hasLayer(this.marker)) {
                         this.marker.addTo(this.map)
                     }
@@ -371,7 +295,6 @@ export default {
                 if (this.focused) {
                     this.map.fitBounds(this.path.getBounds())
                 }
-
             }
 
             //this.map.addLayer(this.path)
@@ -379,39 +302,8 @@ export default {
                 this.map.fitBounds(this.path.getBounds());
                 this.marker.addTo(this.map)
             }
-
-
         },
-        redrawSensors: function (payload, sensor, sensorName) {
-            //modifying the DOM according to the received data
-            var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(payload.timestamp))).asMinutes();
-            var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(payload[this.pmType]);
-            this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.setIcon(
-                L.divIcon({
-                    className: 'svg-icon-' + payload.sensor_id,
-                    html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(payload[this.pmType]).toFixed(2)),
-                    iconAnchor: [20, 10],
-                    iconSize: [20, 32],
-                    popupAnchor: [150, -30]
-                }));
 
-            //this is to check if there is a card currently open if so close and re-open it works with the other if
-            if (this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.isPopupOpen() && this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.sensor_id == payload.sensor_id) {
-                this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.closePopup()
-                this.PopupStatus = true
-
-            }
-            sensor.marker.on('popupopen', (e) => {
-                this.checkSensor(e, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, sensorName, payload)
-            });
-            //give us the ability to update a popup if open albeit a hacky way.
-            if (this.PopupStatus && this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.sensor_id == payload.sensor_id) {
-                this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.openPopup()
-                console.log("opening popup again")
-                this.PopupStatus = false;
-            }
-
-        },
         buildLayers: function () {
             /** Bright Layer */
             this.layers.bright = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -440,7 +332,7 @@ export default {
 
             /** Street Layer */
             this.layers.streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                //detectRetina: true,
+                // detectRetina: true,
                 attribution: '&amp;copy; &lt;a href="https://www.openstreetmap.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors'
             });
             this.layerControl.addBaseLayer(this.layers.streets, "Street Maps");
@@ -459,12 +351,13 @@ export default {
             /** Wind Layer */
             this.buildWindLayer('Carto Positron', false);
         },
+
         windColorScale: function (layerName) {
             var dark = [
-                "rgb(36,104, 180)",
-                "rgb(60,157, 194)",
-                "rgb(128,205,193 )",
-                "rgb(151,218,168 )",
+                "rgb(36,104,180)",
+                "rgb(60,157,194)",
+                "rgb(128,205,193)",
+                "rgb(151,218,168)",
                 "rgb(198,231,181)",
                 "rgb(238,247,217)",
                 "rgb(255,238,159)",
@@ -496,13 +389,13 @@ export default {
                 "rgb(75,255,220)"
             ];
 
-
             if (layerName == "Dark Mode" || layerName == "Satellite") {
                 return dark;
             } else {
                 return light;
             }
         },
+
         buildWindLayer: function (layerName, addWhenready) {
             sensorData.getWindData().then(response => {
                 this.layers.wind_layer = L.velocityLayer({
@@ -527,13 +420,22 @@ export default {
                 }
             });
         },
+
+
+        /**
+         * Accordian for sidebar
+         */
         bindIconsToAccordian: function () {
             $('#PurpleAir').append(this.getPentagonMarker("#9370DB", "#ffff9e", 25, ''));
             $('#EPA').append(this.getSquareMarker("#6B8E23", "#ffff9e", 25, ''));
-            //$('#EPA').append(this.getHexagonMarker("#66CDAA", "#ffff9e", 25, ''));
+            // $('#EPA').append(this.getHexagonMarker("#66CDAA", "#ffff9e", 25, ''));
             $('#DFW').append(this.getCircleMarker("#38b5e6", "#ffff9e", 25, ''));
             $('#pollution').append(this.getCircleMarker("#38b5e6", "#000000", 20, ''));
         },
+
+        /**
+         * Initialize Map
+         */
         initMap: function () {
             this.map = L.map('map', {
                 center: [32.89746164575043, -97.04086303710938],
@@ -557,16 +459,10 @@ export default {
                 this.buildWindLayer(event.name, previousValue);
             });
         },
-        loadPurpleAir: function () {
-            purpleAirData.getSensorData(purpleAirData.sensors.join("|")).then(response => {
-                response.data.results.forEach(result => {
-                    /** They have nested devices. So, let's consider parent only */
-                    if (!result.ParentID) {
-                        this.renderPurpleAir(result);
-                    }
-                });
-            });
-        },
+
+        /**
+         * Load and render map layers and icons
+         */
         loadPollution: function () {
             this.$axios.get("/json/PollutionBurdenByCouncilDistrict.json").then(response => {
                 response.data.forEach(item => {
@@ -594,6 +490,17 @@ export default {
             popup += "</div>";
             location.marker.bindPopup(popup);
         },
+
+        loadPurpleAir: function () {
+            purpleAirData.getSensorData(purpleAirData.sensors.join("|")).then(response => {
+                response.data.results.forEach(result => {
+                    /** They have nested devices. So, let's consider parent only */
+                    if (!result.ParentID) {
+                        this.renderPurpleAir(result);
+                    }
+                });
+            });
+        },
         renderPurpleAir: function (location) {
             location.marker = L.marker([location.Lat, location.Lon], {
                 icon: L.divIcon({
@@ -607,7 +514,7 @@ export default {
             location.marker.addTo(this.purpleAirGroup);
             var popup = "<div style='font-size:14px'>";
             popup += "<div style='text-align:center; font-weight:bold'>" + location.Label + " </div><br>";
-            //Using channel A
+            // Using channel A
             popup += "<li class='pm25'> PM2.5 : " + location.pm2_5_atm + " µg/m³ </li><br>";
             popup += "<li> PM1 : " + location.pm1_0_atm + " µg/m³ </li><br>";
             popup += "<li> PM10 : " + location.pm10_0_atm + " µg/m³ </li><br>";
@@ -627,6 +534,7 @@ export default {
             popup += "</div>";
             location.marker.bindPopup(popup);
         },
+
         loadOpenAQ: function (refresh) {
             if (refresh) {
                 this.map.removeLayer(this.openAQGroup);
@@ -646,7 +554,7 @@ export default {
                     return;
                 }
                 var markerValue = '';
-                var fillColor = "#6B8E23"; //O3 colors to be determined
+                var fillColor = "#6B8E23"; // O3 colors to be determined
                 if (measurement.parameter == "pm25") {
                     fillColor = this.getMarkerColor(measurement.value);
                     markerValue = measurement.value;
@@ -674,6 +582,7 @@ export default {
                 location.marker.bindPopup(popup);
             });
         },
+
         loadEPA: function (refresh) {
             if (refresh) {
                 this.map.removeLayer(this.epaGroup);
@@ -687,7 +596,7 @@ export default {
             });
         },
         renderEPA: function (location) {
-            var fillColor = "#66CDAA"; //O3 colors to be determined
+            var fillColor = "#66CDAA"; // O3 colors to be determined
             var PM_value = "";
             if (location.Parameter == "PM2.5") {
                 fillColor = this.getMarkerColor(location.Value);
@@ -696,7 +605,7 @@ export default {
             location.marker = L.marker([location.Latitude, location.Longitude], {
                 icon: L.divIcon({
                     className: 'svg-icon',
-                    //html: this.getOctagonMarker("#66CDAA", fillColor, 40, PM_value),
+                    // html: this.getOctagonMarker("#66CDAA", fillColor, 40, PM_value),
                     html: this.getSquareMarker("#66CDAA", fillColor, 40, PM_value),
                     iconAnchor: [20, 10],
                     iconSize: [20, 32],
@@ -711,6 +620,7 @@ export default {
             popup += "</div>";
             location.marker.bindPopup(popup);
         },
+
         loadData: function () {
             sensorData.getSensors().then(response => {
                 var i = 0;
@@ -737,12 +647,10 @@ export default {
                     });
                 });
             });
-
-
         },
+
         // single click pop up information
         renderSensor: function (sensor, sensorLocation, sensorName, zIndexPriority) {
-
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(sensor.timestamp))).asMinutes();
             var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(sensor[this.pmType]);
 
@@ -759,9 +667,8 @@ export default {
                 zIndexOffset: zIndexPriority * 5 // Ensures more recently updated sensors will remain on top
             });
 
-            //handles click event for single click events
+            // handles click event for single click events
             sensor.marker.addTo(this.sensorGroup);
-
 
             var popup = L.popup({
                 offset: L.point(-150, 45),
@@ -771,25 +678,52 @@ export default {
             }).setContent("<div id='flycard'></div>")
             sensor.marker.bindPopup(popup);
 
-
-
             sensor.marker.on('click', () => {
                 this.selectedSensor = sensor;
-                //maybe put a watcher on the open target sensor and set data equal to the one in the array
+                // maybe put a watcher on the open target sensor and set data equal to the one in the array
             })
 
-            //look at leaflet documentation :https://leafletjs.com/reference-1.7.1.html#domevent-on || https://leafletjs.com/reference-1.7.1.html#domevent-on
+            // look at leaflet documentation :https://leafletjs.com/reference-1.7.1.html#domevent-on || https://leafletjs.com/reference-1.7.1.html#domevent-on
             sensor.marker.on('popupopen', (e) => {
                 this.sensorEvent(e, sensor, sensorName)
             });
-            /* sensor.marker.once('popupclose', function (e) {
-                e.popup._source.sensorPopup.$destroy("#flyCard");
-            }); */
-
-
+            // sensor.marker.once('popupclose', function (e) {
+            //     e.popup._source.sensorPopup.$destroy("#flyCard");
+            // });
         },
-        checkSensor: function (e, sensor, sensorName, payload) {
 
+
+        redrawSensors: function (payload, sensor, sensorName) {
+            // modifying the DOM according to the received data
+            var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(payload.timestamp))).asMinutes();
+            var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(payload[this.pmType]);
+            this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.setIcon(
+                L.divIcon({
+                    className: 'svg-icon-' + payload.sensor_id,
+                    html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(payload[this.pmType]).toFixed(2)),
+                    iconAnchor: [20, 10],
+                    iconSize: [20, 32],
+                    popupAnchor: [150, -30]
+                }));
+
+            // this is to check if there is a card currently open if so close and re-open it works with the other if
+            if (this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.isPopupOpen() && this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.sensor_id == payload.sensor_id) {
+                this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.closePopup()
+                this.popupStatus = true
+
+            }
+            sensor.marker.on('popupopen', (e) => {
+                this.checkSensor(e, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, sensorName, payload)
+            });
+            // give us the ability to update a popup if open albeit a hacky way.
+            if (this.popupStatus && this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.sensor_id == payload.sensor_id) {
+                this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.openPopup()
+                console.log("opening popup again")
+                this.popupStatus = false;
+            }
+        },
+
+        checkSensor: function (e, sensor, sensorName, payload) {
             var newPopup = new Vue({
                 vuetify,
                 render: h => h(Sensor, {
@@ -801,8 +735,8 @@ export default {
             }).$mount().$el;
 
             sensor.marker.setPopupContent(() => newPopup)
-
         },
+
         sensorEvent: function (e, sensor, sensorName) {
             // Create new pop up vue component and...
             var newPopup = new Vue({
@@ -819,13 +753,16 @@ export default {
             e.popup._source.sensorPopup = newPopup;
 
             // Destroy pop up dialogue after the user closes it
-            /* sensor.marker.once('popupclose', function (e) {
-                e.popup._source.sensorPopup.$destroy("#flyCard");
-            }); */
+            // sensor.marker.once('popupclose', function (e) {
+            //     e.popup._source.sensorPopup.$destroy("#flyCard");
+            // });
         },
+
         buildMarkerIcon: function (sensor) {
-            /** If you change SCG marker,
-             *  you need to fine tune  iconAnchor, iconSize & popupAnchor as well*/
+            /** 
+             * If you change SCG marker,
+             * you need to fine tune  iconAnchor, iconSize & popupAnchor as well
+             */
             return L.divIcon({
                 className: 'svg-icon',
                 html: this.getSVGMarker(this.getMarkerColor(sensor)),
@@ -835,35 +772,23 @@ export default {
             });
         },
 
-        refreshIcons() {
-            this.sensors.forEach(sensor => {
-                sensor.marker.setStyle({
-                    fillColor: this.getMarkerColor(sensor)
-                });
-            });
-        },
+        // Color markers based on PM value
         getMarkerColor(PM) {
-            if (PM >= 0 && PM <= 10) return "#ffff52";//"#ffff9e"; //"#ffff66";
+            if (PM >= 0 && PM <= 10) return "#ffff52"; //"#ffff9e"; //"#ffff66";
             else if (PM > 10 && PM <= 20) return "#ff6600";
             else if (PM > 20 && PM <= 50) return "#ff5534"; //"#cc0000";
             else if (PM > 50 && PM <= 100) return "#D34FD0"; //"#990099";
             else if (PM > 100) return "#AB5753"; //"#732626";
         },
-        slide() {
-            var hidden = $('.side-drawer');
-            if (hidden.hasClass('visible')) {
-                hidden.animate({
-                    "left": "-280px"
-                }, "slow").removeClass('visible');
-            } else {
-                hidden.animate({
-                    "left": "0px"
-                }, "slow").addClass('visible');
-            }
-        },
+
+        // Invert color hex value for text
         invertHex: function (hex) {
             return (Number(`0x1${hex}`) ^ 0xFFFFFF).toString(16).substr(1).toUpperCase();
         },
+
+        /**
+         * Marker shapes
+         */
         getCircleMarker(color, fill, size, value) {
             var textColor = this.invertHex(fill);
             var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24">
@@ -887,6 +812,15 @@ export default {
             var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 572 545"><path fill="${fill}" fill-opacity="0.8" stroke="${color}" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" d="M 286,10 L 10,210 L 116,535 L 456,535 L 562,210 Z"/><text x="280" y="340" style="font-weight: 400" text-anchor="middle" font-family="PT Sans" font-size="180">${value}</text></svg>`;
             return svg;
         },
+
+        refreshIcons() {
+            this.sensors.forEach(sensor => {
+                sensor.marker.setStyle({
+                    fillColor: this.getMarkerColor(sensor)
+                });
+            });
+        },
+
         reset() {
             this.selectedSensor = null;
             this.radarLayer = false;
@@ -901,6 +835,20 @@ export default {
             this.pmType = "pm2_5";
             this.activePanel = 0;
             this.map.setView([32.89746164575043, -97.04086303710938], 10);
-        }
+        },
+
+        // sidebar animcation
+        slide() {
+            var hidden = $('.side-drawer');
+            if (hidden.hasClass('visible')) {
+                hidden.animate({
+                    "left": "-280px"
+                }, "slow").removeClass('visible');
+            } else {
+                hidden.animate({
+                    "left": "0px"
+                }, "slow").addClass('visible');
+            }
+        },
     }
 };
