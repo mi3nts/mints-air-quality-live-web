@@ -72,6 +72,7 @@ const store = new Vuex.Store({
   state: {
     dashChartVal: {}, // temporary cache for chart data
     trigger: 0, // updated to trigger real time updates while on dashboard
+    prevPayload: [], // stores the last valid payload recieved, used for mapping
     
     // array used to select data types and charts
     selected: [
@@ -180,7 +181,14 @@ export default {
         let timestamp = payload.dateTime.split(".");
         payload.dateTime = timestamp[0];
 
-        // discard negative PM and BC values
+        // discard negative PM values for car readout
+        if (payload.PM < 0) {
+          console.log("Negative PM value: PM = " + payload.PM);
+        } else {
+          this.$store.state.prevPayload = payload;
+        }
+
+        // discard negative PM and BC values for charts
         if (payload.PM < 0 || payload.BC < 0) {
           console.log("Negative value(s) received: PM = " + payload.PM + ", BC = " + payload.BC);
         } else {

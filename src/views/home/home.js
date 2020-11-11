@@ -67,10 +67,14 @@ export default {
             pollutionGroup: L.layerGroup(),
 
             path: null,
-            lastReadPM: {},
             marker: null,
             focused: true,
         };
+    },
+    computed: {
+        getLastRead() {
+            return this.$store.state.prevPayload;
+        }
     },
     watch: {
         'pmType': function () {
@@ -224,7 +228,7 @@ export default {
 
         addPoint: function (payload) {
             // console.log("lat:", payload.latitudeCoordinate, "\tlng:", payload.longitudeCoordinate);
-            // console.log(this.lastReadPM.PM)
+            // console.log(this.getLastRead.PM)
             // calling a method to add a point
             this.$store.commit('addPointPath', payload);
 
@@ -248,10 +252,10 @@ export default {
             // })
 
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(this.$store.state.carPath[this.$store.state.carPath.length - 1].timestamp))).asMinutes();
-            var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(this.lastReadPM.PM);
+            var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(this.getLastRead.PM);
             if (this.$store.state.carPath.length > 1) {
 
-                this.path = L.polyline([this.$store.state.carPath[this.$store.state.carPath.length - 2], this.$store.state.carPath[this.$store.state.carPath.length - 1]], { color: this.getMarkerColor(this.lastReadPM.PM ? this.lastReadPM.PM : 0) }).addTo(this.map);
+                this.path = L.polyline([this.$store.state.carPath[this.$store.state.carPath.length - 2], this.$store.state.carPath[this.$store.state.carPath.length - 1]], { color: this.getMarkerColor(this.getLastRead.PM ? this.getLastRead.PM : 0) }).addTo(this.map);
                 this.path.bringToFront();
 
                 // deals with creation of an Icon
@@ -260,7 +264,7 @@ export default {
                     this.marker.setIcon(
                         L.divIcon({
                             className: 'svg-icon-car',
-                            html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.lastReadPM.PM ? this.lastReadPM.PM : 0).toFixed(2)),
+                            html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.getLastRead.PM ? this.getLastRead.PM : 0).toFixed(2)),
                             iconAnchor: [20, 32],
                             iconSize: [20, 32],
                         })
@@ -271,7 +275,7 @@ export default {
                     this.marker = L.marker(this.$store.state.carPath[this.$store.state.carPath.length - 1], {
                         icon: L.divIcon({
                             className: 'svg-icon-car',
-                            html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.lastReadPM.PM ? this.lastReadPM.PM : 0).toFixed(2)),
+                            html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.getLastRead.PM ? this.getLastRead.PM : 0).toFixed(2)),
                             iconAnchor: [20, 32],
                             iconSize: [20, 32],
                         }),
