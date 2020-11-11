@@ -221,19 +221,14 @@ export default {
         payload.dateTime = timestamp[0];
 
         // discard negative PM values for car readout
-        if (payload.PM < 0) {
-          console.log("Negative PM value: PM = " + payload.PM);
-        } else {
+        if (payload.PM >= 0) {
           this.$store.state.prevPayload = payload;
         }
 
         // discard negative PM and BC values for charts
         if (payload.PM < 0 || payload.BC < 0) {
           console.log(
-            "Negative value(s) received: PM = " +
-              payload.PM +
-              ", BC = " +
-              payload.BC
+            "Negative value(s): PM = " + payload.PM + ", BC = " + payload.BC
           );
         } else {
           console.log(

@@ -178,7 +178,7 @@ export default {
         this.bindIconsToAccordian();
 
         /*
-         *replots line if there is existing data in the session
+         * Replots line if there is existing data in the session
          */
         this.replotLine();
     },
@@ -186,6 +186,15 @@ export default {
         // store marker
     },
     mqtt: {
+        /**
+         * TODO: 
+         * Consider moving this stream to App.vue with the main data stream
+         * This'll allow the GPS data to be collected while on the dashboard page.
+         * 
+         * Also considering checking for gaps in time where no GPS data is received.
+         * If there's a period of time without data, it could plot a line straight
+         * across from the previous point. 
+         */
         '001e0610c2e7/GPSGPGGA1'(payload) {
             if (payload != null) {
                 try {
@@ -244,29 +253,29 @@ export default {
          */
         addPoint: function (payload) {
 
-            console.log("lat:", payload.latitudeCoordinate, "\tlng:", payload.longitudeCoordinate);
-            //console.log(this.getLastRead.PM)
-            //calling a method to add a point
+            console.log("LAT:", payload.latitudeCoordinate.toFixed(8), ", LNG:", payload.longitudeCoordinate.toFixed(8));
+            // console.log(this.getLastRead.PM)
+            // calling a method to add a point
             this.$store.commit('addPointPath', { pmThresh: this.getLastRead.PM ? this.getLastRead.PM : 0, payload: payload });
 
-            //need car Icons for direction
+            // need car Icons for direction
 
-            /* var northIcon = L.icon({
-               iconUrl: '../../src/assets/north.png',
-               iconSize: [20, 35]
-           })
-           var southIcon = L.icon({
-                iconUrl: '../../img/south.png',
-                iconSize: [20, 35]
-            })
-           var leftCar = L.icon({
-               iconUrl: '../../src/assets/left.png',
-               iconSize: [20, 35]
-           })
-           var rightCar = L.icon({
-               iconUrl: '../../src/assets/right.png',
-               iconSize: [25, 40]
-           })  */
+            // var northIcon = L.icon({
+            //    iconUrl: '../../src/assets/north.png',
+            //    iconSize: [20, 35]
+            // })
+            // var southIcon = L.icon({
+            //     iconUrl: '../../img/south.png',
+            //     iconSize: [20, 35]
+            // })
+            // var leftCar = L.icon({
+            //    iconUrl: '../../src/assets/left.png',
+            //    iconSize: [20, 35]
+            // })
+            // var rightCar = L.icon({
+            //    iconUrl: '../../src/assets/right.png',
+            //    iconSize: [25, 40]
+            // }) 
             var carPathLength = this.$store.state.carPath.length;
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(this.$store.state.carPath[this.$store.state.carPath.length - 1].timestamp))).asMinutes();
             var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(this.getLastRead.PM);
@@ -275,8 +284,8 @@ export default {
                 this.path = L.polyline([this.$store.state.carPath[carPathLength - 2].coord, this.$store.state.carPath[carPathLength - 1].coord], { color: this.getMarkerColor(this.getLastRead.PM ? this.getLastRead.PM : 0) }).addTo(this.map);
                 this.path.bringToFront();
 
-                //deals with creation of an Icon
-                //TO-DO write logic for directional icons based on latitude & longitude
+                // deals with creation of an Icon
+                // TO-DO write logic for directional icons based on latitude & longitude
                 if (this.marker) {
                     this.marker.setIcon(
                         L.divIcon({
@@ -308,7 +317,7 @@ export default {
                 }
             }
 
-            //this.map.addLayer(this.path)
+            // this.map.addLayer(this.path)
             if (carPathLength == 2) {
                 this.map.fitBounds(this.path.getBounds());
                 this.marker.addTo(this.map)
@@ -431,6 +440,7 @@ export default {
                 }
             });
         },
+
         /**
          * Accordian for sidebar
          */
