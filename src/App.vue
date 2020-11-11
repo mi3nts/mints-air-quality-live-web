@@ -119,7 +119,6 @@ const store = new Vuex.Store({
       },
     ],
     carPath: [],
-    pmTypeCache: 0,
   },
   mutations: {
     pushValue: function (state, data) {
@@ -137,9 +136,6 @@ const store = new Vuex.Store({
     },
     storeSelected: function (state, data) {
       state.selected = data;
-    },
-    storePMThresh: function (state, data) {
-      state.pmTypeCache = data;
     },
     addPointPath: function (state, data) {
       state.carPath.push({
