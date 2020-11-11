@@ -65,13 +65,13 @@ export default {
             purpleAirGroup: L.layerGroup(),
             epaGroup: L.layerGroup(),
             pollutionGroup: L.layerGroup(),
-
             path: null,
             marker: null,
             focused: true,
         };
     },
     computed: {
+        // get last read value from mqtt data
         getLastRead() {
             return this.$store.state.prevPayload;
         }
@@ -226,6 +226,9 @@ export default {
             }
         },
 
+        /**
+         * Add point for car
+         */
         addPoint: function (payload) {
             // console.log("lat:", payload.latitudeCoordinate, "\tlng:", payload.longitudeCoordinate);
             // console.log(this.getLastRead.PM)
@@ -294,37 +297,6 @@ export default {
             }
         },
 
-        redrawSensors: function (payload, sensor, sensorName) {
-            // modifying the DOM according to the received data
-            var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(payload.timestamp))).asMinutes();
-            var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(payload[this.pmType]);
-            this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.setIcon(
-                L.divIcon({
-                    className: 'svg-icon-' + payload.sensor_id,
-                    html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(payload[this.pmType]).toFixed(2)),
-                    iconAnchor: [20, 10],
-                    iconSize: [20, 32],
-                    popupAnchor: [150, -30]
-                }));
-
-            // this is to check if there is a card currently open if so close and re-open it works with the other if
-            if (this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.isPopupOpen() && this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.sensor_id == payload.sensor_id) {
-                this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.closePopup()
-                this.popupStatus = true
-
-            }
-            sensor.marker.on('popupopen', (e) => {
-                this.checkSensor(e, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, sensorName, payload)
-            });
-            // give us the ability to update a popup if open albeit a hacky way.
-            if (this.popupStatus && this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.sensor_id == payload.sensor_id) {
-                this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.openPopup()
-                console.log("opening popup again")
-                this.popupStatus = false;
-            }
-
-        },
-
         buildLayers: function () {
             /** Bright Layer */
             this.layers.bright = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -353,7 +325,7 @@ export default {
 
             /** Street Layer */
             this.layers.streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                //detectRetina: true,
+                // detectRetina: true,
                 attribution: '&amp;copy; &lt;a href="https://www.openstreetmap.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors'
             });
             this.layerControl.addBaseLayer(this.layers.streets, "Street Maps");
@@ -442,6 +414,10 @@ export default {
             });
         },
 
+
+        /**
+         * Accordian for sidebar
+         */
         bindIconsToAccordian: function () {
             $('#PurpleAir').append(this.getPentagonMarker("#9370DB", "#ffff9e", 25, ''));
             $('#EPA').append(this.getSquareMarker("#6B8E23", "#ffff9e", 25, ''));
@@ -450,6 +426,9 @@ export default {
             $('#pollution').append(this.getCircleMarker("#38b5e6", "#000000", 20, ''));
         },
 
+        /**
+         * Initialize Map
+         */
         initMap: function () {
             this.map = L.map('map', {
                 center: [32.89746164575043, -97.04086303710938],
@@ -474,17 +453,9 @@ export default {
             });
         },
 
-        loadPurpleAir: function () {
-            purpleAirData.getSensorData(purpleAirData.sensors.join("|")).then(response => {
-                response.data.results.forEach(result => {
-                    /** They have nested devices. So, let's consider parent only */
-                    if (!result.ParentID) {
-                        this.renderPurpleAir(result);
-                    }
-                });
-            });
-        },
-
+        /**
+         * Load and render map layers and icons
+         */
         loadPollution: function () {
             this.$axios.get("/json/PollutionBurdenByCouncilDistrict.json").then(response => {
                 response.data.forEach(item => {
@@ -492,7 +463,6 @@ export default {
                 });
             });
         },
-
         renderPollution: function (location) {
             location.marker = L.marker([location.Latitude, location.Longitude], {
                 icon: L.divIcon({
@@ -514,6 +484,16 @@ export default {
             location.marker.bindPopup(popup);
         },
 
+        loadPurpleAir: function () {
+            purpleAirData.getSensorData(purpleAirData.sensors.join("|")).then(response => {
+                response.data.results.forEach(result => {
+                    /** They have nested devices. So, let's consider parent only */
+                    if (!result.ParentID) {
+                        this.renderPurpleAir(result);
+                    }
+                });
+            });
+        },
         renderPurpleAir: function (location) {
             location.marker = L.marker([location.Lat, location.Lon], {
                 icon: L.divIcon({
@@ -560,7 +540,6 @@ export default {
                 });
             });
         },
-
         renderOpenAQ: function (location) {
             var parameter = this.epaType.toLocaleLowerCase();
             location.measurements.forEach((measurement) => {
@@ -568,7 +547,7 @@ export default {
                     return;
                 }
                 var markerValue = '';
-                var fillColor = "#6B8E23"; //O3 colors to be determined
+                var fillColor = "#6B8E23"; // O3 colors to be determined
                 if (measurement.parameter == "pm25") {
                     fillColor = this.getMarkerColor(measurement.value);
                     markerValue = measurement.value;
@@ -609,7 +588,6 @@ export default {
                 });
             });
         },
-
         renderEPA: function (location) {
             var fillColor = "#66CDAA"; // O3 colors to be determined
             var PM_value = "";
@@ -620,7 +598,7 @@ export default {
             location.marker = L.marker([location.Latitude, location.Longitude], {
                 icon: L.divIcon({
                     className: 'svg-icon',
-                    //html: this.getOctagonMarker("#66CDAA", fillColor, 40, PM_value),
+                    // html: this.getOctagonMarker("#66CDAA", fillColor, 40, PM_value),
                     html: this.getSquareMarker("#66CDAA", fillColor, 40, PM_value),
                     iconAnchor: [20, 10],
                     iconSize: [20, 32],
@@ -707,6 +685,37 @@ export default {
             // });
         },
 
+
+        redrawSensors: function (payload, sensor, sensorName) {
+            // modifying the DOM according to the received data
+            var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(payload.timestamp))).asMinutes();
+            var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(payload[this.pmType]);
+            this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.setIcon(
+                L.divIcon({
+                    className: 'svg-icon-' + payload.sensor_id,
+                    html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(payload[this.pmType]).toFixed(2)),
+                    iconAnchor: [20, 10],
+                    iconSize: [20, 32],
+                    popupAnchor: [150, -30]
+                }));
+
+            // this is to check if there is a card currently open if so close and re-open it works with the other if
+            if (this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.isPopupOpen() && this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.sensor_id == payload.sensor_id) {
+                this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.closePopup()
+                this.popupStatus = true
+
+            }
+            sensor.marker.on('popupopen', (e) => {
+                this.checkSensor(e, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, sensorName, payload)
+            });
+            // give us the ability to update a popup if open albeit a hacky way.
+            if (this.popupStatus && this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.sensor_id == payload.sensor_id) {
+                this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.openPopup()
+                console.log("opening popup again")
+                this.popupStatus = false;
+            }
+        },
+
         checkSensor: function (e, sensor, sensorName, payload) {
             var newPopup = new Vue({
                 vuetify,
@@ -737,14 +746,16 @@ export default {
             e.popup._source.sensorPopup = newPopup;
 
             // Destroy pop up dialogue after the user closes it
-            /* sensor.marker.once('popupclose', function (e) {
-                e.popup._source.sensorPopup.$destroy("#flyCard");
-            }); */
+            // sensor.marker.once('popupclose', function (e) {
+            //     e.popup._source.sensorPopup.$destroy("#flyCard");
+            // });
         },
 
         buildMarkerIcon: function (sensor) {
-            /** If you change SCG marker,
-             *  you need to fine tune  iconAnchor, iconSize & popupAnchor as well*/
+            /** 
+             * If you change SCG marker,
+             * you need to fine tune  iconAnchor, iconSize & popupAnchor as well
+             */
             return L.divIcon({
                 className: 'svg-icon',
                 html: this.getSVGMarker(this.getMarkerColor(sensor)),
@@ -754,39 +765,23 @@ export default {
             });
         },
 
-        refreshIcons() {
-            this.sensors.forEach(sensor => {
-                sensor.marker.setStyle({
-                    fillColor: this.getMarkerColor(sensor)
-                });
-            });
-        },
-
+        // Color markers based on PM value
         getMarkerColor(PM) {
-            if (PM >= 0 && PM <= 10) return "#ffff52";//"#ffff9e"; //"#ffff66";
+            if (PM >= 0 && PM <= 10) return "#ffff52"; //"#ffff9e"; //"#ffff66";
             else if (PM > 10 && PM <= 20) return "#ff6600";
             else if (PM > 20 && PM <= 50) return "#ff5534"; //"#cc0000";
             else if (PM > 50 && PM <= 100) return "#D34FD0"; //"#990099";
             else if (PM > 100) return "#AB5753"; //"#732626";
         },
 
-        slide() {
-            var hidden = $('.side-drawer');
-            if (hidden.hasClass('visible')) {
-                hidden.animate({
-                    "left": "-280px"
-                }, "slow").removeClass('visible');
-            } else {
-                hidden.animate({
-                    "left": "0px"
-                }, "slow").addClass('visible');
-            }
-        },
-
+        // Invert color hex value for text
         invertHex: function (hex) {
             return (Number(`0x1${hex}`) ^ 0xFFFFFF).toString(16).substr(1).toUpperCase();
         },
 
+        /**
+         * Marker shapes
+         */
         getCircleMarker(color, fill, size, value) {
             var textColor = this.invertHex(fill);
             var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24">
@@ -794,25 +789,29 @@ export default {
                         <text id="sensorText" x="12" y="15" fill="${textColor}" text-anchor="middle" font-family="PT Sans" font-size="8" >${value}</text></svg>`;
             return svg;
         },
-
         getSquareMarker(color, fill, size, value) {
             var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24"><rect fill="${fill}" fill-opacity="0.8" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><text x="12" y="15" style="font-weight: 100" text-anchor="middle" font-family="PT Sans" font-size="8">${value}</text></svg>`;
             return svg;
         },
-
         getHexagonMarker(color, fill, size, value) {
             var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24"><path fill="${fill}" fill-opacity="0.8" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 2l9 4.9V17L12 22l-9-4.9V7z"/><text x="12" y="15" style="font-weight: 100" text-anchor="middle" font-family="PT Sans" font-size="8">${value}</text></svg>`;
             return svg;
         },
-
         getOctagonMarker(color, fill, size, value) {
             var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24"><polygon fill="${fill}" fill-opacity="0.8" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><text x="12" y="15" style="font-weight: 100" text-anchor="middle" font-family="PT Sans" font-size="8">${value}</text></svg>`;
             return svg;
         },
-
         getPentagonMarker(color, fill, size, value) {
             var svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 572 545"><path fill="${fill}" fill-opacity="0.8" stroke="${color}" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" d="M 286,10 L 10,210 L 116,535 L 456,535 L 562,210 Z"/><text x="280" y="340" style="font-weight: 400" text-anchor="middle" font-family="PT Sans" font-size="180">${value}</text></svg>`;
             return svg;
+        },
+
+        refreshIcons() {
+            this.sensors.forEach(sensor => {
+                sensor.marker.setStyle({
+                    fillColor: this.getMarkerColor(sensor)
+                });
+            });
         },
 
         reset() {
@@ -829,6 +828,20 @@ export default {
             this.pmType = "pm2_5";
             this.activePanel = 0;
             this.map.setView([32.89746164575043, -97.04086303710938], 10);
-        }
+        },
+
+        // sidebar animcation
+        slide() {
+            var hidden = $('.side-drawer');
+            if (hidden.hasClass('visible')) {
+                hidden.animate({
+                    "left": "-280px"
+                }, "slow").removeClass('visible');
+            } else {
+                hidden.animate({
+                    "left": "0px"
+                }, "slow").addClass('visible');
+            }
+        },
     }
 };
