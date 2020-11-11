@@ -228,24 +228,24 @@ export default {
             // calling a method to add a point
             this.$store.commit('addPointPath', payload);
 
-            //need car Icons for direction
+            // need car Icons for direction
 
-            /* var northIcon = L.icon({
-               iconUrl: '../../src/assets/north.png',
-               iconSize: [20, 35]
-           })
-           var southIcon = L.icon({
-                iconUrl: '../../img/south.png',
-                iconSize: [20, 35]
-            })
-           var leftCar = L.icon({
-               iconUrl: '../../src/assets/left.png',
-               iconSize: [20, 35]
-           })
-           var rightCar = L.icon({
-               iconUrl: '../../src/assets/right.png',
-               iconSize: [25, 40]
-           })  */
+            //  var northIcon = L.icon({
+            //    iconUrl: '../../src/assets/north.png',
+            //    iconSize: [20, 35]
+            // })
+            // var southIcon = L.icon({
+            //     iconUrl: '../../img/south.png',
+            //     iconSize: [20, 35]
+            // })
+            // var leftCar = L.icon({
+            //     iconUrl: '../../src/assets/left.png',
+            //     iconSize: [20, 35]
+            // })
+            // var rightCar = L.icon({
+            //     iconUrl: '../../src/assets/right.png',
+            //     iconSize: [25, 40]
+            // })
 
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(this.$store.state.carPath[this.$store.state.carPath.length - 1].timestamp))).asMinutes();
             var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(this.lastReadPM.PM);
@@ -254,8 +254,8 @@ export default {
                 this.path = L.polyline([this.$store.state.carPath[this.$store.state.carPath.length - 2], this.$store.state.carPath[this.$store.state.carPath.length - 1]], { color: this.getMarkerColor(this.lastReadPM.PM ? this.lastReadPM.PM : 0) }).addTo(this.map);
                 this.path.bringToFront();
 
-                //deals with creation of an Icon
-                //TO-DO write logic for directional icons based on latitude & longitude
+                // deals with creation of an Icon
+                // TO-DO write logic for directional icons based on latitude & longitude
                 if (this.marker) {
                     this.marker.setIcon(
                         L.divIcon({
@@ -283,7 +283,7 @@ export default {
                 }
             }
 
-            //this.map.addLayer(this.path)
+            // this.map.addLayer(this.path)
             if (this.$store.state.carPath.length == 2) {
                 this.map.fitBounds(this.path.getBounds());
                 this.marker.addTo(this.map)
@@ -291,7 +291,7 @@ export default {
         },
 
         redrawSensors: function (payload, sensor, sensorName) {
-            //modifying the DOM according to the received data
+            // modifying the DOM according to the received data
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(payload.timestamp))).asMinutes();
             var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(payload[this.pmType]);
             this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.setIcon(
@@ -303,7 +303,7 @@ export default {
                     popupAnchor: [150, -30]
                 }));
 
-            //this is to check if there is a card currently open if so close and re-open it works with the other if
+            // this is to check if there is a card currently open if so close and re-open it works with the other if
             if (this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.isPopupOpen() && this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.sensor_id == payload.sensor_id) {
                 this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.closePopup()
                 this.popupStatus = true
@@ -312,7 +312,7 @@ export default {
             sensor.marker.on('popupopen', (e) => {
                 this.checkSensor(e, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, sensorName, payload)
             });
-            //give us the ability to update a popup if open albeit a hacky way.
+            // give us the ability to update a popup if open albeit a hacky way.
             if (this.popupStatus && this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.sensor_id == payload.sensor_id) {
                 this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data.marker.openPopup()
                 console.log("opening popup again")
@@ -371,10 +371,10 @@ export default {
 
         windColorScale: function (layerName) {
             var dark = [
-                "rgb(36,104, 180)",
-                "rgb(60,157, 194)",
-                "rgb(128,205,193 )",
-                "rgb(151,218,168 )",
+                "rgb(36,104,180)",
+                "rgb(60,157,194)",
+                "rgb(128,205,193)",
+                "rgb(151,218,168)",
                 "rgb(198,231,181)",
                 "rgb(238,247,217)",
                 "rgb(255,238,159)",
@@ -441,7 +441,7 @@ export default {
         bindIconsToAccordian: function () {
             $('#PurpleAir').append(this.getPentagonMarker("#9370DB", "#ffff9e", 25, ''));
             $('#EPA').append(this.getSquareMarker("#6B8E23", "#ffff9e", 25, ''));
-            //$('#EPA').append(this.getHexagonMarker("#66CDAA", "#ffff9e", 25, ''));
+            // $('#EPA').append(this.getHexagonMarker("#66CDAA", "#ffff9e", 25, ''));
             $('#DFW').append(this.getCircleMarker("#38b5e6", "#ffff9e", 25, ''));
             $('#pollution').append(this.getCircleMarker("#38b5e6", "#000000", 20, ''));
         },
@@ -523,7 +523,7 @@ export default {
             location.marker.addTo(this.purpleAirGroup);
             var popup = "<div style='font-size:14px'>";
             popup += "<div style='text-align:center; font-weight:bold'>" + location.Label + " </div><br>";
-            //Using channel A
+            // Using channel A
             popup += "<li class='pm25'> PM2.5 : " + location.pm2_5_atm + " µg/m³ </li><br>";
             popup += "<li> PM1 : " + location.pm1_0_atm + " µg/m³ </li><br>";
             popup += "<li> PM10 : " + location.pm10_0_atm + " µg/m³ </li><br>";
@@ -607,7 +607,7 @@ export default {
         },
 
         renderEPA: function (location) {
-            var fillColor = "#66CDAA"; //O3 colors to be determined
+            var fillColor = "#66CDAA"; // O3 colors to be determined
             var PM_value = "";
             if (location.Parameter == "PM2.5") {
                 fillColor = this.getMarkerColor(location.Value);
@@ -678,7 +678,7 @@ export default {
                 zIndexOffset: zIndexPriority * 5 // Ensures more recently updated sensors will remain on top
             });
 
-            //handles click event for single click events
+            // handles click event for single click events
             sensor.marker.addTo(this.sensorGroup);
 
             var popup = L.popup({
@@ -691,16 +691,16 @@ export default {
 
             sensor.marker.on('click', () => {
                 this.selectedSensor = sensor;
-                //maybe put a watcher on the open target sensor and set data equal to the one in the array
+                // maybe put a watcher on the open target sensor and set data equal to the one in the array
             })
 
-            //look at leaflet documentation :https://leafletjs.com/reference-1.7.1.html#domevent-on || https://leafletjs.com/reference-1.7.1.html#domevent-on
+            // look at leaflet documentation :https://leafletjs.com/reference-1.7.1.html#domevent-on || https://leafletjs.com/reference-1.7.1.html#domevent-on
             sensor.marker.on('popupopen', (e) => {
                 this.sensorEvent(e, sensor, sensorName)
             });
-            /* sensor.marker.once('popupclose', function (e) {
-                e.popup._source.sensorPopup.$destroy("#flyCard");
-            }); */
+            // sensor.marker.once('popupclose', function (e) {
+            //     e.popup._source.sensorPopup.$destroy("#flyCard");
+            // });
         },
 
         checkSensor: function (e, sensor, sensorName, payload) {
