@@ -72,7 +72,7 @@ export default {
     },
     computed: {
         // get last read value from mqtt data
-        getLastRead() {
+        getLastRead: function () {
             return this.$store.state.prevPayload;
         }
     },
@@ -232,9 +232,9 @@ export default {
         addPoint: function (payload) {
 
             console.log("lat:", payload.latitudeCoordinate, "\tlng:", payload.longitudeCoordinate);
-            //console.log(this.lastReadPM.PM)
+            //console.log(this.getLastRead.PM)
             //calling a method to add a point
-            this.$store.commit('addPointPath', { pmThresh: this.lastReadPM.PM ? this.lastReadPM.PM : 0, payload: payload });
+            this.$store.commit('addPointPath', { pmThresh: this.getLastRead.PM ? this.getLastRead.PM : 0, payload: payload });
 
             //need car Icons for direction
 
@@ -256,11 +256,11 @@ export default {
            })  */
             var carPathLength = this.$store.state.carPath.length;
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(this.$store.state.carPath[this.$store.state.carPath.length - 1].timestamp))).asMinutes();
-            var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(this.lastReadPM.PM);
+            var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(this.getLastRead.PM);
             if (carPathLength > 1) {
                 console.log([this.$store.state.carPath[carPathLength - 2].coord, this.$store.state.carPath[carPathLength - 1].coord])
-                console.log(this.$store.state.carPath[carPathLength - 1].pmThresh)
-                this.path = L.polyline([this.$store.state.carPath[carPathLength - 2].coord, this.$store.state.carPath[carPathLength - 1].coord], { color: this.getMarkerColor(this.$store.state.carPath[carPathLength - 1].pmThresh) }).addTo(this.map);
+                // console.log(this.$store.state.carPath[carPathLength - 1].pmThresh)
+                this.path = L.polyline([this.$store.state.carPath[carPathLength - 2].coord, this.$store.state.carPath[carPathLength - 1].coord], { color: this.getMarkerColor(this.getLastRead.PM ? this.getLastRead.PM : 0) }).addTo(this.map);
                 this.path.bringToFront();
 
                 //deals with creation of an Icon
@@ -420,8 +420,6 @@ export default {
                 }
             });
         },
-
-
         /**
          * Accordian for sidebar
          */
