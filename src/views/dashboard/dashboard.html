@@ -1,22 +1,32 @@
+<!--This is the html code for the dashboard page-->
 <div class="dashboard">
+    <!--Sidebar-->
     <div class="sideBar visible">
         <div class="menu">
             <v-icon id="icon1" @click="slide">chevron_left</v-icon>
             <v-icon id="icon2" @click="slide">chevron_right</v-icon>
         </div>
+        <!--Contents of the sidebar-->
         <v-list class="list" shaped flat>
             <v-list-item-group multiple>
+                <!--Drag and Drop Features(Sidebar)-->
                 <draggable :list="charts" :disabled="!enabled" class="list-group" ghost-class="ghost"
                     @start="dragging=true" @end="dragging=false">
-                    <v-checkbox class="black-label" v-for="(chart,id) in charts" :key="id" v-model="chart.select" :label="chart.name"></v-checkbox>
+                    <v-checkbox class="black-label" v-for="(chart,id) in charts" :key="id" v-model="chart.select"
+                        :label="chart.name"></v-checkbox>
                 </draggable>
+                <!--Drag and Drop Features(Sidebar) Ends-->
             </v-list-item-group>
         </v-list>
     </div>
+    <!--Sidebar Ends-->
     <div class="charts">
+        <!--Drag and Drop Features(Charts)-->
         <draggable :list="charts" :disabled="!enabled" class="list-group" ghost-class="ghost" @start="dragging=true"
             @end="dragging=false">
-            <DashboardChart v-for="(chart,id) in charts" :key="chart.id" v-if="chart.select" :name="chart.name" :dataType="chart.dataType" :sidebarOpen="sidebarOpen"/>
+            <DashboardChart v-for="(chart,id) in charts" :key="chart.id" v-if="chart.select" :name="chart.name"
+                :dataType="chart.dataType" :sidebarOpen="sidebarOpen" />
         </draggable>
+        <!--Drag and Drop Features(Charts) Ends-->
     </div>
 </div>
