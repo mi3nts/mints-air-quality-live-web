@@ -42,7 +42,7 @@ export default {
             var chart = $('.charts');
             var close_icon = $('#icon1');
             var open_icon = $('#icon2');
-            //Start with sidebar hidden
+            // start with sidebar hidden
             if (hidden.hasClass('visible')) {// hide sidebar
                 close_icon.css("display", "none");
                 open_icon.css("display", "block");

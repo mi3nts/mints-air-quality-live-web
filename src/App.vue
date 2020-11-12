@@ -76,8 +76,18 @@ const store = new Vuex.Store({
 
     // array used to select data types and charts
     selected: [
-      { name: "PM", id: 0, dataType: "PM", select: false },
-      { name: "BC", id: 1, dataType: "BC", select: false },
+      { 
+        name: "PM", 
+        id: 0, 
+        dataType: "PM", 
+        select: false 
+      },
+      { 
+        name: "BC", 
+        id: 1, 
+        dataType: "BC", 
+        select: false 
+      },
       {
         name: "Extinction 405nm",
         id: 2,
@@ -102,9 +112,24 @@ const store = new Vuex.Store({
         dataType: "flow-temperature",
         select: false,
       },
-      { name: "Humidity", id: 6, dataType: "humidity", select: false },
-      { name: "Pressure", id: 7, dataType: "pressure", select: false },
-      { name: "Temperature", id: 8, dataType: "temperature", select: false },
+      { 
+        name: "Humidity", 
+        id: 6, 
+        dataType: "humidity", 
+        select: false 
+      },
+      { 
+        name: "Pressure", 
+        id: 7, 
+        dataType: "pressure", 
+        select: false 
+      },
+      { 
+        name: "Temperature", 
+        id: 8, 
+        dataType: "temperature", 
+        select: false 
+      },
       {
         name: "Voltage 405nm",
         id: 9,
@@ -118,6 +143,7 @@ const store = new Vuex.Store({
         select: false,
       },
     ],
+    
     carPath: [],
   },
   mutations: {
