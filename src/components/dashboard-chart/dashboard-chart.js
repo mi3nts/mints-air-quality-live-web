@@ -154,7 +154,6 @@ export default {
                 if (older == null) {
                     // only one value (no older value)
                     this.readout = newest.toFixed(1);
-
                 } else if (newest == older) {
                     this.readout = newest.toFixed(1);
                     if (this.dataType == "PM") {
