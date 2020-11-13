@@ -67,6 +67,7 @@ export default {
             pollutionGroup: L.layerGroup(),
             path: null,
             marker: null,
+            //car tracking zoom variable
             focused: true,
         };
     },
@@ -190,6 +191,7 @@ export default {
         this.replotLine();
     },
     methods: {
+        //for toggling focus on the car with zoom mode
         toggleFocus: function () {
             if (this.focused) {
                 this.focused = false
@@ -197,6 +199,7 @@ export default {
                 this.focused = true
             }
         },
+        //replot line so that when you navigate back into the map the path is drawn
         replotLine: function () {
             var carPathLength = this.$store.state.carPath.length
             if (carPathLength > 1) {
