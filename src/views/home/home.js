@@ -313,7 +313,7 @@ export default {
                 }
 
                 if (this.focused) {
-                    this.map.fitBounds(this.path.getBounds())
+                    this.map.fitBounds(this.path.getBounds(), { maxZoom: 18 })
                 }
             }
 
