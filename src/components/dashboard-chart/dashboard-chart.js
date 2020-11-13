@@ -17,11 +17,11 @@ export default {
     },
     computed: {
         // get the last version of the chart stored in VueX if possible
-        getChart () {
+        getChart() {
             return this.$store.getters.getChart(this.dataType);
-        }, 
-        getTrigger () {
-            return this.$store.state.trigger;
+        },
+        getTrigger() {
+            return this.$store.state.triggerCharts;
         }
     },
     watch: {
@@ -150,8 +150,8 @@ export default {
             let older = this.previousTwoValues[1];
 
             // check that there is a value before attempting comparisons
-            if (newest) { 
-                if (older == null) { 
+            if (newest) {
+                if (older == null) {
                     // only one value (no older value)
                     this.readout = newest.toFixed(1);
 
@@ -171,7 +171,7 @@ export default {
                         document.getElementById(this.dataType + "-readout").style.color = "#00b300";
                     }
                 }
-                
+
                 this.chart.setOption({
                     series: [{
                         data: this.getChart,

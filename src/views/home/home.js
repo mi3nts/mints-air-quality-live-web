@@ -74,6 +74,9 @@ export default {
         // get last read value from mqtt data
         getLastRead: function () {
             return this.$store.state.prevPayload;
+        },
+        getTrigger: function () {
+            return this.$store.state.triggerMap;
         }
     },
     watch: {
@@ -136,11 +139,15 @@ export default {
             } else {
                 this.map.removeLayer(this.layers.wind_layer);
             }
+        },
+        getTrigger: function () {
+            this.addPoint()
         }
     },
     mounted: function () {
-        // if the page is less than 600px wide, the sidebar starts off hidden
-        if ($(window).width() < 600) {
+        //hid it because it doesn't seem neccesary right now
+        // if the page is less than 1920px wide, the sidebar starts off hidden
+        if ($(window).width() < 1920) {
             this.slide();
         }
 
@@ -182,55 +189,6 @@ export default {
          */
         this.replotLine();
     },
-    beforeDestroy: function () {
-        // store marker
-    },
-    mqtt: {
-        /**
-         * TODO: 
-         * Consider moving this stream to App.vue with the main data stream
-         * This'll allow the GPS data to be collected while on the dashboard page.
-         * 
-         * Also considering checking for gaps in time where no GPS data is received.
-         * If there's a period of time without data, it could plot a line straight
-         * across from the previous point. 
-         */
-        '001e0610c2e7/GPSGPGGA1'(payload) {
-            if (payload != null) {
-                try {
-                    if (JSON.parse(payload.toString())) {
-                        payload = JSON.parse(payload.toString());
-
-                        // update array for latitude and longitude
-                        this.addPoint(payload);
-                    }
-                } catch (error) {
-                    alert(error, "=>", payload.toString())
-                    // handle NaN errors
-                    payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
-
-                }
-            }
-        },
-
-        // '+/calibrated'(payload) {
-        //     if (payload != null) {
-        //         try {
-        //             if (JSON.parse(payload.toString())) {
-        //                 payload = JSON.parse(payload.toString());
-        //             }
-        //         } catch (error) {
-        //             // handle NaN errors
-        //             payload = JSON.parse(payload.toString().replace(/NaN/g, "\"NaN\""))
-        //         }
-
-        //         // update or put values into the sensors array to cache last payload
-        //         if (this.$set(this.sensors, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, payload)) {
-        //             this.redrawSensors(payload, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].data, this.sensors[this.sensors.findIndex(obj => { return obj.data.sensor_id === payload.sensor_id })].name);
-        //         }
-        //     }
-        // }
-    },
     methods: {
         toggleFocus: function () {
             if (this.focused) {
@@ -248,20 +206,14 @@ export default {
                 }
             }
         },
+
         /**
          * Add point for car
          */
-        addPoint: function (payload) {
-
-            console.log("LAT:", payload.latitudeCoordinate.toFixed(8), ", LNG:", payload.longitudeCoordinate.toFixed(8));
-            // console.log(this.getLastRead.PM)
-            // calling a method to add a point
-            this.$store.commit('addPointPath', { pmThresh: this.getLastRead.PM ? this.getLastRead.PM : 0, payload: payload });
-
+        addPoint: function () {
             // need car Icons for direction
-
             // var northIcon = L.icon({
-            //    iconUrl: '../../src/assets/north.png',
+            //    iconUrl: '../../img/north.png',
             //    iconSize: [20, 35]
             // })
             // var southIcon = L.icon({
@@ -269,11 +221,11 @@ export default {
             //     iconSize: [20, 35]
             // })
             // var leftCar = L.icon({
-            //    iconUrl: '../../src/assets/left.png',
+            //    iconUrl: '../../img/left.png',
             //    iconSize: [20, 35]
             // })
             // var rightCar = L.icon({
-            //    iconUrl: '../../src/assets/right.png',
+            //    iconUrl: '../../img/right.png',
             //    iconSize: [25, 40]
             // }) 
             var carPathLength = this.$store.state.carPath.length;
@@ -312,15 +264,10 @@ export default {
                     }
                 }
 
+                //this checks whether the icon should be tracked or not
                 if (this.focused) {
                     this.map.fitBounds(this.path.getBounds(), { maxZoom: 18 })
                 }
-            }
-
-            // this.map.addLayer(this.path)
-            if (carPathLength == 2) {
-                this.map.fitBounds(this.path.getBounds());
-                this.marker.addTo(this.map)
             }
         },
 

@@ -71,22 +71,22 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     dashChartVal: {}, // temporary cache for chart data
-    trigger: 0, // updated to trigger real time updates while on dashboard
+    triggerCharts: 0, // updated to trigger real time updates while on dashboard
     prevPayload: [], // stores the last valid payload recieved, used for mapping
-
+    triggerMap: 0,
     // array used to select data types and charts
     selected: [
-      { 
-        name: "PM", 
-        id: 0, 
-        dataType: "PM", 
-        select: false 
+      {
+        name: "PM",
+        id: 0,
+        dataType: "PM",
+        select: false,
       },
-      { 
-        name: "BC", 
-        id: 1, 
-        dataType: "BC", 
-        select: false 
+      {
+        name: "BC",
+        id: 1,
+        dataType: "BC",
+        select: false,
       },
       {
         name: "Extinction 405nm",
@@ -112,23 +112,23 @@ const store = new Vuex.Store({
         dataType: "flow-temperature",
         select: false,
       },
-      { 
-        name: "Humidity", 
-        id: 6, 
-        dataType: "humidity", 
-        select: false 
+      {
+        name: "Humidity",
+        id: 6,
+        dataType: "humidity",
+        select: false,
       },
-      { 
-        name: "Pressure", 
-        id: 7, 
-        dataType: "pressure", 
-        select: false 
+      {
+        name: "Pressure",
+        id: 7,
+        dataType: "pressure",
+        select: false,
       },
-      { 
-        name: "Temperature", 
-        id: 8, 
-        dataType: "temperature", 
-        select: false 
+      {
+        name: "Temperature",
+        id: 8,
+        dataType: "temperature",
+        select: false,
       },
       {
         name: "Voltage 405nm",
@@ -143,10 +143,13 @@ const store = new Vuex.Store({
         select: false,
       },
     ],
-    
+
     carPath: [],
   },
   mutations: {
+    increaseMapTrigger: function (state) {
+      state.triggerMap++;
+    },
     pushValue: function (state, data) {
       if (!state.dashChartVal[data.name]) {
         state.dashChartVal[data.name] = [];
@@ -264,6 +267,40 @@ export default {
         }
       }
     },
+
+    /**
+     * Also considering checking for gaps in time where no GPS data is received.
+     * If there's a period of time without data, it could plot a line straight
+     * across from the previous point.
+     */
+    "001e0610c2e7/GPSGPGGA1"(payload) {
+      if (payload != null) {
+        try {
+          if (JSON.parse(payload.toString())) {
+            payload = JSON.parse(payload.toString());
+
+            // update array for latitude and longitude
+            this.$store.commit("addPointPath", {
+              pmThresh: this.$store.state.prevPayload
+                ? this.$store.state.prevPayload
+                : 0,
+              payload: payload,
+            });
+            console.log(
+              "LAT:",
+              payload.latitudeCoordinate.toFixed(8),
+              ", LNG:",
+              payload.longitudeCoordinate.toFixed(8)
+            );
+            this.$store.commit("increaseMapTrigger");
+          }
+        } catch (error) {
+          alert(error, "=>", payload.toString());
+          // handle NaN errors
+          payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
+        }
+      }
+    },
   },
   methods: {
     flipPage: function () {
@@ -291,7 +328,7 @@ export default {
           this.$store.commit("shiftPoints", this.charts[i].dataType);
         }
       }
-      this.$store.state.trigger++;
+      this.$store.state.triggerCharts++;
     },
   },
 };
