@@ -158,7 +158,7 @@ export default {
                 } else if (newest == older) {
                     this.readout = newest.toFixed(1);
                     if (this.dataType == "PM") {
-                        document.getElementById(this.dataType + "-readout").style.color = "#a6a6a6";
+                        document.getElementById(this.dataType + "-readout").style.color = "#38b6e6";
                     }
                 } else if (newest > older) {
                     this.readout = "\u25B2" + " " + newest.toFixed(1);
