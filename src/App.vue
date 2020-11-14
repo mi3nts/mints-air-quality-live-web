@@ -246,8 +246,10 @@ export default {
         // Remove the milliseconds from the timestamp for ECharts
         // ECharts seems to be unable to process timestamps with millisecond
         // values of greater than 3 decimal points of accuracy
+        // Add UTC marker (Z) to timestamp
+        // This allows it to be converted to local time more easily
         let timestamp = payload.dateTime.split(".");
-        payload.dateTime = timestamp[0];
+        payload.dateTime = timestamp[0] + "Z";
 
         // discard negative PM values for car readout
         if (payload.PM >= 0) {

@@ -49,10 +49,16 @@ export default {
                     axisLabel: {
                         margin: 8,
                         formatter: function (value) {
-                            // show timestamp in minute:second format
-                            var min = echarts.format.formatTime("mm", value);
-                            var sec = echarts.format.formatTime("ss", value);
-                            return min + ":" + sec;
+                            // show timestamp in hour:minute:second format
+                            var hour = echarts.format.formatTime("hh", value);
+                            var minSec = echarts.format.formatTime(":mm:ss", value);
+                            var amPm = hour >= 12 ? "PM" : "AM";
+
+                            // convert hour 12 hour format
+                            hour = hour % 12;
+                            hour = hour ? hour : 12;
+
+                            return hour + minSec + " " + amPm;
                         }
                     }
                 },
@@ -96,6 +102,7 @@ export default {
                     showSymbol: false,
                     hoverAnimation: false,
                     animation: false,
+                    useUTC: false,
                     data: this.getChart,
                 }],
             };
