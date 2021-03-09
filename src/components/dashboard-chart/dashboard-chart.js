@@ -163,17 +163,17 @@ export default {
                     this.readout = newest.toFixed(1);
                 } else if (newest == older) {
                     this.readout = newest.toFixed(1);
-                    if (this.dataType == "PM") {
+                    if (this.dataType == "BC" || this.dataType == "PM" ) {
                         document.getElementById(this.dataType + "-readout").style.color = "#38b6e6";
                     }
                 } else if (newest > older) {
                     this.readout = "\u25B2" + " " + newest.toFixed(1);
-                    if (this.dataType == "PM") {
+                    if (this.dataType == "BC" || this.dataType == "PM" ) {
                         document.getElementById(this.dataType + "-readout").style.color = "#f90000";
                     }
                 } else if (newest < older) {
                     this.readout = "\u25BC" + " " + newest.toFixed(1);
-                    if (this.dataType == "PM") {
+                    if (this.dataType == "BC" || this.dataType == "PM" ) {
                         document.getElementById(this.dataType + "-readout").style.color = "#00b300";
                     }
                 }
