@@ -12,7 +12,10 @@
         <particulate-matter @close="showPM = false"></particulate-matter>
       </v-dialog>
       <v-spacer></v-spacer>
-      <v-btn x-large exact text @click="flipPage()">{{ dashboardNav }}</v-btn>
+      <!-- split view button -->
+      <v-btn x-large exact text @click="goToSplitView()">{{ splitviewNav }}</v-btn>
+      <!-- -->
+      <v-btn x-large exact text @click="flipPage()" v-if="dashboartBtnVisible" >{{ dashboardNav }}</v-btn>
       <v-btn x-large depressed exact text @click="showPM = true">
         <span class="mr-2 d-none d-lg-flex d-xl-none">Particulate Matter?</span>
         <v-icon class="d-flex">help</v-icon>
@@ -24,9 +27,9 @@
         <about @close="showAbout = false"></about>
       </v-dialog>
     </v-app-bar>
-    <v-content>
+    <v-main>
       <router-view />
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 
@@ -166,6 +169,23 @@ const store = new Vuex.Store({
     storeSelected: function (state, data) {
       state.selected = data;
     },
+
+    // calcAvgGPSData: function (state, data) {
+    //   store.state.sumLat = store.state.sensorLatData.reduce((a, b) => a + b, 0);
+    //   store.state.avgLat = store.state.sumLat / (store.state.sensorLatData.lenght - 1);
+
+    //   store.state.sumLong = store.state.sensorLongData.reduce((a, b) => a+ b, 0);
+    //   store.state.avgLong = store.state.sumLong / (storestate.sensorLongData.lenght - 1);
+
+    //   console.log("avg Lat: ", store.state.avgLat.toFixed(8), "Ave LNG: ", store.state.avgLong.toFixed(8));
+    
+
+    //   this.$store.commit("addPointPath", {
+    //     pmThresh: this.$store. state.prevPayload ? this.$store.state.prevPayload : 0, 
+    //     payload: data});
+      
+    // },
+
     addPointPath: function (state, data) {
       state.carPath.push({
         pmThresh: data.pmThresh,
@@ -214,7 +234,9 @@ export default {
     showAbout: false,
     showPM: false,
     dashboardNav: null, // navigation between map and dashboard
+    splitviewNav: "Split View",
     charts: [], // list of data types pulled from Vuex
+    dashboartBtnVisible: true, //keeps track of when the "Go To Dashboard" button is dashboartBtnVisible
   }),
   created: function () {
     window["moment"] = this.$moment;
@@ -222,6 +244,11 @@ export default {
       this.dashboardNav = "Go to Map";
     } else {
       this.dashboardNav = "Go to Dashboard";
+    }
+
+    if (this.$router.currentRoute.fullPath == "/splitview"){
+      this.dashboartBtnVisible = false;
+      this.splitviewNav = "Exit Split View";
     }
   },
   mounted: function () {
@@ -303,6 +330,34 @@ export default {
         }
       }
     },
+    "001e0610c2e7/GPSGPGGA2"(payload) {
+      if (payload != null) {
+        try {
+          if (JSON.parse(payload.toString())) {
+            payload = JSON.parse(payload.toString());
+
+            // update array for latitude and longitude
+            this.$store.commit("addPointPath", {
+              pmThresh: this.$store.state.prevPayload
+                ? this.$store.state.prevPayload
+                : 0,
+              payload: payload,
+            });
+            console.log(
+              "LAT2:",
+              payload.latitudeCoordinate.toFixed(8),
+              ", LNG2:",
+              payload.longitudeCoordinate.toFixed(8)
+            );
+            this.$store.commit("increaseMapTrigger");
+          }
+        } catch (error) {
+          alert(error, "=>", payload.toString());
+          // handle NaN errors
+          payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
+        }
+      }
+    },
   },
   methods: {
     flipPage: function () {
@@ -313,6 +368,27 @@ export default {
         this.$router.push({ path: "/" });
         this.dashboardNav = "Go to Dashboard";
       }
+    },
+     //function to switch to splitview
+    goToSplitView: function(){
+        if (this.splitviewNav == "Split View"){
+          this.$router.push({path: "/splitview"});
+          this.splitviewNav = "Exit Split View";
+          this.dashboartBtnVisible = false;
+        }
+        else {
+          this.$router.push({path: "/"});
+          this.splitviewNav = "Split View";
+          this.dashboartBtnVisible = true;
+          this.dashboardNav = "Go to Dashboard"
+        }
+    },
+    
+    goHome: function(){
+       this.$router.push({ path: "/"});
+        this.dashboardNav = "Go to Dashboard";
+        this.splitviewNav = "Split View";
+        this.dashboartBtnVisible = true;
     },
     /**
      * Add data to the arrays used by the charts.

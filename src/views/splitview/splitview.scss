@@ -1,0 +1,12 @@
+.splitPane{
+    overflow: hidden;
+    height: 100%;
+    width: 50%;
+    position: fixed;
+}
+.dashboardPane{
+    left: 0;
+}
+.mapPane{
+    left: 50%;
+}
