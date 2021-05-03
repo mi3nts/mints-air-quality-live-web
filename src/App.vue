@@ -315,10 +315,6 @@ export default {
                 : 0,
               payload: payload,
             });
-
-            //payload.latitudeCoordinate = parseInt(payload.latitudeCoordinate);
-            //payload.longitudeCoordinate = parseInt(payload.longitudeCoordinate);
-
             console.log(
               "LAT:",
               payload.latitudeCoordinate.toFixed(8),
@@ -347,9 +343,6 @@ export default {
                 : 0,
               payload: payload,
             });
-
-            //payload.latitudeCoordinate = parseInt(payload.latitudeCoordinate);
-            //payload.longitudeCoordinate = parseInt(payload.longitudeCoordinate);
             console.log(
               "LAT2:",
               payload.latitudeCoordinate.toFixed(8),
