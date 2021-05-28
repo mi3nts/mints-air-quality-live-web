@@ -245,12 +245,15 @@ export default {
                 // TO-DO write logic for directional icons based on latitude & longitude
                 if (this.marker) {
                     this.marker.setIcon(
-                        L.divIcon({
-                            className: 'svg-icon-car',
-                            //icon: northIcon,
-                            html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.getLastRead.PM ? this.getLastRead.PM : 0).toFixed(2)),
-                            iconAnchor: [20, 32],
-                            iconSize: [20, 32],
+                        L.icon({
+                               iconUrl: '../../img/north.png',
+                               iconSize: [20, 35]
+                        //L.divIcon({
+                        //    className: 'svg-icon-car',
+                        //    //icon: northIcon,
+                        //    html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.getLastRead.PM ? this.getLastRead.PM : 0).toFixed(2)),
+                        //    iconAnchor: [20, 32],
+                        //    iconSize: [20, 32],
                         })
                     );
                     this.marker.setLatLng(this.$store.state.carPath[carPathLength - 1].coord)

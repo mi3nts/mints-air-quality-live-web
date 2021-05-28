@@ -1,8 +1,8 @@
 <template>
   <v-app>
     <v-app-bar app dark color="primary" class="align-center">
-      <img class="mr-2" height="50px" src="/img/logo_white.png" />
-      <v-toolbar-title class="display-1 mr-10" @click="home()">
+      <img class="mr-2" height="50px" @click="goHome()" src="/img/logo_white.png" />
+      <v-toolbar-title class="display-1 mr-10" @click="goHome()">
         <span>SharedAirDFW</span>
       </v-toolbar-title>
       <!-- <v-btn x-large depressed exact text :to="{name : 'home'}">
