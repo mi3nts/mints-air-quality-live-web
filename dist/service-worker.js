@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.7d917bfed2727b73424717d669df0ab5.js"
+  "/precache-manifest.67c9ef085ccff39a90737f04c1474f7a.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "shared_air_dfw"});
