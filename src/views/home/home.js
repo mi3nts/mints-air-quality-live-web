@@ -215,23 +215,25 @@ export default {
          */
         addPoint: function () {
             // need car Icons for direction
-            // var northIcon = L.icon({
-            //    iconUrl: '../../img/north.png',
-            //    iconSize: [20, 35]
+            //previously commented out by last team so I am cautious here and simply experimenting with this -kev
+             //var northIcon = L.icon({
+                //iconUrl: '../../img/north.png',
+                //iconSize: [20, 35]
+             //})
+             //var southIcon = L.icon({
+                 //iconUrl: '../../img/south.png',
+                 //iconSize: [20, 35]
+             //})
+             //var leftCar = L.icon({
+                //iconUrl: '../../img/left.png',
+                //iconSize: [20, 35]
+             //})
+             //var rightCar = L.icon({
+                //iconUrl: '../../img/right.png',
+                //iconSize: [25, 40]
             // })
-            // var southIcon = L.icon({
-            //     iconUrl: '../../img/south.png',
-            //     iconSize: [20, 35]
-            // })
-            // var leftCar = L.icon({
-            //    iconUrl: '../../img/left.png',
-            //    iconSize: [20, 35]
-            // })
-            // var rightCar = L.icon({
-            //    iconUrl: '../../img/right.png',
-            //    iconSize: [25, 40]
-            // }) 
-            var carPathLength = this.$store.state.carPath.length;
+             //********************************************************************** */ 
+            var carPathLength = this.$store.state.carPath.length; 
             var timeDiffMinutes = this.$moment.duration(this.$moment.utc().diff(this.$moment.utc(this.$store.state.carPath[this.$store.state.carPath.length - 1].timestamp))).asMinutes();
             var fillColor = timeDiffMinutes > 10 ? '#808080' : this.getMarkerColor(this.getLastRead.PM);
             if (carPathLength > 1) {
@@ -246,6 +248,12 @@ export default {
                         L.icon({
                                iconUrl: '../../img/north.png',
                                iconSize: [20, 35]
+                        //L.divIcon({
+                        //    className: 'svg-icon-car',
+                        //    //icon: northIcon,
+                        //    html: this.getCircleMarker("#38b5e6", fillColor, 40, parseFloat(this.getLastRead.PM ? this.getLastRead.PM : 0).toFixed(2)),
+                        //    iconAnchor: [20, 32],
+                        //    iconSize: [20, 32],
                         })
                     );
                     this.marker.setLatLng(this.$store.state.carPath[carPathLength - 1].coord)
