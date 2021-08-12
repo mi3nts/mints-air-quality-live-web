@@ -93,72 +93,60 @@ const store = new Vuex.Store({
         dataType: "BC",
         select: false,
       },
-      // {
-      //   name: "Extinction 405nm",
-      //   id: null,
-      //   dataType: "Extinction-405nm",
-      //   select: false,
-      // },
-      // {
-      //   name: "Extinction 880nm",
-      //   id: null,
-      //   dataType: "Extinction-880nm",
-      //   select: false,
-      // },
-      {
-        name: "Current 405nm",
-        id: 2,
-        dataType: "current-405nm",
-        select: false,
-      },
-      {
-        name: "Flow Temperature",
-        id: 3,
-        dataType: "flow-temperature",
-        select: false,
-      },
       {
         name: "Humidity",
-        id: 4,
+        id: 2,
         dataType: "humidity",
         select: false,
       },
       {
         name: "Pressure",
-        id: 5,
+        id: 3,
         dataType: "pressure",
         select: false,
       },
       {
         name: "Temperature",
-        id: 6,
+        id: 4,
         dataType: "temperature",
         select: false,
       },
-      // {
-      //   name: "Voltage 405nm",
-      //   id: null,
-      //   dataType: "voltage-405nm",
-      //   select: false,
-      // },
-      // {
-      //   name: "Voltage 880nm",
-      //   id: null,
-      //   dataType: "voltage-880nm",
-      //   select: false,
-      // },
       {
         name: "H2O",
-        id: 7,
+        id: 5,
         dataType: "H2O",
         select: false,
       },
       {
         name: "CO2",
-        id: 8,
+        id: 6,
         dataType: "CO2",
         select: false,
       },
+      {
+          name: "NO2",
+          id: 7,
+          dataType: "NO2",
+          select: false,
+      },
+      {
+          name: "NO",
+          id: 8,
+          dataType: "NO",
+          select: false,
+      },
+      {
+          name: "NOX",
+          id: 9,
+          dataType: "NOX",
+          select: false,
+      },
+      {
+          name: "Ozone",
+          id: 10,
+          dataType: "Ozone",
+          select: false,
+      }
 
     ],
 
@@ -237,6 +225,13 @@ export default {
     dashboartBtnVisible: true, //keeps track of when the "Go To Dashboard" button is dashboartBtnVisible
     H2Ostore: null,
     CO2store: null,
+    NO2store: null,
+    NOstore: null,
+    NOXstore: null,
+    PM_BC_timestampStore: null,
+    PM2_5store: null,
+    BCstore: null,
+    OzoneStore: null,
     aPayload: null, 
     latA1: null,
     latA2: null,
@@ -274,219 +269,145 @@ export default {
     console.log(this.$mqtt.subscribe("#"));
   },
   mqtt: {
-    "MOCKID/LICOR"(payload) {
-      if (payload != null) {
-        try { //has CO2 and H2O values
-          if (JSON.parse(payload.toString())) {
-            payload = JSON.parse(payload.toString())
-            this.H2Ostore = payload.H2O;
-            this.CO2store = payload.CO2;   
-          }
-        } catch (error) {
-          alert(error, "=>", payload.toString());
-          // handle NaN errors
-          payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
+    "001e0610c2e7/LICOR"(payload) {
+        if (payload != null) {
+            console.log(payload)
+            try { //has CO2 and H2O values
+                if (JSON.parse(payload.toString())) {
+                    payload = JSON.parse(payload.toString())
+                    console.log("CO2 - " + payload.CO2 + ", H20 - " + payload.H20)
+
+                    // Setting the values here will trigger handlers under 'watch' to update the charts
+                    this.H2Ostore = payload.H2O;
+                    this.CO2store = payload.CO2;   
+                }
+            } catch (error) {
+                console.log("Error occured reading from 001e0610c2e7/LICOR:\n" + error.toString())
+            }
         }
-      }
     },
 
-    "MOCKID/2B-BC"(payload) {
+    "001e0610c2e7/2B-BC"(payload) {
+        if (payload != null) {
+            try {
+                if (JSON.parse(payload.toString())) {
+                    payload = JSON.parse(payload.toString());
+                    // Remove the milliseconds from the timestamp for ECharts
+                    // ECharts seems to be unable to process timestamps with millisecond
+                    // values of greater than 3 decimal points of accuracy
+                    // Add UTC marker (Z) to timestamp
+                    // This allows it to be converted to local time more easily
+                    let timestamp = payload.dateTime.split(".");
+                    payload.dateTime = timestamp[0] + "Z";
+
+                    // discard negative PM values for car readout
+                    if (payload.PM >= 0) {
+                    this.$store.state.prevPayload = payload;
+                    }
+
+                    // Report negative PM and BC values for charts
+                    if (payload.PM < 0 || payload.BC < 0) {
+                    console.log(
+                        "Negative value(s): PM = " + payload.PM + ", BC = " + payload.BC
+                    );
+                    } else {
+                    console.log(
+                        "New incoming data: PM = " + payload.PM + ", BC = " + payload.BC
+                    );
+                    }
+
+                    // Setting the values here will trigger handlers under 'watch' to update the charts
+                    this.PM_BC_timestampStore = payload.timestamp
+                    this.PM2_5store = payload.PM
+                    this.BCstore = payload.BC
+                }
+            } catch (error) {
+                console.log("Error occured reading from 001e0610c2e7/2B-BC:\n" + error.toString())
+            }
+        }
+    },
+
+    "001e0610c2e7/2B-NOX"(payload) {
       if (payload != null) {
         try {
           if (JSON.parse(payload.toString())) {
-            payload = JSON.parse(payload.toString());
+            payload = JSON.parse(payload.toString());     
+            console.log("NO2 - " + payload.NO2 + ", NOX - " + payload.NOX + ", NO - " + payload.NO)
+
+            // Setting the values here will trigger handlers under 'watch' to update the charts
+            this.NO2store = payload.NO2;
+            this.NOXstore = payload.NOX;
+            this.NOstore = payload.NO;
           }
         } catch (error) {
-          // handle NaN errors
-          payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
-        }
-        // Remove the milliseconds from the timestamp for ECharts
-        // ECharts seems to be unable to process timestamps with millisecond
-        // values of greater than 3 decimal points of accuracy
-        // Add UTC marker (Z) to timestamp
-        // This allows it to be converted to local time more easily
-        let timestamp = payload.dateTime.split(".");
-        payload.dateTime = timestamp[0] + "Z";
-
-        // discard negative PM values for car readout
-        if (payload.PM >= 0) {
-          this.$store.state.prevPayload = payload;
-        }
-        // discard negative PM and BC values for charts
-        if (payload.PM < 0 || payload.BC < 0) {
-          console.log(
-            "Negative value(s): PM = " + payload.PM + ", BC = " + payload.BC
-          );
-        } else {
-          console.log(
-            "New incoming data: PM = " + payload.PM + ", BC = " + payload.BC
-          );
-        }
-          payload.H2O = this.H2Ostore;
-          payload.CO2 = this.CO2store;
-          this.addChartValues(payload);
-      }
-    },
-
-    "MOCKID/2B-NOX"(payload) {
-      if (payload != null) {
-        try {
-          if (JSON.parse(payload.toString())) {
-            payload = JSON.parse(payload.toString());
-            //console.log(payload);          
-          }
-        } catch (error) {
-          alert(error, "=>", payload.toString());
-          // handle NaN errors
-          payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
-        }
-      }
-    },
-
-
-    "MOCKID/NP2"(payload) {
-      if (payload != null) {
-        try {
-          if (JSON.parse(payload.toString())) {
-            payload = JSON.parse(payload.toString())      
-          }
-        } catch (error) {
-          alert(error, "=>", payload.toString());
-          // handle NaN errors
-          payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
-        }
-      }
-    },
-
-    "MOCKID/2B-O3"(payload) {
-      if (payload != null) {
-        try {
-          if (JSON.parse(payload.toString())) {
-            payload = JSON.parse(payload.toString())     
-          }
-        } catch (error) {
-          alert(error, "=>", payload.toString());
-          // handle NaN errors
-          payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
+            console.log("Error occured reading from 001e0610c2e7/2B-NOX:\n" + error.toString())
         }
       }
     },
 
     /**
-     * Also considering checking for gaps in time where no GPS data is received.
-     * If there's a period of time without data, it could plot a line straight
-     * across from the previous point.
+     * Doesn't seem to be any useful data here
      */
-    "MOCKID/GPSGPGGA1"(payload) {
+    // "001e0610c2e7/NP2"(payload) {
+    //   if (payload != null) {
+    //     try {
+    //       if (JSON.parse(payload.toString())) {   
+    //         console.log("NP2 - " + payload.toString());  
+    //         payload = JSON.parse(payload.toString())     
+    //       }
+    //     } catch (error) {
+    //       alert(error, "=>", payload.toString());
+    //       // handle NaN errors
+    //       payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
+    //     }
+    //   }
+    // },
+
+    "001e0610c2e7/2B-O3"(payload) {
       if (payload != null) {
         try {
           if (JSON.parse(payload.toString())) {
+            payload = JSON.parse(payload.toString())
+            console.log("Ozone - " + payload.ozone);    
+
+            // Setting the values here will trigger handlers under 'watch' to update the charts
+            this.OzoneStore = payload.ozone;
+          }
+        } catch (error) {
+          console.log("Error occured reading from 001e0610c2e7/2B-O3:\n" + error.toString())
+        }
+      }
+    },
+
+    /**
+     * The most accurate being used right now
+     */
+    "001e0636e527/GPGGA"(payload) {
+      if (payload != null) {
+        try {
+          if (JSON.parse(payload.toString())) {
+            // Uncomment to get full information about the GPS payload
+            //console.log(payload.toString())
+
             payload = JSON.parse(payload.toString());
             //turn to float for calculation           
-            this.latA1 = parseFloat(payload.latitudeCoordinate);
-            this.longA1 = parseFloat(payload.longitudeCoordinate);
-          }
-        } catch (error) {
-          alert(error, "=>", payload.toString());
-          // handle NaN errors
-          payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
-        }
-      }
-    },
-
-    "MOCKID/GPSGPGGA2"(payload) {
-      if (payload != null) {
-        try {
-          if (JSON.parse(payload.toString())) {
-            payload = JSON.parse(payload.toString());
-            //turn to float for calculation
-            this.latA2 = parseFloat(payload.latitudeCoordinate);
-            this.longA2 = parseFloat(payload.longitudeCoordinate);
-          }
-        } catch (error) {
-          alert(error, "=>", payload.toString());
-          // handle NaN errors
-          payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
-        }
-      }
-    },
-
-    "MOCKID/GPSGPGGA3"(payload) {
-      if (payload != null) {
-        try {
-          if (JSON.parse(payload.toString())) {
-            payload = JSON.parse(payload.toString());
-            //turn to float for calculation
-            this.latA3 = parseFloat(payload.latitudeCoordinate);
-            this.longA3 = parseFloat(payload.longitudeCoordinate);
-          }
-        } catch (error) {
-          alert(error, "=>", payload.toString());
-          // handle NaN errors
-          payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
-        }
-      }
-    },
-
-    "MOCKID/GPSGPRMC1"(payload) {
-      if (payload != null) {
-        try {
-          if (JSON.parse(payload.toString())) {
-            payload = JSON.parse(payload.toString());
-            //turn to float for calculation
-            this.latC1 = parseFloat(payload.latitudeCoordinate);
-            this.longC1 = parseFloat(payload.longitudeCoordinate);
-          }
-        } catch (error) {
-          alert(error, "=>", payload.toString());
-          // handle NaN errors
-          payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
-        }
-      }
-    },
-
-    "MOCKID/GPSGPRMC2"(payload) {
-      if (payload != null) {
-        try {
-          if (JSON.parse(payload.toString())) {
-            payload = JSON.parse(payload.toString());
-            //turn to float for calculation
-            this.latC2 = parseFloat(payload.latitudeCoordinate);
-            this.longC2 = parseFloat(payload.longitudeCoordinate);
-          }
-        } catch (error) {
-          alert(error, "=>", payload.toString());
-          // handle NaN errors
-          payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
-        }
-      }
-    },
-
-    "MOCKID/GPSGPRMC3"(payload) {
-      if (payload != null) {
-        try {
-          if (JSON.parse(payload.toString())) {
-            payload = JSON.parse(payload.toString());
-
-            //turn to float for calculation
-            this.latC3 = parseFloat(payload.latitudeCoordinate);
-            this.longC3 = parseFloat(payload.longitudeCoordinate);           
-
-            //avoids initial null values because not all the coordinate values are properly stored yet, thus use GPSGPRMC3 position as the default value
-            if((this.latA1 == null)||(this.latA2== null)||(this.latA3 == null)||(this.latC1==null)||(this.latC2==null)||(this.latC3==null)){
-              //default position
-              this.avglat = parseFloat(payload.latitudeCoordinate);
-              this.avglong = parseFloat(payload.longitudeCoordinate);
-            } else {
-              //average position
-              this.avglong = (this.longA1 + this.longA2 + this.longA3 + this.longC1 + this.longC2 + this.longC3)/6;
-              this.avglat = (this.latA1 + this.latA2 + this.latA3 + this.latC1 + this.latC2 + this.latC3)/6;
-
-            }
+            // this.latA1 = parseFloat(payload.latitude);
+            // this.longA1 = parseFloat(payload.longitude);
+                       
+            console.log("GPGGA - " + payload.latitude + ", " + payload.longitude)
+            var localLatitude = parseFloat(payload.latitude);
+            var localLongitude = parseFloat(payload.longitude);
             
-            //applies the average values to be sent to place the car icon
-            payload.latitudeCoordinate = this.avglat;
-            payload.longitudeCoordinate = this.avglong;
+            // Coordinate conversion formula (raw data, format unknown, to lat/long)
+            payload.latitudeCoordinate = Math.floor(localLatitude/100) + (localLatitude - 100*(Math.floor(localLatitude/100)))/60;
+            if(payload.latDirection == "S") {
+              payload.latitudeCoordinate = -1*payload.latitudeCoordinate;
+            }
+
+            payload.longitudeCoordinate = Math.floor(localLongitude/100) + (localLongitude - 100*(Math.floor(localLongitude/100)))/60;
+            if(payload.lonDirection == "W") {
+              payload.longitudeCoordinate = -1*payload.longitudeCoordinate;
+            }
 
             // update array for latitude and longitude
             this.$store.commit("addPointPath", {
@@ -505,7 +426,164 @@ export default {
         }
       }
     },
+
+    /*
+        Below are five other GPS sensors
+        The last one's event handler (on reception handling) will manage averaging 
+          all of the other values to get a more accurate position
+    */
+    /**
+     * Also considering checking for gaps in time where no GPS data is received.
+     * If there's a period of time without data, it could plot a line straight
+     * across from the previous point.
+     */
+    // "001e0610c2e7/GPSGPGGA2"(payload) {
+    //   if (payload != null) {
+    //     try {
+    //       console.log("GPSA2 - " + payload.toString())
+    //       if (JSON.parse(payload.toString())) {
+    //         payload = JSON.parse(payload.toString());
+    //         //turn to float for calculation
+    //         this.latA2 = parseFloat(payload.latitudeCoordinate);
+    //         this.longA2 = parseFloat(payload.longitudeCoordinate);
+    //       }
+    //     } catch (error) {
+    //       alert(error, "=>", payload.toString());
+    //       // handle NaN errors
+    //       payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
+    //     }
+    //   }
+    // },
+
+    // "001e0610c2e7/GPSGPGGA3"(payload) {
+    //   if (payload != null) {
+    //     console.log("GPSA3 - " + payload.toString())
+    //     try {
+    //       if (JSON.parse(payload.toString())) {
+    //         payload = JSON.parse(payload.toString());
+    //         //turn to float for calculation
+    //         this.latA3 = parseFloat(payload.latitudeCoordinate);
+    //         this.longA3 = parseFloat(payload.longitudeCoordinate);
+    //       }
+    //     } catch (error) {
+    //       alert(error, "=>", payload.toString());
+    //       // handle NaN errors
+    //       payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
+    //     }
+    //   }
+    // },
+
+    // "001e0610c2e7/GPSGPRMC1"(payload) {
+    //   if (payload != null) {
+    //     try {
+    //       console.log("GPSC1 - " + payload.toString())
+    //       if (JSON.parse(payload.toString())) {
+    //         payload = JSON.parse(payload.toString());
+    //         //turn to float for calculation
+    //         this.latC1 = parseFloat(payload.latitudeCoordinate);
+    //         this.longC1 = parseFloat(payload.longitudeCoordinate);
+    //       }
+    //     } catch (error) {
+    //       alert(error, "=>", payload.toString());
+    //       // handle NaN errors
+    //       payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
+    //     }
+    //   }
+    // },
+
+    // "001e0610c2e7/GPSGPRMC2"(payload) {
+    //   if (payload != null) {
+    //     console.log("GPSC2 - " + payload.toString())
+    //     try {
+    //       if (JSON.parse(payload.toString())) {
+    //         payload = JSON.parse(payload.toString());
+    //         //turn to float for calculation
+    //         this.latC2 = parseFloat(payload.latitudeCoordinate);
+    //         this.longC2 = parseFloat(payload.longitudeCoordinate);
+    //       }
+    //     } catch (error) {
+    //       alert(error, "=>", payload.toString());
+    //       // handle NaN errors
+    //       payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
+    //     }
+    //   }
+    // },
+
+    // "001e0610c2e7/GPSGPRMC3"(payload) {
+    //   if (payload != null) {
+    //     console.log("GPSC3 - " + payload.toString())
+    //     try {
+    //       if (JSON.parse(payload.toString())) {
+    //         payload = JSON.parse(payload.toString());
+
+    //         //turn to float for calculation
+    //         this.latC3 = parseFloat(payload.latitudeCoordinate);
+    //         this.longC3 = parseFloat(payload.longitudeCoordinate);           
+
+    //         //avoids initial null values because not all the coordinate values are properly stored yet, thus use GPSGPRMC3 position as the default value
+    //         if((this.latA1 == null)||(this.latA2== null)||(this.latA3 == null)||(this.latC1==null)||(this.latC2==null)||(this.latC3==null)){
+    //           //default position
+    //           this.avglat = parseFloat(payload.latitudeCoordinate);
+    //           this.avglong = parseFloat(payload.longitudeCoordinate);
+    //         } else {
+    //           //average position
+    //           this.avglong = (this.longA1 + this.longA2 + this.longA3 + this.longC1 + this.longC2 + this.longC3)/6;
+    //           this.avglat = (this.latA1 + this.latA2 + this.latA3 + this.latC1 + this.latC2 + this.latC3)/6;
+
+    //         }
+            
+    //         //applies the average values to be sent to place the car icon
+    //         payload.latitudeCoordinate = this.avglat;
+    //         payload.longitudeCoordinate = this.avglong;
+
+    //         // update array for latitude and longitude
+    //         this.$store.commit("addPointPath", {
+    //           pmThresh: this.$store.state.prevPayload
+    //             ? this.$store.state.prevPayload
+    //             : 0,
+    //           payload: payload,
+    //         });
+
+    //         this.$store.commit("increaseMapTrigger");
+    //       }
+    //     } catch (error) {
+    //       alert(error, "=>", payload.toString());
+    //       // handle NaN errors
+    //       payload = JSON.parse(payload.toString().replace(/NaN/g, '"NaN"'));
+    //     }
+    //   }
+    // },
   },
+
+  // Whenever variables from "data:" are changed and there is a handler here for that variable,
+  //   the functions here will run
+  watch: {
+      'NO2store': function() {
+          this.addToChart('NO2', Date.now(), this.NO2store);
+      },
+      'NOstore': function() {
+          this.addToChart('NO', Date.now(), this.NOstore);
+      },
+      'NOXstore': function() {
+          this.addToChart('NOX', Date.now(), this.NOXstore);
+      },
+      'H20store': function() {
+          this.addToChart('H20', Date.now(), this.H20store);
+      },
+      'CO2store': function() {
+          this.addToChart('CO2', Date.now(), this.CO2store);
+      },
+      'PM2_5store': function() {
+          this.addToChart('PM', this.PM_BC_timestampStore, this.PM2_5store);
+      },
+      'BCstore': function() {
+          this.addToChart('BC', this.PM_BC_timestampStore, this.BCstore);
+      },
+      'OzoneStore': function() {
+          this.addToChart('Ozone', Date.now(), this.OzoneStore);
+      }
+  },
+
   methods: {
     flipPage: function () {
       if (this.dashboardNav == "Go to Dashboard") {
@@ -537,24 +615,29 @@ export default {
         this.splitviewNav = "Split View";
         this.dashboartBtnVisible = true;
     },
-    /**
-     * Add data to the arrays used by the charts.
-     * Loop through every data type in the charts array and adds all values in one go.
-     */
-    addChartValues: function (data) {
-      for (var i = 0; i < this.charts.length; i++) {
-        this.$store.commit("pushValue", {
-          name: this.charts[i].dataType,
-          value: [data.dateTime, data[this.charts[i].dataType]],
-        });
 
-        // if the number of points in the chart exceeds 50, shift out the oldest point
-        if (this.$store.getters.getChart(this.charts[i].dataType).length > 50) {
-          this.$store.commit("shiftPoints", this.charts[i].dataType);
+    /**
+     * Add data to the respective dashboard charts by type.
+     * 
+     * Type must match an existing "selected" element in the data store
+     */
+    addToChart: function (type, timestamp, data) {
+        for(var i = 0; i < this.charts.length; i++) {
+            if(type == this.charts[i].dataType) {
+                this.$store.commit("pushValue", {
+                    name: this.charts[i].dataType,
+                    value: [timestamp, data],
+                })
+                
+                // if the number of points in the chart exceeds 50, shift out the oldest point
+                if (this.$store.getters.getChart(this.charts[i].dataType).length > 50) {
+                    this.$store.commit("shiftPoints", this.charts[i].dataType);
+                }
+                break;
+            }
         }
-      }
-      this.$store.state.triggerCharts++;
-    },
+        this.$store.state.triggerCharts++;
+    }
   },
 };
 </script>

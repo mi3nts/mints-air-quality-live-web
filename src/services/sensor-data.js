@@ -6,21 +6,21 @@ import Vue from "vue";
 export default new Vue({
     data: function () {
         return {
-            baseUrl: "https://mintsdata.utdallas.edu:3000"
+            baseUrl: "https://api.sharedairdfw.com"
         }
     },
     methods: {
-        getSensors: function () {
-            return this.$axios.get(this.baseUrl + "/sensor_id_list");
+        getSensorsList: function () {
+            return this.$axios.get(this.baseUrl + "/sensors/list");
+        },
+        getMainSensorData: function() {
+            return this.$axios.get(this.baseUrl + "/latest/all/main");
         },
         getSensorData: function (sensorID) {
-            return this.$axios.get(this.baseUrl + "/latest/" + sensorID);
+            return this.$axios.get(this.baseUrl + "/sensors/" + sensorID + "/latest");
         },
-        getSensorLocation: function (sensorID) {
-            return this.$axios.get(this.baseUrl + "/location/" + sensorID);
-        },
-        getSensorName: function (sensorID) {
-            return this.$axios.get(this.baseUrl + "/sensorNameOf/" + sensorID);
+        getSensorPastHourAverage: function (sensorID, type, interval) {
+            return this.$axios.get(this.baseUrl + "/latest/average/" + type + "/" + sensorID + "/" + interval)  
         },
         getChartData: function (sensorID, range, interval) {
             if(interval == '')
